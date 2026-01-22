@@ -1,4 +1,6 @@
+using MemberManagement.Domain.Interfaces;
 using MemberManagement.Infrastructure;
+using MemberManagement.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace MemberManagement.Web
@@ -16,6 +18,9 @@ namespace MemberManagement.Web
             builder.Services.AddDbContext<MMSDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
+
+            // Add Dependency Injection
+            builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 
             var app = builder.Build();
 
