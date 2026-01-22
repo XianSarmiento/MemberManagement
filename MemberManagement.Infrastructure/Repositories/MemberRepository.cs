@@ -20,9 +20,8 @@ namespace MemberManagement.Infrastructure.Repositories
 
         public async Task<IEnumerable<Member>> GetAllAsync()
         {
-            return await _context.Members
-                .Where(m => m.IsActive) // only active members
-                .ToListAsync();
+            // only active members
+            return await _context.Members.Where(m => m.IsActive).ToListAsync();
         }
 
         public async Task<Member> GetByIdAsync(int memberId)

@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MemberManagement.Application\MemberManagement.Application.csproj" />
     <ProjectReference Include="..\MemberManagement.Infrastructure\MemberManagement.Infrastructure.csproj" />
   </ItemGroup>
 

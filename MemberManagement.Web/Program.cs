@@ -1,3 +1,4 @@
+using MemberManagement.Application.Services;
 using MemberManagement.Domain.Interfaces;
 using MemberManagement.Infrastructure;
 using MemberManagement.Infrastructure.Repositories;
@@ -21,6 +22,7 @@ namespace MemberManagement.Web
 
             // Add Dependency Injection
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+            builder.Services.AddScoped<IMemberService, MemberService>();
 
             var app = builder.Build();
 

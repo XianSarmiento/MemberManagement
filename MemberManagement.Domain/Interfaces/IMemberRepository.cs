@@ -21,17 +21,4 @@ namespace MemberManagement.Domain.Interfaces
         // Soft delete (set IsActive = false)
         Task SoftDeleteAsync(int memberId);
     }
-    public class MemberService
-    {
-        private readonly IMemberRepository _memberRepo;
-
-        public MemberService(IMemberRepository memberRepo)
-        {
-            _memberRepo = memberRepo;
-        }
-
-        public Task<IEnumerable<Member>> GetActiveMembers() => _memberRepo.GetAllAsync();
-    }
-
-
 }
