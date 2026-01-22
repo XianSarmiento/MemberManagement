@@ -14,9 +14,8 @@ namespace MemberManagement.Domain.Entities
         [Required(ErrorMessage = "Last Name is required.")]
         public string LastName { get; set; }
 
-        // FOR INSTANCES LANG: [Required(ErrorMessage = "BirthDate is required.")]
         [BirthDateValidation(ErrorMessage = "BirthDate cannot be in the future.")]
-        public DateTime BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
 
         public string Address { get; set; }
         public string Branch { get; set; }
@@ -33,9 +32,9 @@ namespace MemberManagement.Domain.Entities
         {
             protected override ValidationResult IsValid(object value, ValidationContext validationContext)
             {
-                if (value is DateTime birthDate)
+                if (value is DateOnly birthDate)
                 {
-                    if (birthDate > DateTime.Now)
+                    if (birthDate > DateOnly.FromDateTime(DateTime.Today))
                     {
                         return new ValidationResult(ErrorMessage ?? "Birthdate cannot be in the future.");
                     }

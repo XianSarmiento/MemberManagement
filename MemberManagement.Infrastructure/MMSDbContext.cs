@@ -11,5 +11,14 @@ namespace MemberManagement.Infrastructure
         }
 
         public DbSet<Member> Members { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Member>(entity =>
+            {
+                entity.Property(e => e.BirthDate)
+                      .HasColumnType("date");
+            });
+        }
     }
 }
