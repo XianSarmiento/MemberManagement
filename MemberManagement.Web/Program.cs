@@ -1,3 +1,4 @@
+using MemberManagement.Application.Interfaces;
 using MemberManagement.Application.Services;
 using MemberManagement.Domain.Interfaces;
 using MemberManagement.Infrastructure;

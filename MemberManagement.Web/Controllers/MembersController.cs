@@ -1,4 +1,5 @@
-﻿using MemberManagement.Application.Services;
+﻿using MemberManagement.Application.Interfaces;
+using MemberManagement.Application.Services;
 using MemberManagement.Domain.Entities;
 using MemberManagement.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;

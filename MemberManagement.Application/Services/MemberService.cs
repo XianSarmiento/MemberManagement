@@ -1,4 +1,5 @@
-﻿using MemberManagement.Domain.Entities;
+﻿using MemberManagement.Application.Interfaces;
+using MemberManagement.Domain.Entities;
 using MemberManagement.Domain.Interfaces;
 using System;
 using System.Collections.Generic;

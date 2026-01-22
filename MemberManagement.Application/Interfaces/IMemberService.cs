@@ -1,6 +1,6 @@
 ﻿using MemberManagement.Domain.Entities;
 
-namespace MemberManagement.Application.Services
+namespace MemberManagement.Application.Interfaces
 {
     public interface IMemberService
     {
