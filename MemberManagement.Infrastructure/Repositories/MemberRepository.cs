@@ -24,7 +24,7 @@ namespace MemberManagement.Infrastructure.Repositories
             return await _context.Members.Where(m => m.IsActive).ToListAsync();
         }
 
-        public async Task<Member> GetByIdAsync(int memberId)
+        public async Task<Member?> GetByIdAsync(int memberId)
         {
             return await _context.Members.FindAsync(memberId);
         }

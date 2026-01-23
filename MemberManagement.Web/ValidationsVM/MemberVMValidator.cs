@@ -1,0 +1,20 @@
+﻿using FluentValidation;
+using MemberManagement.Domain.Entities;
+using MemberManagement.Web.ViewModels;
+
+namespace MemberManagement.Web.ValidationsVM
+{
+    // install FluentValidation via NuGet if not already installed
+    public class MemberVMValidator : AbstractValidator<MemberVM>
+    {
+        public MemberVMValidator()
+        {
+            RuleFor(x => x.FirstName).NotEmpty().WithMessage("First Name is required.");
+            RuleFor(x => x.LastName).NotEmpty().WithMessage("Last Name is required.");
+            RuleFor(x => x.BirthDate)
+                .NotNull().WithMessage("BirthDate is required.")
+                .Must(date => date.Date <= DateTime.Today)
+                .WithMessage("Birth date cannot be in the future");
+        }
+    }
+}

@@ -1,8 +1,40 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <h2 class="text-center">Member Management System</h2>
+    <p class="lead text-center">Record and maintain basic membership information.</p>
+
+    <br />
+
+    <div class="row justify-content-center mt-4">
+        @*  Add Member Card *@
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-plus-fill" style="font-size: 2.5rem;"></i>
+                    <h5 class="card-title mt-2">Add Member</h5>
+                    <p class="card-text small">Click here to add a new member to the system.</p>
+                    <a asp-controller="Members" asp-action="Create" class="btn btn-outline-primary">
+                        Add Member
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @* View Members Card *@
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill" style="font-size: 2.5rem;"></i>
+                    <h5 class="card-title mt-2">View Members</h5>
+                    <p class="card-text small">See all existing members in the system.</p>
+                    <a asp-controller="Members" asp-action="Index" class="btn btn-outline-success">
+                        View Members
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

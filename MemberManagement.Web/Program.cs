@@ -1,8 +1,14 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using MemberManagement.Application.Core;
 using MemberManagement.Application.Interfaces;
 using MemberManagement.Application.Services;
+using MemberManagement.Application.Validation;
+using MemberManagement.Domain.Entities;
 using MemberManagement.Domain.Interfaces;
 using MemberManagement.Infrastructure;
 using MemberManagement.Infrastructure.Repositories;
+using MemberManagement.Web.ValidationsVM;
 using Microsoft.EntityFrameworkCore;
 
 namespace MemberManagement.Web
@@ -13,8 +19,16 @@ namespace MemberManagement.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Add services to the container or MVC
             builder.Services.AddControllersWithViews();
+
+            // Register validators
+            builder.Services.AddValidatorsFromAssemblyContaining<MemberVMValidator>();
+            builder.Services.AddScoped<IValidator<Member>, MemberValidator>();
+
+            // Enable FluentValidation integration
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddFluentValidationClientsideAdapters();
 
             // Add DbContext
             builder.Services.AddDbContext<MMSDbContext>(options =>
@@ -24,6 +38,7 @@ namespace MemberManagement.Web
             // Add Dependency Injection
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
             builder.Services.AddScoped<IMemberService, MemberService>();
+            builder.Services.AddScoped<MemberCore>();
 
             var app = builder.Build();
 

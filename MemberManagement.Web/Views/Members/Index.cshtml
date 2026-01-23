@@ -1,0 +1,124 @@
+﻿@model IEnumerable<MemberManagement.Web.ViewModels.MemberVM>
+
+<br />
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <h2>Members List</h2>
+
+        <p style="text-align:left;">
+            <br />
+            <a asp-action="Create" class="btn btn-primary btn-sm px-4 py-2">
+                <i class="bi bi-person-plus me-2"></i> Create
+            </a>
+        </p>
+
+        <table class="table table-bordered table-striped" style="width:100%; padding:4px; font-size:12px;">
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>Member ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Birth Date</th>
+                    <th>Address</th>
+                    <th>Branch</th>
+                    <th>Contact No</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@m.MemberID"
+                               class="btn btn-sm btn-outline-primary"
+                               title="Edit Member">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary btn-delete-hover"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    data-id="@m.MemberID"
+                                    data-name="@m.FirstName @m.LastName"
+                                    title="Delete Member">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                        <td>@m.MemberID</td>
+                        <td>@m.FirstName</td>
+                        <td>@m.LastName</td>
+                        <td>@m.BirthDate.ToString("yyyy-MM-dd")</td>
+                        <td>@m.Address</td>
+                        <td>@m.Branch</td>
+                        <td>@m.ContactNo</td>
+                        <td>@m.EmailAddress</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="deleteForm" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="deleteMemberId" />
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Deactivate Member</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            @* Are you sure you want to deactivate <strong id="memberName"></strong>? *@
+                            <strong id="memberName"></strong> will be marked as inactive. Continue?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">Yes</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var memberId = button.getAttribute('data-id');
+            var memberName = button.getAttribute('data-name');
+
+            // Set member name in modal
+            deleteModal.querySelector('#memberName').textContent = memberName;
+
+            // Set hidden input value
+            deleteModal.querySelector('#deleteMemberId').value = memberId;
+
+            // Optional: form action can stay as just /Members/Delete
+            deleteModal.querySelector('#deleteForm').action = '/Members/Delete';
+        });
+    </script>
+}
+
+<style>
+
+    /* Delete button turns red on hover */
+    .btn-delete-hover:hover {
+        color: #fff;                  /* text white */
+        background-color: #dc3545;    /* Bootstrap danger red */
+        border-color: #dc3545;        /* border red */
+        transition: all 0.2s ease-in-out;
+    }
+
+</style>

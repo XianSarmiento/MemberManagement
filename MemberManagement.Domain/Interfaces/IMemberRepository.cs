@@ -10,7 +10,7 @@ namespace MemberManagement.Domain.Interfaces
         Task<IEnumerable<Member>> GetAllAsync();
 
         // Get Member ID
-        Task<Member> GetByIdAsync(int memberId);
+        Task<Member?> GetByIdAsync(int memberId);
 
         // Create Member
         Task AddAsync(Member member);
