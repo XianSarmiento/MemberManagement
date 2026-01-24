@@ -6,13 +6,25 @@
     <div class="card-body">
 
         <h2>Members List</h2>
+        <br />
 
-        <p style="text-align:left;">
-            <br />
-            <a asp-action="Create" class="btn btn-primary btn-sm px-4 py-2">
-                <i class="bi bi-person-plus me-2"></i> Create
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <a asp-action="Create" class="btn btn-primary btn-sm px-3 py-1">
+                <i class="bi bi-person-plus me-1"></i> Create
             </a>
-        </p>
+
+            <form method="get" class="d-flex" style="max-width:260px;">
+                <input type="text"
+                       name="searchLastName"
+                       class="form-control form-control-sm me-2"
+                       placeholder="Search by Last Name"
+                       value="@ViewBag.SearchLastName"
+                       style="height:28px; width:182px" />
+                <button class="btn btn-sm btn-primary py-1" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
 
         <table class="table table-bordered table-striped" style="width:100%; padding:4px; font-size:12px;">
             <thead>

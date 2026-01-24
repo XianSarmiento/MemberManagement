@@ -15,9 +15,18 @@ public class MembersController : Controller
         _vmValidator = vmValidator;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchLastName = "")
     {
         var dtos = await _memberCore.GetActiveMembersAsync();
+
+        // Filter by Last Name (case-insensitive) if search provided
+        // declare above the lastname variable
+        if (!string.IsNullOrWhiteSpace(searchLastName))
+        {
+            dtos = dtos
+                .Where(d => d.LastName.Contains(searchLastName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
 
         // Map DTOs → VM
         var vms = dtos.Select(d => new MemberVM
@@ -32,6 +41,7 @@ public class MembersController : Controller
             EmailAddress = d.EmailAddress
         });
 
+        ViewBag.SearchLastName = searchLastName; // to keep the input in the search box
         return View(vms);
     }
 
