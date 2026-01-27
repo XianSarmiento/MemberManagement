@@ -1,4 +1,5 @@
-﻿@model IEnumerable<MemberManagement.Web.ViewModels.MemberVM>
+﻿@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<MemberManagement.Web.ViewModels.MemberVM>
 
 <br />
 <div class="card shadow-sm">
@@ -74,6 +75,37 @@
             </tbody>
         </table>
 
+        <div class="d-flex justify-content-between align-items-center mt-2">
+
+            <div class="d-flex align-items-center">
+                <form method="get">
+                    <select name="pageSize" class="form-select form-select-sm" style="height:28px; width:80px;" onchange="this.form.submit()">
+                        <option value="5" selected="@(ViewBag.CurrentPageSize == 5 ? "selected" : null)">5</option>
+                        <option value="10" selected="@(ViewBag.CurrentPageSize == 10 ? "selected" : null)">10</option>
+                        <option value="-1" selected="@(ViewBag.CurrentPageSize == -1 ? "selected" : null)">All</option>
+                    </select>
+                    <input type="hidden" name="searchLastName" value="@ViewBag.SearchLastName" />
+                </form>
+            </div>
+
+            <div class="text-center flex-grow-1" style="font-size:13px">
+                Total of Members: <strong>@ViewBag.Pagination.total</strong> |
+                Page: <strong>@ViewBag.Pagination.page</strong> of
+                <strong>@(Math.Ceiling((double)ViewBag.Pagination.total / ViewBag.Pagination.pageSize))</strong> |
+                Showing <strong>@ViewBag.Pagination.items.Count</strong> items
+            </div>
+
+            <div>
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchLastName = ViewBag.SearchLastName, pageSize = ViewBag.CurrentPageSize }),
+                new PagedListRenderOptions
+                {
+                    LiElementClasses = new[] { "page-item" },
+                    PageClasses = new[] { "page-link" },
+                    UlElementClasses = new[] { "pagination pagination-sm mb-0" }
+                })
+            </div>
+        </div>
+
         <!-- Delete Confirmation Modal -->
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -86,7 +118,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            @* Are you sure you want to deactivate <strong id="memberName"></strong>? *@
                             <strong id="memberName"></strong> will be marked as inactive. Continue?
                         </div>
                         <div class="modal-footer">
@@ -122,15 +153,3 @@
         });
     </script>
 }
-
-<style>
-
-    /* Delete button turns red on hover */
-    .btn-delete-hover:hover {
-        color: #fff;                  /* text white */
-        background-color: #dc3545;    /* Bootstrap danger red */
-        border-color: #dc3545;        /* border red */
-        transition: all 0.2s ease-in-out;
-    }
-
-</style>

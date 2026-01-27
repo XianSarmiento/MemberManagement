@@ -1,8 +1,9 @@
-﻿using MemberManagement.Application.Core;
+﻿using FluentValidation;
+using MemberManagement.Application.Business;
+using MemberManagement.Application.Core;
 using MemberManagement.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using FluentValidation;
-using MemberManagement.Application.Business;
+using X.PagedList.Extensions;
 
 public class MembersController : Controller
 {
@@ -15,12 +16,11 @@ public class MembersController : Controller
         _vmValidator = vmValidator;
     }
 
-    public async Task<IActionResult> Index(string searchLastName = "")
+    public async Task<IActionResult> Index(string searchLastName = "", int page = 1, int pageSize = 5)
     {
         var dtos = await _memberCore.GetActiveMembersAsync();
 
-        // Filter by Last Name (case-insensitive) if search provided
-        // declare above the lastname variable
+        // Filter by Last Name 
         if (!string.IsNullOrWhiteSpace(searchLastName))
         {
             dtos = dtos
@@ -39,10 +39,28 @@ public class MembersController : Controller
             Branch = d.Branch,
             ContactNo = d.ContactNo,
             EmailAddress = d.EmailAddress
-        });
+        }).ToList();
 
-        ViewBag.SearchLastName = searchLastName; // to keep the input in the search box
-        return View(vms);
+        // Support "All" items
+        int actualPageSize = pageSize;
+        if (pageSize == -1) // Use -1 for "All"
+            actualPageSize = vms.Count;
+
+        var pagedList = vms.ToPagedList(page, actualPageSize);
+
+        // Response metadata for API or frontend use
+        ViewBag.Pagination = new
+        {
+            items = pagedList.ToList(),
+            total = vms.Count,
+            page = page,
+            pageSize = actualPageSize
+        };
+
+        ViewBag.SearchLastName = searchLastName;
+        ViewBag.CurrentPageSize = pageSize;
+
+        return View(pagedList);
     }
 
     [HttpGet]
