@@ -1,0 +1,111 @@
+
+/*=================================================*/
+/* LAYOUT UI */
+/*=================================================*/
+
+
+.layout-custom {
+}
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 60px;
+        background-color: #fff;
+        border-right: 1px solid #ccc;
+        box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+        overflow-x: hidden;
+        transition: width 0.3s;
+        z-index: 1050;
+    }
+
+    .sidebar:hover {
+        width: 220px;
+    }
+
+    /* Sidebar Header */
+    .sidebar-header {
+        height: 60px;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    /* Sidebar title */
+    .sidebar-title {
+        font-weight: bold;
+        font-size: 1.2rem;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar-title .short-text {
+        display: inline-block;
+    }
+
+    .sidebar-title .full-text {
+        display: none;
+    }
+
+    .sidebar:hover .sidebar-title .short-text {
+        display: none;
+    }
+
+    .sidebar:hover .sidebar-title .full-text {
+        display: inline-block;
+    }
+
+    /* Sidebar nav links */
+    .sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    .sidebar .nav-link i {
+        font-size: 1.2rem;
+    }
+
+    .sidebar .nav-link .link-text {
+        margin-left: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .sidebar:hover .nav-link .link-text {
+        opacity: 1;
+    }
+
+    /* Main content shift */
+    .main-content {
+        margin-left: 60px;
+        transition: margin-left 0.3s;
+    }
+
+    .sidebar:hover ~ .main-content {
+        margin-left: 220px;
+    }
+
+/* Sidebar User Section (icon only) */
+.layout-custom .sidebar-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+}
+
+    .layout-custom .sidebar-user .user-icon {
+        font-size: 2rem; /* size of the icon */
+        color: #333; /* primary color */
+    }

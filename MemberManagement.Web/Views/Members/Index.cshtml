@@ -1,36 +1,79 @@
 ﻿@using X.PagedList.Mvc.Core
 @model X.PagedList.IPagedList<MemberManagement.Web.ViewModels.MemberVM>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="successAlert" class="alert alert-success text-center">
+        <i class="fa-solid fa-circle-info"></i>
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<link rel="stylesheet" href="~/css/memberpg/memberindex.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 <br />
-<div class="card shadow-sm">
+<div class="card shadow-lg">
 
     <div class="card-body">
 
-        <h2>Members List</h2>
-        <br />
+        <div class="member-top-bar">
 
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <a asp-action="Create" class="btn btn-primary btn-sm px-3 py-1">
-                <i class="bi bi-person-plus me-1"></i> Create
-            </a>
+            <div class="d-flex justify-content-between align-items-center">
 
-            <form method="get" class="d-flex" style="max-width:260px;">
-                <input type="text"
-                       name="searchLastName"
-                       class="form-control form-control-sm me-2"
-                       placeholder="Search by Last Name"
-                       value="@ViewBag.SearchLastName"
-                       style="height:28px; width:182px" />
-                <button class="btn btn-sm btn-primary py-1" type="submit">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
+                <div class="d-flex align-items-center gap-2">
+                    <a asp-action="Create" class="btn btn-primary btn-sm btn-create-member" title="Create Member">
+                        <i class="bi bi-person-plus"></i>
+                    </a>
+
+                    <h2 class="mb-0">MEMBERS LIST</h2>
+                </div>
+
+                <form method="get" class="d-flex gap-2">
+
+                    <div class="position-relative" style="width:200px;">
+                        <input type="text"
+                               name="searchLastName"
+                               id="searchLastName"
+                               class="form-control form-control-sm member-search-input"
+                               placeholder="Search Lastname"
+                               value="@ViewBag.SearchLastName" />
+                    </div>
+
+                    <div class="position-relative" style="width:200px;">
+                        <input list="branchList"
+                               name="branch"
+                               id="branchFilter"
+                               class="form-control form-control-sm member-search-input"
+                               placeholder="Filter by Branch"
+                               value="@ViewBag.Branch" />
+
+                        <datalist id="branchList">
+                            @if (ViewBag.Branches != null)
+                            {
+                                foreach (var b in ViewBag.Branches as List<string>)
+                                {
+                                    <option value="@b"></option>
+                                }
+                            }
+                        </datalist>
+                    </div>
+
+                    <button class="btn btn-sm btn-primary py-1" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+
+                </form>
+
+            </div>
         </div>
 
-        <table class="table table-bordered table-striped" style="width:100%; padding:4px; font-size:12px;">
-            <thead>
+        <br />
+
+        @* MEMBERS TABLE *@
+        <table class="table table-bordered table-striped member-table">
+            <thead class="table-primary">
                 <tr>
-                    <th>Actions</th>
                     <th>Member ID</th>
                     <th>First Name</th>
                     <th>Last Name</th>
@@ -38,18 +81,33 @@
                     <th>Address</th>
                     <th>Branch</th>
                     <th>Contact No</th>
-                    <th>Email</th>
+                    <th>Email Address</th>
+                    <th>Manage</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var m in Model)
                 {
                     <tr>
+                        <td>@m.MemberID</td>
+                        <td>@m.FirstName</td>
+                        <td>@m.LastName</td>
+                        <td>@m.BirthDate.ToString("yyyy-MM-dd")</td>
+                        <td>@m.Address</td>
+                        <td>@m.Branch</td>
+                        <td>@m.ContactNo</td>
+                        <td>@m.EmailAddress</td>
                         <td>
                             <a asp-action="Edit" asp-route-id="@m.MemberID"
                                class="btn btn-sm btn-outline-primary"
                                title="Edit Member">
                                 <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            <a asp-action="Detail" asp-route-id="@m.MemberID"
+                               class="btn btn-sm btn-outline-success"
+                               title="Member Details">
+                                <i class="bi bi-info-circle"></i>
                             </a>
 
                             <button type="button"
@@ -62,33 +120,32 @@
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
-                        <td>@m.MemberID</td>
-                        <td>@m.FirstName</td>
-                        <td>@m.LastName</td>
-                        <td>@m.BirthDate.ToString("yyyy-MM-dd")</td>
-                        <td>@m.Address</td>
-                        <td>@m.Branch</td>
-                        <td>@m.ContactNo</td>
-                        <td>@m.EmailAddress</td>
+
                     </tr>
                 }
             </tbody>
         </table>
 
+        @* PAGINATION & PAGE SIZE *@
         <div class="d-flex justify-content-between align-items-center mt-2">
 
             <div class="d-flex align-items-center">
                 <form method="get">
-                    <select name="pageSize" class="form-select form-select-sm" style="height:28px; width:80px;" onchange="this.form.submit()">
+                    <select name="pageSize"
+                            class="form-select form-select-sm"
+                            style="height:28px; width:80px;"
+                            onchange="this.form.submit()">
                         <option value="5" selected="@(ViewBag.CurrentPageSize == 5 ? "selected" : null)">5</option>
                         <option value="10" selected="@(ViewBag.CurrentPageSize == 10 ? "selected" : null)">10</option>
                         <option value="-1" selected="@(ViewBag.CurrentPageSize == -1 ? "selected" : null)">All</option>
                     </select>
+
                     <input type="hidden" name="searchLastName" value="@ViewBag.SearchLastName" />
+                    <input type="hidden" name="branch" value="@ViewBag.Branch" />
                 </form>
             </div>
 
-            <div class="text-center flex-grow-1" style="font-size:13px">
+            <div class="text-center flex-grow-1 member-pagination-info">
                 Total of Members: <strong>@ViewBag.Pagination.total</strong> |
                 Page: <strong>@ViewBag.Pagination.page</strong> of
                 <strong>@(Math.Ceiling((double)ViewBag.Pagination.total / ViewBag.Pagination.pageSize))</strong> |
@@ -96,17 +153,22 @@
             </div>
 
             <div>
-                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchLastName = ViewBag.SearchLastName, pageSize = ViewBag.CurrentPageSize }),
-                new PagedListRenderOptions
-                {
-                    LiElementClasses = new[] { "page-item" },
-                    PageClasses = new[] { "page-link" },
-                    UlElementClasses = new[] { "pagination pagination-sm mb-0" }
-                })
+                @Html.PagedListPager(Model, page => Url.Action("Index", new {
+                page,
+                searchLastName = ViewBag.SearchLastName,
+                branch = ViewBag.Branch,
+                pageSize = ViewBag.CurrentPageSize
+                                }),
+                                new PagedListRenderOptions
+                                {
+                                    LiElementClasses = new[] { "page-item" },
+                                    PageClasses = new[] { "page-link" },
+                                    UlElementClasses = new[] { "pagination pagination-sm mb-0" }
+                                })
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
+        @* DELETE MODAL *@
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -115,7 +177,7 @@
                         <input type="hidden" name="id" id="deleteMemberId" />
                         <div class="modal-header">
                             <h5 class="modal-title" id="deleteModalLabel">Deactivate Member</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <strong id="memberName"></strong> will be marked as inactive. Continue?
@@ -123,7 +185,6 @@
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-danger">Yes</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-
                         </div>
                     </form>
                 </div>
@@ -133,7 +194,6 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script>
         var deleteModal = document.getElementById('deleteModal');
@@ -142,14 +202,19 @@
             var memberId = button.getAttribute('data-id');
             var memberName = button.getAttribute('data-name');
 
-            // Set member name in modal
             deleteModal.querySelector('#memberName').textContent = memberName;
-
-            // Set hidden input value
             deleteModal.querySelector('#deleteMemberId').value = memberId;
-
-            // Optional: form action can stay as just /Members/Delete
             deleteModal.querySelector('#deleteForm').action = '/Members/Delete';
         });
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+                const alert = document.getElementById('successAlert');
+                if(alert) {
+                    setTimeout(() => {
+                        alert.style.animation = 'fadeOut 0.5s forwards';
+                        setTimeout(() => alert.remove(), 500);
+                    }, 3000);
+                }
+            });
     </script>
 }

@@ -16,19 +16,23 @@ public class MembersController : Controller
         _vmValidator = vmValidator;
     }
 
-    public async Task<IActionResult> Index(string searchLastName = "", int page = 1, int pageSize = 5)
+    public async Task<IActionResult> Index(string searchLastName = "", string branch = "", int page = 1, int pageSize = 5)
     {
         var dtos = await _memberCore.GetActiveMembersAsync();
 
-        // Filter by Last Name 
+        // FILTER: Last Name
         if (!string.IsNullOrWhiteSpace(searchLastName))
         {
-            dtos = dtos
-                .Where(d => d.LastName.Contains(searchLastName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            dtos = dtos.Where(d => d.LastName.Contains(searchLastName, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
-        // Map DTOs → VM
+        // FILTER: Branch
+        if (!string.IsNullOrWhiteSpace(branch))
+        {
+            dtos = dtos.Where(d => d.Branch.Equals(branch, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // MAP DTO → VM
         var vms = dtos.Select(d => new MemberVM
         {
             MemberID = d.MemberID,
@@ -41,14 +45,14 @@ public class MembersController : Controller
             EmailAddress = d.EmailAddress
         }).ToList();
 
-        // Support "All" items
+        // PAGE SIZE SUPPORT
         int actualPageSize = pageSize;
-        if (pageSize == -1) // Use -1 for "All"
-            actualPageSize = vms.Count;
+        if (pageSize == -1)
+          actualPageSize = vms.Count == 0 ? 1 : vms.Count;
 
         var pagedList = vms.ToPagedList(page, actualPageSize);
 
-        // Response metadata for API or frontend use
+        // PAGINATION METADATA
         ViewBag.Pagination = new
         {
             items = pagedList.ToList(),
@@ -57,8 +61,18 @@ public class MembersController : Controller
             pageSize = actualPageSize
         };
 
+        // VIEW DATA (for Index.cshtml)
         ViewBag.SearchLastName = searchLastName;
+        ViewBag.Branch = branch;
         ViewBag.CurrentPageSize = pageSize;
+
+        // BRANCH LIST FOR DATALIST
+        ViewBag.Branches = dtos
+            .Select(d => d.Branch)
+            .Where(b => !string.IsNullOrWhiteSpace(b))
+            .Distinct()
+            .OrderBy(b => b)
+            .ToList();
 
         return View(pagedList);
     }
@@ -94,12 +108,16 @@ public class MembersController : Controller
         try
         {
             await _memberCore.CreateMemberAsync(dto);
+
+            TempData["SuccessMessage"] = OperationMessage.User.Created;
+            Console.WriteLine(OperationMessage.System.Created);
+
             return RedirectToAction(nameof(Index));
         }
-        catch (ValidationException ex)
+        catch
         {
-            foreach (var error in ex.Errors)
-                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            ModelState.AddModelError(string.Empty, OperationMessage.Error.SaveFailed);
+            Console.WriteLine(OperationMessage.Error.SaveFailed);
             return View(vm);
         }
     }
@@ -150,24 +168,61 @@ public class MembersController : Controller
             ContactNo = vm.ContactNo,
             EmailAddress = vm.EmailAddress
         };
-
         try
         {
             await _memberCore.UpdateMemberAsync(dto);
+
+            TempData["SuccessMessage"] = OperationMessage.User.Updated;
+            Console.WriteLine(OperationMessage.System.Updated);
+
             return RedirectToAction(nameof(Index));
         }
-        catch (Exception ex)
+        catch
         {
-            ModelState.AddModelError("", ex.Message);
+            ModelState.AddModelError(string.Empty, OperationMessage.Error.SaveFailed);
+            Console.WriteLine(OperationMessage.Error.SaveFailed);
             return View(vm);
         }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Detail(int id)
+    {
+        var dto = await _memberCore.GetMemberByIdAsync(id);
+        if (dto == null) return NotFound();
+
+        var vm = new MemberVM
+        {
+            MemberID = dto.MemberID,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            BirthDate = dto.BirthDate,
+            Address = dto.Address,
+            Branch = dto.Branch,
+            ContactNo = dto.ContactNo,
+            EmailAddress = dto.EmailAddress
+        };
+
+        return View(vm);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
-        await _memberCore.DeleteMemberAsync(id);
+        try
+        {
+            await _memberCore.DeleteMemberAsync(id);
+
+            TempData["SuccessMessage"] = OperationMessage.User.Deleted;
+            Console.WriteLine(OperationMessage.System.Deleted);
+        }
+        catch
+        {
+            TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
+            Console.WriteLine(OperationMessage.Error.SaveFailed);
+        }
+
         return RedirectToAction(nameof(Index));
     }
 }

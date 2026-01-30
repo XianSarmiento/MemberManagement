@@ -1,0 +1,97 @@
+
+/*=================================================*/
+/* EDIT MEMBER UI */
+/*=================================================*/
+
+
+
+/* Card Header Name inside the card */
+.card-header-name {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    font-size: 25px;
+    font-weight: 500;
+}
+
+/* Container for centering the form */
+.member-form-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Form card styling */
+.member-form-card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    background-color: #fff;
+}
+
+/* Form groups */
+.form-group {
+    margin-bottom: 12px;
+}
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 500;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 6px;
+        font-size: 13px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+/* Validation messages */
+.text-danger {
+    color: red;
+    font-size: 12px;
+}
+
+/* Buttons container */
+.form-buttons {
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* Buttons */
+.btn-edit-member, .btn-edit-cancel {
+    padding: 6px 14px;
+    font-size: 13px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Save button */
+.btn-edit-member {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    margin-right: 8px;
+}
+
+    .btn-edit-member:hover {
+        background-color: #45a049;
+    }
+
+/* Cancel button */
+.btn-edit-cancel {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+    .btn-edit-cancel:hover {
+        background-color: #e2e6ea;
+    }

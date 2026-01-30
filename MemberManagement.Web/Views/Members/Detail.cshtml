@@ -1,0 +1,144 @@
+﻿@model MemberManagement.Web.ViewModels.MemberVM
+
+@{
+    var today = DateTime.Today;
+    var age = today.Year - Model.BirthDate.Year;
+    if (Model.BirthDate.Date > today.AddYears(-age)) { age--; }
+}
+
+<h2 class="card-header-name">MEMBER DETAILS</h2>
+
+<div class="member-detail-form-container">
+    <div class="member-detail-form-card">
+
+        @* PERSONAL INFORMATION *@
+        <h5 class="section-title">Personal Information</h5>
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label>Member Name</label>
+                <p class="form-control-plaintext">
+                    @Model.FirstName @Model.LastName
+                </p>
+            </div>
+
+            <div class="col-md-3 form-group">
+                <label>Birthdate</label>
+                <p class="form-control-plaintext">
+                    @Model.BirthDate.ToString("yyyy-MM-dd")
+                </p>
+            </div>
+
+            <div class="col-md-3 form-group">
+                <label>Age</label>
+                <p class="form-control-plaintext">@age</p>
+            </div>
+        </div>
+
+        @* CONTACT INFORMATION *@
+        <h5 class="section-title mt-3">Contact Information</h5>
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label>Address</label>
+                <p class="form-control-plaintext">@Model.Address</p>
+            </div>
+
+            <div class="col-md-3 form-group">
+                <label>Mobile Number</label>
+                <p class="form-control-plaintext">@Model.ContactNo</p>
+            </div>
+
+            <div class="col-md-3 form-group">
+                <label>Email Address</label>
+                <p class="form-control-plaintext">@Model.EmailAddress</p>
+            </div>
+        </div>
+
+        @* ORGANIZATION INFORMATION *@
+        <h5 class="section-title mt-3">Organization</h5>
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label>Branch</label>
+                <p class="form-control-plaintext">@Model.Branch</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 form-group">
+                <label>Status</label>
+                <p class="form-control-plaintext">@Model.IsActive</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 form-group">
+                <label>Date Created</label>
+                <p class="form-control-plaintext">@Model.DateCreated</p>
+            </div>
+        </div>
+
+
+        @* ACTIONS *@
+        <div class="form-buttons mt-4">
+            <a asp-action="Index" class="btn-create-cancel">Back</a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* ===== MEMBER DETAILS CONTAINER ===== */
+    .member-detail-form-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    /* ===== MEMBER DETAILS CARD ===== */
+    .member-detail-form-card {
+        width: 100%;
+        max-width: 900px;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 24px 28px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ===== SECTION TITLES ===== */
+    .member-detail-form-card .section-title {
+        font-weight: 600;
+        font-size: 15px;
+        color: #495057;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 6px;
+        margin-bottom: 15px;
+    }
+
+    /* ===== FORM GROUP ===== */
+    .member-detail-form-card .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 2px;
+    }
+
+    /* ===== VALUE TEXT ===== */
+    .member-detail-form-card .form-control-plaintext {
+        font-size: 14px;
+        font-weight: 500;
+        color: #212529;
+        padding: 0;
+    }
+
+    /* ===== BUTTONS ===== */
+    .member-detail-form-card .form-buttons {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .member-detail-form-card .btn-create-cancel {
+        padding: 6px 18px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+</style>

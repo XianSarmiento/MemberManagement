@@ -1,63 +1,61 @@
 ﻿@model MemberManagement.Web.ViewModels.MemberVM
 
-<h2 style="text-align:center;">EDIT MEMBER</h2>
+<link rel="stylesheet" href="~/css/memberpg/memberedit.css" />
 
-<div style="display:flex; justify-content:center; margin-top:20px;">
-    <div style="border:1px solid #ccc; padding:20px; border-radius:8px;
-                box-shadow:0 2px 6px rgba(0,0,0,0.1); width:320px; background-color:#fff;">
+<br/>
+<div class="member-form-container">
+    <div class="member-form-card">
+        <!-- Header inside the card -->
+        <h2 class="card-header-name">EDIT MEMBER</h2>
 
         <form asp-action="Edit" method="post">
             <input type="hidden" asp-for="MemberID" />
 
-            <div style="margin-bottom:10px;">
-                <label asp-for="FirstName" style="font-size:12px; font-weight:normal;">First Name</label>
-                <input asp-for="FirstName" style="width:100%; padding:4px; font-size:12px;" />
-                <span asp-validation-for="FirstName" style="color:red; font-size:12px;"></span>
+            <div class="form-group">
+                <label asp-for="FirstName">First Name</label>
+                <input asp-for="FirstName" class="form-control-sm" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
 
-            <div style="margin-bottom:10px;">
-                <label asp-for="LastName" style="font-size:12px; font-weight:normal;">Last Name</label>
-                <input asp-for="LastName" style="width:100%; padding:4px; font-size:12px;" />
-                <span asp-validation-for="LastName" style="color:red; font-size:12px;"></span>
+            <div class="form-group">
+                <label asp-for="LastName">Last Name</label>
+                <input asp-for="LastName" class="form-control-sm" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
 
-            <div style="margin-bottom:10px;">
-                <label asp-for="BirthDate" style="font-size:12px; font-weight:normal;">Birthdate</label>
-                <input asp-for="BirthDate" type="date" style="width:100%; padding:4px; font-size:12px;" />
-                <span asp-validation-for="BirthDate" style="color:red; font-size:12px;"></span>
+            <div class="form-group">
+                <label asp-for="BirthDate">Birthdate</label>
+                <input asp-for="BirthDate" type="date" class="form-control-sm" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
             </div>
 
-            <div style="margin-bottom:10px;">
-                <label asp-for="Address" style="font-size:12px; font-weight:normal;">Address</label>
-                <input asp-for="Address" style="width:100%; padding:4px; font-size:12px;" />
-                <span asp-validation-for="Address" style="color:red; font-size:12px;"></span>
+            <div class="form-group">
+                <label asp-for="Address">Address</label>
+                <input asp-for="Address" class="form-control-sm" />
+                <span asp-validation-for="Address" class="text-danger"></span>
             </div>
 
-            <div style="margin-bottom:10px;">
-                <label asp-for="Branch" style="font-size:12px; font-weight:normal;">Branch</label>
-                <input asp-for="Branch" style="width:100%; padding:4px; font-size:12px;" />
-                <span asp-validation-for="Branch" style="color:red; font-size:12px;"></span>
+            <div class="form-group">
+                <label asp-for="Branch">Branch</label>
+                <input asp-for="Branch" class="form-control-sm" />
+                <span asp-validation-for="Branch" class="text-danger"></span>
             </div>
 
-            <div style="margin-bottom:10px;">
-                <label asp-for="ContactNo" style="font-size:12px; font-weight:normal;">Mobile Number</label>
-                <input asp-for="ContactNo" style="width:100%; padding:4px; font-size:12px;" />
-                <span asp-validation-for="ContactNo" style="color:red; font-size:12px;"></span>
+            <div class="form-group">
+                <label asp-for="ContactNo">Mobile Number</label>
+                <input asp-for="ContactNo" class="form-control-sm" />
+                <span asp-validation-for="ContactNo" class="text-danger"></span>
             </div>
 
-            <div style="margin-bottom:10px;">
-                <label asp-for="EmailAddress" style="font-size:12px; font-weight:normal;">Email Address</label>
-                <input asp-for="EmailAddress" style="width:100%; padding:4px; font-size:12px;" />
-                <span asp-validation-for="EmailAddress" style="color:red; font-size:12px;"></span>
+            <div class="form-group">
+                <label asp-for="EmailAddress">Email Address</label>
+                <input asp-for="EmailAddress" class="form-control-sm" />
+                <span asp-validation-for="EmailAddress" class="text-danger"></span>
             </div>
 
-            <div style="text-align:center; margin-top:15px;">
-                <button type="submit" style="padding:6px 14px; background-color:#4CAF50; color:white; border:none; border-radius:4px; cursor:pointer; font-size:14px;">
-                    Save Changes
-                </button>
-                <a asp-action="Index" style="padding:6px 14px; background-color:#f0f0f0; color:#333; border:1px solid #ccc; border-radius:4px; text-decoration:none; margin-left:6px; font-size:14px;">
-                    Cancel
-                </a>
+            <div class="form-buttons">
+                <button type="submit" class="btn-edit-member">Save</button>
+                <a asp-action="Index" class="btn-edit-cancel">Cancel</a>
             </div>
         </form>
     </div>
