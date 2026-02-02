@@ -1,5 +1,7 @@
-﻿@using X.PagedList.Mvc.Core
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
 @model X.PagedList.IPagedList<MemberManagement.Web.ViewModels.MemberVM>
+
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -14,11 +16,9 @@
 
 <br />
 <div class="card shadow-lg">
-
     <div class="card-body">
 
         <div class="member-top-bar">
-
             <div class="d-flex justify-content-between align-items-center">
 
                 <div class="d-flex align-items-center gap-2">
@@ -30,31 +30,21 @@
                 </div>
 
                 <form method="get" class="d-flex gap-2">
-
                     <div class="position-relative" style="width:200px;">
-                        <input type="text"
-                               name="searchLastName"
-                               id="searchLastName"
+                        <input type="text" name="searchLastName" id="searchLastName"
                                class="form-control form-control-sm member-search-input"
-                               placeholder="Search Lastname"
-                               value="@ViewBag.SearchLastName" />
+                               placeholder="Search Lastname" value="@(ViewBag.SearchLastName ?? "")" />
                     </div>
 
                     <div class="position-relative" style="width:200px;">
-                        <input list="branchList"
-                               name="branch"
-                               id="branchFilter"
+                        <input list="branchList" name="branch" id="branchFilter"
                                class="form-control form-control-sm member-search-input"
-                               placeholder="Filter by Branch"
-                               value="@ViewBag.Branch" />
+                               placeholder="Filter by Branch" value="@(ViewBag.Branch ?? "")" />
 
                         <datalist id="branchList">
-                            @if (ViewBag.Branches != null)
+                            @foreach (var b in (ViewBag.Branches as List<string> ?? new List<string>()))
                             {
-                                foreach (var b in ViewBag.Branches as List<string>)
-                                {
-                                    <option value="@b"></option>
-                                }
+                                <option value="@b"></option>
                             }
                         </datalist>
                     </div>
@@ -62,9 +52,7 @@
                     <button class="btn btn-sm btn-primary py-1" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
-
                 </form>
-
             </div>
         </div>
 
@@ -86,7 +74,33 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var m in Model)
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <i class="bi bi-emoji-frown d-block mb-2" style="font-size: 2rem;"></i>
+
+                            @{
+                                string msg = "We couldn’t find any members.";
+                                var lastNameFilter = ViewData["SearchLastName"] as string;
+                                var branchFilter = ViewData["SelectedBranch"] as string;
+
+                                if (!string.IsNullOrWhiteSpace(lastNameFilter))
+                                {
+                                    msg = $"We couldn’t find any members matching '{lastNameFilter}'.";
+                                }
+                                else if (!string.IsNullOrWhiteSpace(branchFilter))
+                                {
+                                    msg = $"We couldn’t find any members in branch '{branchFilter}'.";
+                                }
+                            }
+
+                            @msg
+                        </td>
+                    </tr>
+                }
+
+                @foreach (var m in (Model ?? Enumerable.Empty<MemberManagement.Web.ViewModels.MemberVM>()))
                 {
                     <tr>
                         <td>@m.MemberID</td>
@@ -115,49 +129,52 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#deleteModal"
                                     data-id="@m.MemberID"
-                                    data-name="@m.FirstName @m.LastName"
+                                    data-name="@($"{m.FirstName} {m.LastName}")"
                                     title="Delete Member">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
-
                     </tr>
                 }
             </tbody>
         </table>
 
         @* PAGINATION & PAGE SIZE *@
+        @{
+            var currentPageSize = ViewBag.CurrentPageSize ?? 5;
+        }
         <div class="d-flex justify-content-between align-items-center mt-2">
 
             <div class="d-flex align-items-center">
                 <form method="get">
-                    <select name="pageSize"
-                            class="form-select form-select-sm"
-                            style="height:28px; width:80px;"
-                            onchange="this.form.submit()">
-                        <option value="5" selected="@(ViewBag.CurrentPageSize == 5 ? "selected" : null)">5</option>
-                        <option value="10" selected="@(ViewBag.CurrentPageSize == 10 ? "selected" : null)">10</option>
-                        <option value="-1" selected="@(ViewBag.CurrentPageSize == -1 ? "selected" : null)">All</option>
+                    @{
+                        var rawPageSize = ViewBag.RawPageSize ?? 5;
+                    }
+
+                    <select name="pageSize" class="form-select form-select-sm" style="height:28px; width:80px;" onchange="this.form.submit()">
+                        <option value="5" selected="@(rawPageSize == 5 ? "selected" : null)">5</option>
+                        <option value="10" selected="@(rawPageSize == 10 ? "selected" : null)">10</option>
+                        <option value="-1" selected="@(rawPageSize == -1 ? "selected" : null)">All</option>
                     </select>
 
-                    <input type="hidden" name="searchLastName" value="@ViewBag.SearchLastName" />
-                    <input type="hidden" name="branch" value="@ViewBag.Branch" />
+                    <input type="hidden" name="searchLastName" value="@(ViewBag.SearchLastName ?? "")" />
+                    <input type="hidden" name="branch" value="@(ViewBag.Branch ?? "")" />
                 </form>
             </div>
 
             <div class="text-center flex-grow-1 member-pagination-info">
-                Total of Members: <strong>@ViewBag.Pagination.total</strong> |
-                Page: <strong>@ViewBag.Pagination.page</strong> of
-                <strong>@(Math.Ceiling((double)ViewBag.Pagination.total / ViewBag.Pagination.pageSize))</strong> |
-                Showing <strong>@ViewBag.Pagination.items.Count</strong> items
+                Total Members: <strong>@(Model?.TotalItemCount ?? 0)</strong> |
+                Page: <strong>@(Model?.PageNumber ?? 1)</strong> of
+                <strong>@(Model?.PageCount ?? 1)</strong> |
+                Showing <strong>@(Model?.Count ?? 0)</strong> items
             </div>
 
             <div>
                 @Html.PagedListPager(Model, page => Url.Action("Index", new {
                 page,
-                searchLastName = ViewBag.SearchLastName,
-                branch = ViewBag.Branch,
-                pageSize = ViewBag.CurrentPageSize
+                searchLastName = ViewBag.SearchLastName ?? "",
+                branch = ViewBag.Branch ?? "",
+                pageSize = currentPageSize
                                 }),
                                 new PagedListRenderOptions
                                 {
@@ -197,24 +214,28 @@
 @section Scripts {
     <script>
         var deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var memberId = button.getAttribute('data-id');
-            var memberName = button.getAttribute('data-name');
+        if(deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                if(!button) return;
 
-            deleteModal.querySelector('#memberName').textContent = memberName;
-            deleteModal.querySelector('#deleteMemberId').value = memberId;
-            deleteModal.querySelector('#deleteForm').action = '/Members/Delete';
-        });
+                var memberId = button.getAttribute('data-id') ?? '';
+                var memberName = button.getAttribute('data-name') ?? '';
+
+                deleteModal.querySelector('#memberName').textContent = memberName;
+                deleteModal.querySelector('#deleteMemberId').value = memberId;
+                deleteModal.querySelector('#deleteForm').action = '/Members/Delete';
+            });
+        }
 
         window.addEventListener('DOMContentLoaded', (event) => {
-                const alert = document.getElementById('successAlert');
-                if(alert) {
-                    setTimeout(() => {
-                        alert.style.animation = 'fadeOut 0.5s forwards';
-                        setTimeout(() => alert.remove(), 500);
-                    }, 3000);
-                }
-            });
+            const alert = document.getElementById('successAlert');
+            if(alert) {
+                setTimeout(() => {
+                    alert.style.animation = 'fadeOut 0.5s forwards';
+                    setTimeout(() => alert.remove(), 500);
+                }, 3000);
+            }
+        });
     </script>
 }

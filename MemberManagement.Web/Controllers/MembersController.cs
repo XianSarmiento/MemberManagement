@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MemberManagement.Application.Business;
 using MemberManagement.Application.Core;
+using MemberManagement.Web.Mappers;
 using MemberManagement.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList.Extensions;
@@ -18,61 +19,18 @@ public class MembersController : Controller
 
     public async Task<IActionResult> Index(string searchLastName = "", string branch = "", int page = 1, int pageSize = 5)
     {
-        var dtos = await _memberCore.GetActiveMembersAsync();
+        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch);     //
 
-        // FILTER: Last Name
-        if (!string.IsNullOrWhiteSpace(searchLastName))
-        {
-            dtos = dtos.Where(d => d.LastName.Contains(searchLastName, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+        var vms = result.Members.ToViewModels();                                            // Use mapper instead of repeating mapping logic
 
-        // FILTER: Branch
-        if (!string.IsNullOrWhiteSpace(branch))
-        {
-            dtos = dtos.Where(d => d.Branch.Equals(branch, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+        ViewBag.RawPageSize = pageSize;                                                     // Save the raw selection for the UI
+        int actualPageSize = pageSize < 1 ? vms.Count : pageSize;                           // If pageSize < 1, show all items
+        var pagedList = vms.ToPagedList(page, actualPageSize);                              // Build paged list correctly
 
-        // MAP DTO → VM
-        var vms = dtos.Select(d => new MemberVM
-        {
-            MemberID = d.MemberID,
-            FirstName = d.FirstName,
-            LastName = d.LastName,
-            BirthDate = d.BirthDate,
-            Address = d.Address,
-            Branch = d.Branch,
-            ContactNo = d.ContactNo,
-            EmailAddress = d.EmailAddress
-        }).ToList();
-
-        // PAGE SIZE SUPPORT
-        int actualPageSize = pageSize;
-        if (pageSize == -1)
-          actualPageSize = vms.Count == 0 ? 1 : vms.Count;
-
-        var pagedList = vms.ToPagedList(page, actualPageSize);
-
-        // PAGINATION METADATA
-        ViewBag.Pagination = new
-        {
-            items = pagedList.ToList(),
-            total = vms.Count,
-            page = page,
-            pageSize = actualPageSize
-        };
-
-        // VIEW DATA (for Index.cshtml)
+        ViewBag.Branches = result.Branches ?? new List<string>();                           // ViewBag for filters
         ViewBag.SearchLastName = searchLastName;
-        ViewBag.Branch = branch;
+        ViewBag.SelectedBranch = branch;
         ViewBag.CurrentPageSize = pageSize;
-
-        // BRANCH LIST FOR DATALIST
-        ViewBag.Branches = dtos
-            .Select(d => d.Branch)
-            .Where(b => !string.IsNullOrWhiteSpace(b))
-            .Distinct()
-            .OrderBy(b => b)
-            .ToList();
 
         return View(pagedList);
     }
@@ -84,8 +42,7 @@ public class MembersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MemberVM vm)
     {
-        // Validate VM first
-        var validationResult = await _vmValidator.ValidateAsync(vm);
+        var validationResult = await _vmValidator.ValidateAsync(vm);                        // Validate VM first
         if (!validationResult.IsValid)
         {
             foreach (var error in validationResult.Errors)
@@ -94,24 +51,13 @@ public class MembersController : Controller
             return View(vm);
         }
 
-        var dto = new MemberDTO
-        {
-            FirstName = vm.FirstName,
-            LastName = vm.LastName,
-            BirthDate = vm.BirthDate,
-            Address = vm.Address,
-            Branch = vm.Branch,
-            ContactNo = vm.ContactNo,
-            EmailAddress = vm.EmailAddress
-        };
+        var dto = vm.ToDTO();                                                               // Use mapper from DTO
 
         try
         {
             await _memberCore.CreateMemberAsync(dto);
-
             TempData["SuccessMessage"] = OperationMessage.User.Created;
             Console.WriteLine(OperationMessage.System.Created);
-
             return RedirectToAction(nameof(Index));
         }
         catch
@@ -128,17 +74,7 @@ public class MembersController : Controller
         var dto = await _memberCore.GetMemberByIdAsync(id);
         if (dto == null) return NotFound();
 
-        var vm = new MemberVM
-        {
-            MemberID = dto.MemberID,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            BirthDate = dto.BirthDate,
-            Address = dto.Address,
-            Branch = dto.Branch,
-            ContactNo = dto.ContactNo,
-            EmailAddress = dto.EmailAddress
-        };
+        var vm = dto.ToViewModel();
 
         return View(vm);
     }
@@ -147,27 +83,17 @@ public class MembersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(MemberVM vm)
     {
-        // Validate VM first
-        var validationResult = await _vmValidator.ValidateAsync(vm);
+        var validationResult = await _vmValidator.ValidateAsync(vm);                        // Validate VM first
         if (!validationResult.IsValid)
         {
             foreach (var error in validationResult.Errors)
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
-            return View(vm);
+            return View(vm);                                                                // Use mapper from DTO
         }
 
-        var dto = new MemberDTO
-        {
-            MemberID = vm.MemberID,
-            FirstName = vm.FirstName,
-            LastName = vm.LastName,
-            BirthDate = vm.BirthDate,
-            Address = vm.Address,
-            Branch = vm.Branch,
-            ContactNo = vm.ContactNo,
-            EmailAddress = vm.EmailAddress
-        };
+        var dto = vm.ToDTO();
+
         try
         {
             await _memberCore.UpdateMemberAsync(dto);
@@ -191,17 +117,7 @@ public class MembersController : Controller
         var dto = await _memberCore.GetMemberByIdAsync(id);
         if (dto == null) return NotFound();
 
-        var vm = new MemberVM
-        {
-            MemberID = dto.MemberID,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            BirthDate = dto.BirthDate,
-            Address = dto.Address,
-            Branch = dto.Branch,
-            ContactNo = dto.ContactNo,
-            EmailAddress = dto.EmailAddress
-        };
+        var vm = dto.ToViewModel();
 
         return View(vm);
     }

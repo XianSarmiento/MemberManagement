@@ -7,16 +7,17 @@
 
 /* Card container shadow */
 .card.shadow-lg {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Top rectangle container */
 .member-top-bar {
     border: 1px solid #ccc;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    padding: 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
     margin-top: 0;
     margin-bottom: 1rem;
+    border-radius: 8px;
 }
 
 /* Create button circle */
@@ -27,32 +28,66 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
+    transition: all 0.2s ease-in-out;
 }
+
+    .btn-create-member:hover {
+        transform: scale(1.1);
+    }
 
 /* Search input fields */
 .member-search-input {
-    height: 28px;
+    height: 32px;
     padding-right: 30px;
+    font-size: 0.875rem;
 }
 
 /* Table styles */
 .member-table {
     width: 100%;
-    padding: 4px;
-    font-size: 12px;
+    font-size: 13px;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
+    .member-table th,
+    .member-table td {
+        vertical-align: middle;
+        padding: 0.5rem;
+    }
+
+    .member-table th {
+        font-weight: 600;
+    }
+
+    /* No members found styling */
+    .member-table .text-center.text-muted {
+        font-size: 0.95rem;
+        color: #6c757d;
+    }
+
+    /* Icon inside table buttons */
+    .member-table td .btn i {
+        font-size: 0.9rem;
+        width: 16px;
+        height: 16px;
+    }
+
 /* Delete button hover effect */
-.btn-delete-hover:hover {
-    color: #fff;
-    background-color: #dc3545;
-    border-color: #dc3545;
+.btn-delete-hover {
     transition: all 0.2s ease-in-out;
 }
+
+    .btn-delete-hover:hover {
+        color: #fff !important;
+        background-color: #dc3545 !important;
+        border-color: #dc3545 !important;
+    }
 
 /* Pagination container text */
 .member-pagination-info {
     font-size: 13px;
+    color: #495057;
 }
 
 /* Modal form */
@@ -65,13 +100,6 @@
     min-width: 80px;
 }
 
-/* Small icons for edit, details, and delete */
-.member-table td .btn i {
-    font-size: 0.8rem;
-    width: 12px;
-    height: 12px;
-}
-
 /* Floating Success Alert */
 #successAlert {
     position: fixed;
@@ -81,9 +109,9 @@
     max-width: 400px;
     width: auto;
     z-index: 1050;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
-    font-size: 18px;
+    font-size: 0.95rem;
     text-align: center;
     padding: 0.75rem 1.25rem;
     display: flex;
@@ -96,9 +124,9 @@
     animation: slideDown 0.5s forwards;
 }
 
-    /* Icon styling */
+    /* Icon styling inside alert */
     #successAlert i {
-        font-size: 18px;
+        font-size: 1rem;
     }
 
 /* Slide-down animation */
@@ -122,5 +150,29 @@
 
     to {
         opacity: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .member-top-bar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+        .member-top-bar form {
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+    .member-table td,
+    .member-table th {
+        font-size: 12px;
+        padding: 0.35rem;
+    }
+
+    .member-search-input {
+        width: 100% !important;
     }
 }

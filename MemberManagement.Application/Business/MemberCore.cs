@@ -37,7 +37,9 @@ namespace MemberManagement.Application.Core
                 Address = m.Address,
                 Branch = m.Branch,
                 ContactNo = m.ContactNo,
-                EmailAddress = m.EmailAddress
+                EmailAddress = m.EmailAddress,
+                IsActive = m.IsActive,
+                DateCreated = m.DateCreated
             });
         }
 
@@ -55,7 +57,9 @@ namespace MemberManagement.Application.Core
                 Address = member.Address,
                 Branch = member.Branch,
                 ContactNo = member.ContactNo,
-                EmailAddress = member.EmailAddress
+                EmailAddress = member.EmailAddress,
+                IsActive = member.IsActive,
+                DateCreated = member.DateCreated
             };
         }
 
@@ -120,5 +124,25 @@ namespace MemberManagement.Application.Core
             member.IsActive = false;
             await _memberService.UpdateAsync(member);
         }
+
+        // Get members for index with filtering and pagination
+        public async Task<MemberIndexResult> GetMembersForIndexAsync(string searchLastName, string branch)
+        {
+            var dtos = (await GetActiveMembersAsync()).ToList();
+
+            if (!string.IsNullOrWhiteSpace(searchLastName))
+                dtos = dtos.Where(d => d.LastName?.Contains(searchLastName, StringComparison.OrdinalIgnoreCase) ?? false).ToList();
+
+            if (!string.IsNullOrWhiteSpace(branch))
+                dtos = dtos.Where(d => d.Branch?.Equals(branch, StringComparison.OrdinalIgnoreCase) ?? false).ToList();
+
+            return new MemberIndexResult
+            {
+                Members = dtos,
+                Branches = dtos.Select(d => d.Branch!).Where(b => !string.IsNullOrWhiteSpace(b)).Distinct().OrderBy(b => b).ToList(),
+                TotalItems = dtos.Count
+            };
+        }
+
     }
 }

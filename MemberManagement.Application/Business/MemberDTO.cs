@@ -10,5 +10,7 @@
         public string? Branch { get; set; }
         public string? ContactNo { get; set; }
         public string? EmailAddress { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

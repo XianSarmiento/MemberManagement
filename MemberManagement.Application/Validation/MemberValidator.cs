@@ -14,6 +14,10 @@ namespace MemberManagement.Application.Validation
                 .NotNull().WithMessage("BirthDate is required.")
                 .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
                 .WithMessage("BirthDate cannot be in the future.");
+            RuleFor(m => m.Address).NotEmpty().WithMessage("Address is required.");
+            RuleFor(m => m.Branch).NotEmpty().WithMessage("Branch is required.");
+            RuleFor(m => m.ContactNo).NotEmpty().WithMessage("Mobile No. is required.");
+            RuleFor(m => m.EmailAddress).NotEmpty().WithMessage("Email Address is required.");
         }
     }
 }
