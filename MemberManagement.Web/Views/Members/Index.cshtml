@@ -30,13 +30,13 @@
                 </div>
 
                 <form method="get" class="d-flex gap-2">
-                    <div class="position-relative" style="width:200px;">
+                    <div class="position-relative" style="width:150px;">
                         <input type="text" name="searchLastName" id="searchLastName"
                                class="form-control form-control-sm member-search-input"
                                placeholder="Search Lastname" value="@(ViewBag.SearchLastName ?? "")" />
                     </div>
 
-                    <div class="position-relative" style="width:200px;">
+                    <div style="width:150px;">
                         <input list="branchList" name="branch" id="branchFilter"
                                class="form-control form-control-sm member-search-input"
                                placeholder="Filter by Branch" value="@(ViewBag.Branch ?? "")" />
@@ -52,6 +52,10 @@
                     <button class="btn btn-sm btn-primary py-1" type="submit">
                         <i class="bi bi-search"></i>
                     </button>
+
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary py-1" title="Clear All Filters">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </a>
                 </form>
             </div>
         </div>
@@ -62,12 +66,42 @@
         <table class="table table-bordered table-striped member-table">
             <thead class="table-primary">
                 <tr>
-                    <th>Member ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
+            <thead class="table-primary">
+                <tr>
+                    <th>
+                        <a href="@Url.Action("Index", new { searchLastName = ViewBag.SearchLastName, branch = ViewBag.SelectedBranch, sortColumn = "MemberID", sortOrder = ViewBag.SortColumn == "MemberID" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })">
+                            @if (ViewBag.SortColumn == "MemberID")
+                            { <i class="bi @(ViewBag.SortOrder == "asc" ? "bi-funnel-fill" : "bi-funnel")"></i> }
+                            Member ID
+                        </a>
+                    </th>
+
+                    <th>
+                        <a href="@Url.Action("Index", new { searchLastName = ViewBag.SearchLastName, branch = ViewBag.SelectedBranch, sortColumn = "FirstName", sortOrder = ViewBag.SortColumn == "FirstName" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })">
+                            @if (ViewBag.SortColumn == "FirstName")
+                            { <i class="bi @(ViewBag.SortOrder == "asc" ? "bi-funnel-fill" : "bi-funnel")"></i> }
+                            First Name
+                        </a>
+                    </th>
+
+                    <th>
+                        <a href="@Url.Action("Index", new { searchLastName = ViewBag.SearchLastName, branch = ViewBag.SelectedBranch, sortColumn = "LastName", sortOrder = ViewBag.SortColumn == "LastName" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })">
+                            @if (ViewBag.SortColumn == "LastName")
+                            { <i class="bi @(ViewBag.SortOrder == "asc" ? "bi-funnel-fill" : "bi-funnel")"></i> }
+                            Last Name
+                        </a>
+                    </th>
+
+                    <th>
+                        <a href="@Url.Action("Index", new { searchLastName = ViewBag.SearchLastName, branch = ViewBag.SelectedBranch, sortColumn = "Branch", sortOrder = ViewBag.SortColumn == "Branch" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })">
+                            @if (ViewBag.SortColumn == "Branch")
+                            { <i class="bi @(ViewBag.SortOrder == "asc" ? "bi-funnel-fill" : "bi-funnel")"></i> }
+                            Branch
+                        </a>
+                    </th>
+
                     <th>Birth Date</th>
                     <th>Address</th>
-                    <th>Branch</th>
                     <th>Contact No</th>
                     <th>Email Address</th>
                     <th>Manage</th>
@@ -106,9 +140,9 @@
                         <td>@m.MemberID</td>
                         <td>@m.FirstName</td>
                         <td>@m.LastName</td>
+                        <td>@m.Branch</td>
                         <td>@m.BirthDate.ToString("yyyy-MM-dd")</td>
                         <td>@m.Address</td>
-                        <td>@m.Branch</td>
                         <td>@m.ContactNo</td>
                         <td>@m.EmailAddress</td>
                         <td>

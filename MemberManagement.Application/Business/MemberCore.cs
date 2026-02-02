@@ -125,16 +125,37 @@ namespace MemberManagement.Application.Core
             await _memberService.UpdateAsync(member);
         }
 
-        // Get members for index with filtering and pagination
-        public async Task<MemberIndexResult> GetMembersForIndexAsync(string searchLastName, string branch)
+        // Get members for index with filtering, sorting, and pagination
+        public async Task<MemberIndexResult> GetMembersForIndexAsync(
+            string searchLastName,
+            string branch,
+            string sortColumn = "MemberID",    // default sort column
+            string sortOrder = "asc")          // default sort order
         {
             var dtos = (await GetActiveMembersAsync()).ToList();
 
+            // Filtering
             if (!string.IsNullOrWhiteSpace(searchLastName))
                 dtos = dtos.Where(d => d.LastName?.Contains(searchLastName, StringComparison.OrdinalIgnoreCase) ?? false).ToList();
 
             if (!string.IsNullOrWhiteSpace(branch))
                 dtos = dtos.Where(d => d.Branch?.Equals(branch, StringComparison.OrdinalIgnoreCase) ?? false).ToList();
+
+            // Sorting
+            dtos = (sortColumn, sortOrder.ToLower()) switch
+            {
+                ("MemberID", "asc") => dtos.OrderBy(d => d.MemberID).ToList(),
+                ("MemberID", "desc") => dtos.OrderByDescending(d => d.MemberID).ToList(),
+                ("FirstName", "asc") => dtos.OrderBy(d => d.FirstName).ToList(),
+                ("FirstName", "desc") => dtos.OrderByDescending(d => d.FirstName).ToList(),
+                ("LastName", "asc") => dtos.OrderBy(d => d.LastName).ToList(),
+                ("LastName", "desc") => dtos.OrderByDescending(d => d.LastName).ToList(),
+                ("BirthDate", "asc") => dtos.OrderBy(d => d.BirthDate).ToList(),
+                ("BirthDate", "desc") => dtos.OrderByDescending(d => d.BirthDate).ToList(),
+                ("Branch", "asc") => dtos.OrderBy(d => d.Branch).ToList(),
+                ("Branch", "desc") => dtos.OrderByDescending(d => d.Branch).ToList(),
+                _ => dtos.OrderBy(d => d.MemberID).ToList()
+            };
 
             return new MemberIndexResult
             {

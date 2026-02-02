@@ -17,9 +17,12 @@ public class MembersController : Controller
         _vmValidator = vmValidator;
     }
 
-    public async Task<IActionResult> Index(string searchLastName = "", string branch = "", int page = 1, int pageSize = 5)
+    public async Task<IActionResult> Index(
+        string searchLastName = "", string branch = "", 
+        string sortColumn = "MemberID", string sortOrder = "asc",
+        int page = 1, int pageSize = 5)
     {
-        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch);     //
+        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, sortColumn, sortOrder);
 
         var vms = result.Members.ToViewModels();                                            // Use mapper instead of repeating mapping logic
 
@@ -31,6 +34,9 @@ public class MembersController : Controller
         ViewBag.SearchLastName = searchLastName;
         ViewBag.SelectedBranch = branch;
         ViewBag.CurrentPageSize = pageSize;
+
+        ViewBag.SortColumn = sortColumn;                                                    // Keep track of sorting for the view
+        ViewBag.SortOrder = sortOrder;
 
         return View(pagedList);
     }
