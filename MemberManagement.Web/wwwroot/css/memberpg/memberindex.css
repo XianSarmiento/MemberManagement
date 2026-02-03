@@ -1,79 +1,48 @@
-﻿
+﻿/*=================================================*/
+/* MEMBER INDEX UI - memberindex.css */
 /*=================================================*/
-/* MEMBER INDEX UI */
-/*=================================================*/
 
 
 
-/* Card container shadow */
+/* 1. LAYOUT & CONTAINERS */
 .card.shadow-lg {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Top rectangle container */
 .member-top-bar {
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     padding: 0.75rem 1rem;
-    margin-top: 0;
     margin-bottom: 1rem;
     border-radius: 8px;
+    background-color: #fff;
 }
 
-/* Create button circle */
+/* New containers for inline-width removal */
+.search-input-container {
+    width: 150px;
+    position: relative;
+}
+
+.branch-filter-container {
+    width: 150px;
+}
+
+/* 2. BUTTONS & ACTIONS */
 .btn-create-member {
-    height: 45px;
-    width: 45px;
+    height: 40px;
+    width: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    transition: all 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, background-color 0.2s;
 }
 
     .btn-create-member:hover {
         transform: scale(1.1);
     }
 
-/* Search input fields */
-.member-search-input {
-    height: 32px;
-    padding-right: 30px;
-    font-size: 0.875rem;
-}
-
-/* Table styles */
-.member-table {
-    width: 100%;
-    font-size: 13px;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-    .member-table th,
-    .member-table td {
-        vertical-align: middle;
-        padding: 0.5rem;
-    }
-
-    .member-table th {
-        font-weight: 600;
-    }
-
-    /* No members found styling */
-    .member-table .text-center.text-muted {
-        font-size: 0.95rem;
-        color: #6c757d;
-    }
-
-    /* Icon inside table buttons */
-    .member-table td .btn i {
-        font-size: 0.9rem;
-        width: 16px;
-        height: 16px;
-    }
-
-/* Delete button hover effect */
 .btn-delete-hover {
     transition: all 0.2s ease-in-out;
 }
@@ -84,55 +53,109 @@
         border-color: #dc3545 !important;
     }
 
-/* Pagination container text */
+/* 3. TABLE STYLING */
+.member-table {
+    width: 100%;
+    font-size: 13px; /* Slightly larger for readability */
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+    .member-table th,
+    .member-table td {
+        vertical-align: middle;
+        padding: 0.6rem;
+    }
+
+    .member-table th {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        /* Table Header Links (Sorting) */
+        .member-table th a {
+            text-decoration: none;
+            color: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+            .member-table th a:hover {
+                color: #0d6efd;
+            }
+
+            .member-table th a i {
+                color: #0d6efd; /* Highlight sorting icon */
+                font-size: 0.9rem;
+            }
+
+    /* Action Column Buttons */
+    .member-table td .btn-group .btn {
+        padding: 0.25rem 0.4rem;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .member-table td .btn i {
+        font-size: 0.85rem;
+    }
+
+/* 4. FORM ELEMENTS */
+#branchFilter {
+    -webkit-appearance: auto;
+    appearance: auto;
+    background-image: none;
+    padding-right: 0;
+}
+
+.form-control-sm, .form-select-sm {
+    font-size: 0.85rem;
+}
+
+/* 5. PAGINATION & INFO */
 .member-pagination-info {
     font-size: 13px;
-    color: #495057;
+    color: #6c757d;
 }
 
-/* Modal form */
+/* Page-size select container */
+.page-size-select {
+    width: auto;
+}
+
+/* 6. MODALS */
 #deleteModal .modal-content {
-    border-radius: 8px;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-/* Modal buttons spacing */
-#deleteModal .btn {
-    min-width: 80px;
+#deleteModal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
 }
 
-/* Floating Success Alert */
+/* 7. FLOATING ALERTS */
 #successAlert {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 400px;
-    width: auto;
-    z-index: 1050;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    text-align: center;
-    padding: 0.75rem 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background-color: #d4edda; /* Green background for success */
-    color: #155724; /* Dark green text */
-    border: 1px solid #c3e6cb;
-    opacity: 0;
+    z-index: 2000;
+    min-width: 300px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 50px; /* Pill shape */
+    padding: 0.75rem 1.5rem;
     animation: slideDown 0.5s forwards;
 }
 
-    /* Icon styling inside alert */
-    #successAlert i {
-        font-size: 1rem;
-    }
-
-/* Slide-down animation */
 @keyframes slideDown {
     from {
-        top: -50px;
+        top: -100px;
         opacity: 0;
     }
 
@@ -142,7 +165,6 @@
     }
 }
 
-/* Auto-dismiss fade-out animation */
 @keyframes fadeOut {
     from {
         opacity: 1;
@@ -153,64 +175,47 @@
     }
 }
 
-/* FIX datalist dropdown positioning */
-#branchFilter {
-    -webkit-appearance: auto; /* restore native behavior */
-    appearance: auto;
-    background-image: none;
-    padding-right: 0; /* prevents offset bug */
-}
-
-/* Remove underline and default link styling for table headers */
-.member-table th a {
-    text-decoration: none; /* no underline */
-    color: inherit; /* inherit text color */
-    display: inline-flex; /* so we can align icon nicely */
-    align-items: center;
-    gap: 4px; /* spacing between text and icon */
-}
-
-    .member-table th a:hover {
-        color: #0d6efd; /* optional: change color on hover */
-    }
-
-/* Make all bi-funnel icons blue */
-.bi-funnel,
-.bi-funnel-fill {
-    color: #0d6efd; /* Bootstrap primary blue */
-    margin-left: 5px; /* small spacing from text */
-    font-size: 0.9rem; /* adjust size to match header nicely */
-    vertical-align: middle; /* align with text */
-    transition: color 0.2s ease; /* smooth color change */
-}
-
-/* Optional: hover effect on active header */
-th a:hover .bi-funnel,
-th a:hover .bi-funnel-fill {
-    color: #0056b3; /* darker blue on hover */
-}
-
-
-/* Responsive adjustments */
-@media (max-width: 576px) {
-    .member-top-bar {
+/* 8. RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .member-top-bar .d-flex {
         flex-direction: column;
-        gap: 0.5rem;
+        align-items: flex-start !important;
+        gap: 1rem;
     }
 
-        .member-top-bar form {
-            width: 100%;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+    .member-top-bar form {
+        width: 100%;
+    }
+
+        .member-top-bar form div {
+            width: 100% !important; /* Force search inputs to full width on mobile */
         }
 
-    .member-table td,
-    .member-table th {
-        font-size: 12px;
-        padding: 0.35rem;
-    }
-
-    .member-search-input {
-        width: 100% !important;
+    .member-table {
+        display: block;
+        overflow-x: auto;
     }
 }
+
+/* 9. Scrollable table wrapper */
+.scrollable-table {
+    max-height: 400px; /* Approx 10 rows height, adjust as needed */
+    overflow-y: auto; /* Vertical scroll */
+    display: block;
+}
+
+    /* Keep table headers sticky */
+    .scrollable-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #cfe2ff; /* match your table-primary color */
+    }
+
+/* 10. No Results Icon */
+.no-results-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+

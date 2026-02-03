@@ -1,65 +1,91 @@
 ﻿@model MemberManagement.Web.ViewModels.MemberVM
 
-<link rel="stylesheet" href="~/css/memberpg/memberedit.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/memberpg/memberedit.css" />
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/memberpg/memberedit.js"></script>
+}
 
-<br/>
+
+
 <div class="member-form-container">
     <div class="member-form-card">
         <h2 class="card-header-name">EDIT MEMBER</h2>
+
+        <br />
 
         <form asp-action="Edit" method="post">
             <input type="hidden" asp-for="MemberID" />
 
             <div class="form-group">
-                <label asp-for="FirstName">First Name</label>
-                <input asp-for="FirstName" class="form-control-sm" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+                <div class="input-wrapper">
+                    <input asp-for="FirstName" class="form-control-sm" />
+                    <label asp-for="FirstName">First Name</label>
+                    <span asp-validation-for="FirstName" class="text-danger floating-error"></span>
+                </div>
             </div>
 
             <div class="form-group">
-                <label asp-for="LastName">Last Name</label>
-                <input asp-for="LastName" class="form-control-sm" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
+                <div class="input-wrapper">
+                    <input asp-for="LastName" class="form-control-sm" />
+                    <label asp-for="LastName">Last Name</label>
+                    <span asp-validation-for="LastName" class="text-danger floating-error"></span>
+                </div>
             </div>
 
             <div class="form-group">
-                <label asp-for="BirthDate">Birthdate</label>
-                <input asp-for="BirthDate" type="date" class="form-control-sm" />
-                <span asp-validation-for="BirthDate" class="text-danger"></span>
+                <div class="input-wrapper">
+                    <input asp-for="BirthDate" type="date" class="form-control-sm" />
+                    <label asp-for="BirthDate">Birthdate</label>
+                    <span asp-validation-for="BirthDate" class="text-danger floating-error"></span>
+                </div>
             </div>
 
             <div class="form-group">
-                <label asp-for="Address">Address</label>
-                <input asp-for="Address" class="form-control-sm" />
-                <span asp-validation-for="Address" class="text-danger"></span>
+                <div class="input-wrapper">
+                    <input asp-for="Address" class="form-control-sm" />
+                    <label asp-for="Address">Address</label>
+                    <span asp-validation-for="Address" class="text-danger floating-error"></span>
+                </div>
             </div>
 
             <div class="form-group">
-                <label asp-for="Branch">Branch</label>
-                <input asp-for="Branch" class="form-control-sm" />
-                <span asp-validation-for="Branch" class="text-danger"></span>
+                <div class="input-wrapper">
+                    <input asp-for="Branch" class="form-control-sm" />
+                    <label asp-for="Branch">Branch</label>
+                    <span asp-validation-for="Branch" class="text-danger floating-error"></span>
+                </div>
             </div>
 
             <div class="form-group">
-                <label asp-for="ContactNo">Mobile Number</label>
-                <input asp-for="ContactNo" class="form-control-sm" />
-                <span asp-validation-for="ContactNo" class="text-danger"></span>
+                <div class="input-wrapper">
+                    <input asp-for="ContactNo" id="ContactNo" class="form-control-sm" maxlength="11" inputmode="numeric" />
+                    <label asp-for="ContactNo">Mobile Number</label>
+                    <span asp-validation-for="ContactNo" class="text-danger floating-error"></span>
+                </div>
             </div>
 
             <div class="form-group">
-                <label asp-for="EmailAddress">Email Address</label>
-                <input asp-for="EmailAddress" class="form-control-sm" />
-                <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                <div class="input-wrapper">
+                    <input asp-for="EmailAddress" class="form-control-sm" />
+                    <label asp-for="EmailAddress">Email Address</label>
+                    <span asp-validation-for="EmailAddress" class="text-danger floating-error"></span>
+                </div>
             </div>
+
+            <br />
 
             <div class="form-buttons">
-                <button type="submit" class="btn-edit-member">Save</button>
-                <a asp-action="Index" class="btn-edit-cancel">Cancel</a>
+                <button type="submit" class="btn-edit-member">
+                    <span class="btn-text">Save</span>
+                </button>
+
+                <a asp-action="Index" class="btn-edit-cancel">
+                    <span class="btn-text">Cancel</span>
+                </a>
             </div>
         </form>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

@@ -1,21 +1,21 @@
 ﻿@model MemberManagement.Web.ViewModels.MemberVM
 
-<link rel="stylesheet" href="~/css/memberpg/memberdetails.css" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/memberpg/memberdetails.css" />
+}
 
-<br />
+
+
 <div class="member-detail-form-container">
     <div class="member-detail-form-card">
         <div class="member-header">
-            <a asp-action="Index" class="btn-icon-back" title="Back">
-                <i class="fa-solid fa-arrow-left"></i>
+            <a asp-action="Index" class="btn-icon-back" title="Back"> <i class="fa-solid fa-arrow-left"></i>
             </a>
 
             <h2 class="card-header-name">MEMBER DETAILS</h2>
             <div class="header-spacer"></div>
 
-            <a asp-action="Edit" asp-route-id="@Model.MemberID"
-               class="btn-icon-back" title="Edit Member">
-                <i class="bi bi-pencil-square"></i>
+            <a asp-action="Edit" asp-route-id="@Model.MemberID" class="btn-icon-back" title="Edit Member"> <i class="bi bi-pencil-square"></i>
             </a>
         </div>
 

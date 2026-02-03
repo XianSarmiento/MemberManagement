@@ -20,7 +20,7 @@ public class MembersController : Controller
     public async Task<IActionResult> Index(
         string searchLastName = "", string branch = "", 
         string sortColumn = "MemberID", string sortOrder = "asc",
-        int page = 1, int pageSize = 5)
+        int page = 1, int pageSize = 10)
     {
         var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, sortColumn, sortOrder);
 

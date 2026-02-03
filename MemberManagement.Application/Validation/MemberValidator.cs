@@ -16,8 +16,14 @@ namespace MemberManagement.Application.Validation
                 .WithMessage("BirthDate cannot be in the future.");
             RuleFor(m => m.Address).NotEmpty().WithMessage("Address is required.");
             RuleFor(m => m.Branch).NotEmpty().WithMessage("Branch is required.");
-            RuleFor(m => m.ContactNo).NotEmpty().WithMessage("Mobile No. is required.");
-            RuleFor(m => m.EmailAddress).NotEmpty().WithMessage("Email Address is required.");
+            RuleFor(m => m.ContactNo)
+                .NotEmpty().WithMessage("Mobile No. is required.")
+                .Matches(@"^09\d{9}$")
+                .WithMessage("Invalid PH number.");
+            RuleFor(m => m.EmailAddress)
+                .NotEmpty().WithMessage("Email Address is required.")
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+                .WithMessage("Invalid email address..");
         }
     }
 }

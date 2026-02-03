@@ -3,6 +3,25 @@
 @model X.PagedList.IPagedList<MemberManagement.Web.ViewModels.MemberVM>
 
 
+@* What it is: A Razor code block. Purpose: Run server-side C# code inside a view. *@
+@{
+    ViewData["Title"] = "Members List";
+    var searchLastName = ViewBag.SearchLastName as string;
+    var branch = ViewBag.Branch as string;
+    var pageSize = ViewBag.RawPageSize ?? 10;
+    var sortColumn = ViewBag.SortColumn as string;
+    var sortOrder = ViewBag.SortOrder as string;
+
+    // Logic for "No Results" message
+    var noResultsMessage = (string.IsNullOrWhiteSpace(searchLastName) && string.IsNullOrWhiteSpace(branch))
+        ? "No results for your current filters."
+        : "No members found.";
+
+    // Helper function to toggle sort direction and keep the table headers clean
+    Func<string, string> GetToggleOrder = (col) => (sortColumn == col && sortOrder == "asc") ? "desc" : "asc";
+}
+
+@* What it is: A Razor conditional statement. Purpose: Conditionally render HTML depending on server-side data. *@
 @if (TempData["SuccessMessage"] != null)
 {
     <div id="successAlert" class="alert alert-success text-center">
@@ -11,36 +30,44 @@
     </div>
 }
 
-<link rel="stylesheet" href="~/css/memberpg/memberindex.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+@* What it is: Razor sections. Purpose: Define named content sections that can be rendered in a layout page (_Layout.cshtml). *@
+@section Styles {
+    <link rel="stylesheet" href="~/css/memberpg/memberindex.css" />
+}
+@section Scripts {
+    <script src="~/js/memberpg/memberindex.js"></script>
+}
+
+
 
 <br />
 <div class="card shadow-lg">
     <div class="card-body">
 
-        <div class="member-top-bar">
+        @* MEMBERS LIST | SEARCH BAR | FILTER | REFRESH *@
+        <div class="member-top-bar mb-3">
             <div class="d-flex justify-content-between align-items-center">
 
                 <div class="d-flex align-items-center gap-2">
                     <a asp-action="Create" class="btn btn-primary btn-sm btn-create-member" title="Create Member">
                         <i class="bi bi-person-plus"></i>
                     </a>
-
                     <h2 class="mb-0">MEMBERS LIST</h2>
                 </div>
 
                 <form method="get" class="d-flex gap-2">
+                    <input type="hidden" name="pageSize" value="@pageSize" />
+
                     <div class="position-relative" style="width:150px;">
                         <input type="text" name="searchLastName" id="searchLastName"
-                               class="form-control form-control-sm member-search-input"
-                               placeholder="Search Lastname" value="@(ViewBag.SearchLastName ?? "")" />
+                               class="form-control form-control-sm" 
+                               placeholder="Search Lastname" value="@searchLastName" />
                     </div>
 
                     <div style="width:150px;">
                         <input list="branchList" name="branch" id="branchFilter"
-                               class="form-control form-control-sm member-search-input"
-                               placeholder="Filter by Branch" value="@(ViewBag.Branch ?? "")" />
-
+                               class="form-control form-control-sm"
+                               placeholder="Filter by Branch" value="@branch" />
                         <datalist id="branchList">
                             @foreach (var b in (ViewBag.Branches as List<string> ?? new List<string>()))
                             {
@@ -49,150 +76,103 @@
                         </datalist>
                     </div>
 
-                    <button class="btn btn-sm btn-primary py-1" type="submit">
+                    <button class="btn btn-sm btn-primary py-1" type="submit" title="Filter">
                         <i class="bi bi-search"></i>
                     </button>
-
-                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary py-1" title="Clear All Filters">
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary py-1" title="Refresh">
                         <i class="bi bi-arrow-clockwise"></i>
                     </a>
                 </form>
             </div>
         </div>
 
-        <br />
-
         @* MEMBERS TABLE *@
-        <table class="table table-bordered table-striped member-table">
-            <thead class="table-primary">
-                <tr>
-            <thead class="table-primary">
-                <tr>
-                    <th>
-                        <a href="@Url.Action("Index", new { searchLastName = ViewBag.SearchLastName, branch = ViewBag.SelectedBranch, sortColumn = "MemberID", sortOrder = ViewBag.SortColumn == "MemberID" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })">
-                            @if (ViewBag.SortColumn == "MemberID")
-                            { <i class="bi @(ViewBag.SortOrder == "asc" ? "bi-funnel-fill" : "bi-funnel")"></i> }
-                            Member ID
-                        </a>
-                    </th>
-
-                    <th>
-                        <a href="@Url.Action("Index", new { searchLastName = ViewBag.SearchLastName, branch = ViewBag.SelectedBranch, sortColumn = "FirstName", sortOrder = ViewBag.SortColumn == "FirstName" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })">
-                            @if (ViewBag.SortColumn == "FirstName")
-                            { <i class="bi @(ViewBag.SortOrder == "asc" ? "bi-funnel-fill" : "bi-funnel")"></i> }
-                            First Name
-                        </a>
-                    </th>
-
-                    <th>
-                        <a href="@Url.Action("Index", new { searchLastName = ViewBag.SearchLastName, branch = ViewBag.SelectedBranch, sortColumn = "LastName", sortOrder = ViewBag.SortColumn == "LastName" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })">
-                            @if (ViewBag.SortColumn == "LastName")
-                            { <i class="bi @(ViewBag.SortOrder == "asc" ? "bi-funnel-fill" : "bi-funnel")"></i> }
-                            Last Name
-                        </a>
-                    </th>
-
-                    <th>
-                        <a href="@Url.Action("Index", new { searchLastName = ViewBag.SearchLastName, branch = ViewBag.SelectedBranch, sortColumn = "Branch", sortOrder = ViewBag.SortColumn == "Branch" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })">
-                            @if (ViewBag.SortColumn == "Branch")
-                            { <i class="bi @(ViewBag.SortOrder == "asc" ? "bi-funnel-fill" : "bi-funnel")"></i> }
-                            Branch
-                        </a>
-                    </th>
-
-                    <th>Birth Date</th>
-                    <th>Address</th>
-                    <th>Contact No</th>
-                    <th>Email Address</th>
-                    <th>Manage</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
+        <div class="table-responsive scrollable-table">
+            <table class="table table-bordered table-striped member-table">
+                <thead class="table-primary">
                     <tr>
-                        <td colspan="9" class="text-center text-muted py-5">
-                            <i class="bi bi-emoji-frown d-block mb-2" style="font-size: 2rem;"></i>
-
-                            @{
-                                string msg = "We couldn’t find any members.";
-                                var lastNameFilter = ViewData["SearchLastName"] as string;
-                                var branchFilter = ViewData["SelectedBranch"] as string;
-
-                                if (!string.IsNullOrWhiteSpace(lastNameFilter))
-                                {
-                                    msg = $"We couldn’t find any members matching '{lastNameFilter}'.";
-                                }
-                                else if (!string.IsNullOrWhiteSpace(branchFilter))
-                                {
-                                    msg = $"We couldn’t find any members in branch '{branchFilter}'.";
-                                }
-                            }
-
-                            @msg
-                        </td>
-                    </tr>
-                }
-
-                @foreach (var m in (Model ?? Enumerable.Empty<MemberManagement.Web.ViewModels.MemberVM>()))
-                {
-                    <tr>
-                        <td>@m.MemberID</td>
-                        <td>@m.FirstName</td>
-                        <td>@m.LastName</td>
-                        <td>@m.Branch</td>
-                        <td>@m.BirthDate.ToString("yyyy-MM-dd")</td>
-                        <td>@m.Address</td>
-                        <td>@m.ContactNo</td>
-                        <td>@m.EmailAddress</td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@m.MemberID"
-                               class="btn btn-sm btn-outline-primary"
-                               title="Edit Member">
-                                <i class="bi bi-pencil-square"></i>
+                        <th>
+                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "MemberID", sortOrder = GetToggleOrder("MemberID") })">
+                                @if (sortColumn == "MemberID")
+                                { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } ID
                             </a>
-
-                            <a asp-action="Detail" asp-route-id="@m.MemberID"
-                               class="btn btn-sm btn-outline-success"
-                               title="Member Details">
-                                <i class="bi bi-info-circle"></i>
+                        </th>
+                        <th>
+                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "FirstName", sortOrder = GetToggleOrder("FirstName") })">
+                                @if (sortColumn == "FirstName")
+                                { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } First Name
                             </a>
-
-                            <button type="button"
-                                    class="btn btn-sm btn-outline-secondary btn-delete-hover"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal"
-                                    data-id="@m.MemberID"
-                                    data-name="@($"{m.FirstName} {m.LastName}")"
-                                    title="Delete Member">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
+                        </th>
+                        <th>
+                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "LastName", sortOrder = GetToggleOrder("LastName") })">
+                                @if (sortColumn == "LastName")
+                                {  <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Last Name
+                            </a>
+                        </th>
+                        <th>
+                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "Branch", sortOrder = GetToggleOrder("Branch") })">
+                                @if (sortColumn == "Branch")
+                                { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Branch
+                            </a>
+                        </th>
+                        <th>Birth Date</th>
+                        <th>Address</th>
+                        <th>Contact No</th>
+                        <th>Email Address</th>
+                        <th>Manage</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-5">
+                                <i class="bi bi-emoji-frown d-block mb-2" style="font-size: 2rem;"></i>
+                                @noResultsMessage
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var m in (Model ?? Enumerable.Empty<MemberManagement.Web.ViewModels.MemberVM>()))
+                    {
+                        <tr>
+                            <td>@m.MemberID</td>
+                            <td>@m.FirstName</td>
+                            <td>@m.LastName</td>
+                            <td>@m.Branch</td>
+                            <td>@m.BirthDate.ToString("yyyy-MM-dd")</td>
+                            <td>@m.Address</td>
+                            <td>@m.ContactNo</td>
+                            <td>@m.EmailAddress</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a asp-action="Edit" asp-route-id="@m.MemberID" class="btn btn-sm btn-outline-primary" title="Edit Member"> <i class="bi bi-pencil-square"></i> </a>
+                                    <a asp-action="Detail" asp-route-id="@m.MemberID" class="btn btn-sm btn-outline-success" title="Member Details"> <i class="bi bi-info-circle"></i> </a>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-delete-hover"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-id="@m.MemberID" data-name="@($"{m.FirstName} {m.LastName}")"
+                                            data-url="@Url.Action("Delete", "Members")"
+                                            title="Delete Member">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
         @* PAGINATION & PAGE SIZE *@
-        @{
-            var currentPageSize = ViewBag.CurrentPageSize ?? 5;
-        }
         <div class="d-flex justify-content-between align-items-center mt-2">
-
-            <div class="d-flex align-items-center">
-                <form method="get">
-                    @{
-                        var rawPageSize = ViewBag.RawPageSize ?? 5;
-                    }
-
-                    <select name="pageSize" class="form-select form-select-sm" style="height:28px; width:80px;" onchange="this.form.submit()">
-                        <option value="5" selected="@(rawPageSize == 5 ? "selected" : null)">5</option>
-                        <option value="10" selected="@(rawPageSize == 10 ? "selected" : null)">10</option>
-                        <option value="-1" selected="@(rawPageSize == -1 ? "selected" : null)">All</option>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <form method="get" class="d-flex align-items-center gap-2">
+                    <select name="pageSize" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                        <option value="10" selected="@(pageSize == 10)">10 per page</option>
+                        <option value="20" selected="@(pageSize == 20)">20 per page</option>
+                        <option value="-1" selected="@(pageSize == -1)">Show All</option>
                     </select>
-
-                    <input type="hidden" name="searchLastName" value="@(ViewBag.SearchLastName ?? "")" />
-                    <input type="hidden" name="branch" value="@(ViewBag.Branch ?? "")" />
+                    <input type="hidden" name="searchLastName" value="@searchLastName" />
+                    <input type="hidden" name="branch" value="@branch" />
                 </form>
             </div>
 
@@ -204,18 +184,20 @@
             </div>
 
             <div>
-                @Html.PagedListPager(Model, page => Url.Action("Index", new {
-                page,
-                searchLastName = ViewBag.SearchLastName ?? "",
-                branch = ViewBag.Branch ?? "",
-                pageSize = currentPageSize
-                                }),
-                                new PagedListRenderOptions
-                                {
-                                    LiElementClasses = new[] { "page-item" },
-                                    PageClasses = new[] { "page-link" },
-                                    UlElementClasses = new[] { "pagination pagination-sm mb-0" }
-                                })
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchLastName, branch, pageSize
+                }),
+                    new PagedListRenderOptions
+                        {
+                        LiElementClasses = new[] { "page-item" },
+                        PageClasses = new[] { "page-link" },
+                        UlElementClasses = new[] { "pagination pagination-sm mb-0" },
+                        MaximumPageNumbersToDisplay = 3,
+                        DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+                        DisplayLinkToLastPage = PagedListDisplayMode.Never,
+                        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                        DisplayEllipsesWhenNotShowingAllPageNumbers = true
+                    })
             </div>
         </div>
 
@@ -245,31 +227,4 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        var deleteModal = document.getElementById('deleteModal');
-        if(deleteModal) {
-            deleteModal.addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget;
-                if(!button) return;
 
-                var memberId = button.getAttribute('data-id') ?? '';
-                var memberName = button.getAttribute('data-name') ?? '';
-
-                deleteModal.querySelector('#memberName').textContent = memberName;
-                deleteModal.querySelector('#deleteMemberId').value = memberId;
-                deleteModal.querySelector('#deleteForm').action = '/Members/Delete';
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', (event) => {
-            const alert = document.getElementById('successAlert');
-            if(alert) {
-                setTimeout(() => {
-                    alert.style.animation = 'fadeOut 0.5s forwards';
-                    setTimeout(() => alert.remove(), 500);
-                }, 3000);
-            }
-        });
-    </script>
-}
