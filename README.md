@@ -13,6 +13,11 @@ The solution is divided into four specialized layers to maintain a clear separat
 * **MemberManagement.Infrastructure**: Handles data persistence and external concerns. It contains the **MMSDbContext.cs**, EF Core **Migrations**, and **Repository** implementations (`MemberRepository.cs`).
 * **MemberManagement.Domain**: The core layer containing enterprise-level entities like `Member.cs` and core repository interfaces.
 
+Testing (Supporting Project)
+
+* **MemberManagement.Tests**: Unit test project covering Member CRUD operations, validation rules, and age-related business logic.  
+  Tests target the Application and Domain layers and use mocked dependencies.
+
 ---
 
 ## 🛠 Tech Stack
@@ -22,6 +27,7 @@ The solution is divided into four specialized layers to maintain a clear separat
 * **Database**: Microsoft SQL Server
 * **Validation**: FluentValidation (12.1.1)
 * **UI Helpers**: X.PagedList.Mvc.Core (10.5.9)
+* Testing: xUnit, Moq, FluentAssertions
 
 ---
 
@@ -59,6 +65,41 @@ Set `MemberManagement.Web` as the startup project and run it via Visual Studio (
 ```bash
 cd MemberManagement.Web
 dotnet run
+
+```
+
+## 🧪 Unit Testing
+
+The solution includes comprehensive unit tests to ensure correctness and reliability of the core business logic.
+
+Test Coverage
+
+* Member CRUD Operations
+  * Create, Update, Delete, and Retrieve members via MemberService
+  * Repository interactions are mocked to isolate business logic
+
+* Validation Logic 
+  * FluentValidation rules for MemberDTO and MemberVM
+  *  Verifies required fields, value ranges, and invalid inputs
+
+* Age Calculation & Rules
+  * Ensures age is calculated correctly from BirthDate
+  * Validates minimum/maximum age constraints and edge cases
+
+Testing Approach
+
+* xUnit for test execution
+* Moq for mocking repositories and dependencies
+* FluentAssertions for expressive, readable assertions
+* Tests follow Arrange–Act–Assert (AAA) pattern
+* Focused on Application and Domain layers for fast, isolated tests
+
+Running Tests
+
+From the solution root:
+
+```bash
+dotnet test
 
 ```
 
