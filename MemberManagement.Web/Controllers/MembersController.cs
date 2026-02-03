@@ -4,38 +4,35 @@ using MemberManagement.Application.Core;
 using MemberManagement.Web.Mappers;
 using MemberManagement.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using X.PagedList;
 using X.PagedList.Extensions;
 
-public class MembersController : Controller
+public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmValidator) : Controller
 {
-    private readonly MemberCore _memberCore;
-    private readonly IValidator<MemberVM> _vmValidator;
-
-    public MembersController(MemberCore memberCore, IValidator<MemberVM> vmValidator)
-    {
-        _memberCore = memberCore;
-        _vmValidator = vmValidator;
-    }
+    private readonly MemberCore _memberCore = memberCore;
+    private readonly IValidator<MemberVM> _vmValidator = vmValidator;
+    private readonly IPagedList<MemberVM>? pagedMembers;
 
     public async Task<IActionResult> Index(
         string searchLastName = "", string branch = "", 
         string sortColumn = "MemberID", string sortOrder = "asc",
         int page = 1, int pageSize = 10)
     {
-        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, sortColumn, sortOrder);
+        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, sortColumn, sortOrder);                  // Fetch DTOs from service
 
-        var vms = result.Members.ToViewModels();                                            // Use mapper instead of repeating mapping logic
 
-        ViewBag.RawPageSize = pageSize;                                                     // Save the raw selection for the UI
-        int actualPageSize = pageSize < 1 ? vms.Count : pageSize;                           // If pageSize < 1, show all items
-        var pagedList = vms.ToPagedList(page, actualPageSize);                              // Build paged list correctly
+        var vms = result.Members.ToViewModels();                                                                                // Use mapper instead of repeating mapping logic (Map to VMs)
 
-        ViewBag.Branches = result.Branches ?? new List<string>();                           // ViewBag for filters
+        ViewBag.RawPageSize = pageSize;                                                                                         // Save the raw selection for the UI
+        int actualPageSize = pageSize < 1 ? vms.Count : pageSize;                                                               // If pageSize < 1, show all items
+        var pagedList = vms.ToPagedList(page, actualPageSize);                                                                  // Build paged list correctly
+
+        ViewBag.Branches = result.Branches ?? new List<string>();                                                               // ViewBag for filters
         ViewBag.SearchLastName = searchLastName;
         ViewBag.SelectedBranch = branch;
         ViewBag.CurrentPageSize = pageSize;
 
-        ViewBag.SortColumn = sortColumn;                                                    // Keep track of sorting for the view
+        ViewBag.SortColumn = sortColumn;                                                                                        // Keep track of sorting for the view
         ViewBag.SortOrder = sortOrder;
 
         return View(pagedList);
