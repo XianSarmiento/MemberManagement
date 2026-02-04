@@ -12,9 +12,9 @@ namespace MemberManagement.Application.Validation
             RuleFor(m => m.LastName).NotEmpty().WithMessage("Last Name is required.");
 
             RuleFor(m => m.BirthDate)
-                .NotNull().WithMessage("BirthDate is required.")
                 .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
-                .WithMessage("BirthDate cannot be in the future.");
+                .WithMessage("BirthDate cannot be in the future.")
+                .When(m => m.BirthDate.HasValue);
 
             // Optional fields (Only validate if provided or if not required)
             RuleFor(m => m.Address)

@@ -22,7 +22,7 @@ namespace MemberManagement.Application.Core
             MemberID = m.MemberID,
             FirstName = m.FirstName,
             LastName = m.LastName,
-            BirthDate = m.BirthDate.ToDateTime(TimeOnly.MinValue),
+            BirthDate = m.BirthDate.HasValue ? m.BirthDate.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
             Address = m.Address,
             Branch = m.Branch,
             ContactNo = m.ContactNo,
@@ -61,7 +61,7 @@ namespace MemberManagement.Application.Core
             {
                 FirstName = dto.FirstName!,
                 LastName = dto.LastName!,
-                BirthDate = DateOnly.FromDateTime(dto.BirthDate.Date),
+                BirthDate = dto.BirthDate.HasValue ? DateOnly.FromDateTime(dto.BirthDate.Value.Date) : null,
                 Address = dto.Address!,
                 Branch = dto.Branch!,
                 ContactNo = dto.ContactNo!,
@@ -88,7 +88,7 @@ namespace MemberManagement.Application.Core
             // Map DTO → Entity
             member.FirstName = dto.FirstName!;
             member.LastName = dto.LastName!;
-            member.BirthDate = DateOnly.FromDateTime(dto.BirthDate.Date);
+            member.BirthDate = dto.BirthDate.HasValue ? DateOnly.FromDateTime(dto.BirthDate.Value.Date) : null;
             member.Address = dto.Address!;
             member.Branch = dto.Branch!;
             member.ContactNo = dto.ContactNo!;

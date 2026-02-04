@@ -13,8 +13,7 @@ namespace MemberManagement.Web.ValidationsVM
             RuleFor(x => x.LastName).NotEmpty().WithMessage("Last Name is required.");
 
             RuleFor(x => x.BirthDate)
-                .NotNull().WithMessage("BirthDate is required.")
-                .Must(date => date.Date <= DateTime.Today)
+                .Must(date => !date.HasValue || date.Value.Date <= DateTime.Today)
                 .WithMessage("Birth date cannot be in the future");
 
             // Optional fields (Only validate if provided or if not required)

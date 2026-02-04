@@ -7,6 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using X.PagedList.Extensions;
 
+/// <summary>
+/// Controller responsible for managing Member entities in the application.
+/// It provides CRUD operations (Create, Read, Update, Delete) and supports
+/// paging, sorting, filtering, and validation using FluentValidation.
+/// </summary>
 public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmValidator) : Controller
 {
     private readonly MemberCore _memberCore = memberCore;
@@ -17,20 +22,20 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
         string sortColumn = "MemberId", string sortOrder = "asc",
         int page = 1, int pageSize = 10)
     {
-        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, sortColumn, sortOrder);                  // Fetch DTOs from service
+        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, sortColumn, sortOrder);
 
-        var memberVMs = result.Members.ToViewModels();                                                                          // Use mapper instead of repeating mapping logic (Map to VMs)
+        var memberVMs = result.Members.ToViewModels();
 
-        ViewBag.rawPageSize = pageSize;                                                                                         // Save the raw selection for the UI
-        int actualPageSize = pageSize < 1 ? memberVMs.Count : pageSize;                                                         // If pageSize < 1, show all items
-        var pagedList = memberVMs.ToPagedList(page, actualPageSize);                                                            // Build paged list correctly
+        ViewBag.rawPageSize = pageSize;
+        int actualPageSize = pageSize < 1 ? memberVMs.Count : pageSize;
+        var pagedList = memberVMs.ToPagedList(page, actualPageSize);
 
-        ViewBag.branches = result.Branches ?? new List<string>();                                                               // ViewBag for filters
+        ViewBag.branches = result.Branches ?? new List<string>();
         ViewBag.searchLastName = searchLastName;
         ViewBag.selectedBranch = branch;
         ViewBag.currentPageSize = pageSize;
 
-        ViewBag.sortColumn = sortColumn;                                                                                        // Keep track of sorting for the view
+        ViewBag.sortColumn = sortColumn;
         ViewBag.sortOrder = sortOrder;
 
         return View(new MemberIndexVM
@@ -52,7 +57,7 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MemberVM memberVM)
     {
-        var validationResult = await _vmValidator.ValidateAsync(memberVM);                        // Validate VM first
+        var validationResult = await _vmValidator.ValidateAsync(memberVM); 
         if (!validationResult.IsValid)
         {
             foreach (var error in validationResult.Errors)
@@ -61,7 +66,7 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
             return View(memberVM);
         }
 
-        var dto = memberVM.ToDTO();                                                               // Use mapper from DTO
+        var dto = memberVM.ToDTO();
 
         try
         {

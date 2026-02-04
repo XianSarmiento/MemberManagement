@@ -13,7 +13,7 @@ namespace MemberManagement.Domain.Entities
         public string FirstName { get; set; } = null!;
         [Required]
         public string LastName { get; set; } = null!;
-        public DateOnly BirthDate { get; set; }
+        public DateOnly? BirthDate { get; set; }
 
 
         // Optional Member Fields → allow NULL

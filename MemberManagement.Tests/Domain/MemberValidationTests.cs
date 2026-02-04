@@ -50,6 +50,9 @@ namespace MemberManagement.Tests.Domain
     {
         public static bool IsValidEmail(this Member m)
         {
+            if (string.IsNullOrWhiteSpace(m.EmailAddress))
+                return false; // null or empty is invalid
+
             try
             {
                 var addr = new System.Net.Mail.MailAddress(m.EmailAddress);

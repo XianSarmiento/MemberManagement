@@ -33,19 +33,23 @@
             <div class="col-md-3 form-group">
                 <label>Birthdate</label>
                 <p class="form-control-plaintext">
-                    @Model.BirthDate.ToString("yyyy-MM-dd")
+                    @Model.BirthDate?.ToString("yyyy-MM-dd") ?? "—"
                 </p>
             </div>
 
             @{
-                var today = DateTime.Today;
-                var age = today.Year - Model.BirthDate.Year;
-                if (Model.BirthDate.Date > today.AddYears(-age)) { age--; }
+                int? age = null;
+                if (Model.BirthDate.HasValue)
+                {
+                    var today = DateTime.Today;
+                    age = today.Year - Model.BirthDate.Value.Year;
+                    if (Model.BirthDate.Value.Date > today.AddYears(-age.Value)) { age--; }
+                }
             }
 
             <div class="col-md-3 form-group">
                 <label>Age</label>
-                <p class="form-control-plaintext">@age</p>
+                <p class="form-control-plaintext">@((age.HasValue) ? age.Value.ToString() : "—")</p>
             </div>
         </div>
 
