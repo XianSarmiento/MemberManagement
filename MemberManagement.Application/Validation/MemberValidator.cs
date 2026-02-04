@@ -9,21 +9,30 @@ namespace MemberManagement.Application.Validation
         public MemberValidator()
         {
             RuleFor(m => m.FirstName).NotEmpty().WithMessage("First Name is required.");
+
             RuleFor(m => m.LastName).NotEmpty().WithMessage("Last Name is required.");
+
             RuleFor(x => x.BirthDate)
                 .NotNull().WithMessage("BirthDate is required.")
                 .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
                 .WithMessage("BirthDate cannot be in the future.");
-            RuleFor(m => m.Address).NotEmpty().WithMessage("Address is required.");
-            RuleFor(m => m.Branch).NotEmpty().WithMessage("Branch is required.");
+
+            // Optional fields (Only validate if provided or if not required)
+            RuleFor(m => m.Address)
+                .MaximumLength(200).WithMessage("Address cannot exceed 200 characters.")
+                .When(m => !string.IsNullOrEmpty(m.Address));
+
+            RuleFor(m => m.Branch)
+                .MaximumLength(50).WithMessage("Branch cannot exceed 50 characters.")
+                .When(m => !string.IsNullOrEmpty(m.Branch));
+
             RuleFor(m => m.ContactNo)
-                .NotEmpty().WithMessage("Mobile No. is required.")
-                .Matches(@"^09\d{9}$")
-                .WithMessage("Invalid PH number.");
+                .Matches(@"^09\d{9}$").WithMessage("Invalid PH number.")
+                .When(m => !string.IsNullOrEmpty(m.ContactNo));
+
             RuleFor(m => m.EmailAddress)
-                .NotEmpty().WithMessage("Email Address is required.")
-                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-                .WithMessage("Invalid email address..");
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Invalid email address.")
+                .When(m => !string.IsNullOrEmpty(m.EmailAddress));
         }
     }
 }

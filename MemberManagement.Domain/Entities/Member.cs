@@ -7,18 +7,24 @@ namespace MemberManagement.Domain.Entities
         [Key]
         public int MemberID { get; set; }
 
+
         // Core Member Data
-        public required string FirstName { get; set; }
-        public required string LastName { get; set; }
+        [Required]
+        public string FirstName { get; set; } = null!;
+        [Required]
+        public string LastName { get; set; } = null!;
         public DateOnly BirthDate { get; set; }
-        public required string Address { get; set; }
-        public required string Branch { get; set; }
 
-        // Additonal Member Fields
-        public required string ContactNo { get; set; }
-        public required string EmailAddress { get; set; }
-        public bool IsActive { get; set; } 
+
+        // Optional Member Fields → allow NULL
+        public string? Address { get; set; }
+        public string? Branch { get; set; }
+        public string? ContactNo { get; set; }
+        public string? EmailAddress { get; set; }
+
+
+        // System Fields
+        public bool IsActive { get; set; }
         public DateTime DateCreated { get; set; }
-
     }
 }

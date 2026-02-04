@@ -41,10 +41,13 @@ namespace MemberManagement.Web.Mappers
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,
                 BirthDate = vm.BirthDate,
-                Address = vm.Address,
-                Branch = vm.Branch,
-                ContactNo = vm.ContactNo,
-                EmailAddress = vm.EmailAddress,
+
+                // Convert empty strings to null for optional fields
+                Address = string.IsNullOrWhiteSpace(vm.Address) ? null : vm.Address.Trim(),
+                Branch = string.IsNullOrWhiteSpace(vm.Branch) ? null : vm.Branch.Trim(),
+                ContactNo = string.IsNullOrWhiteSpace(vm.ContactNo) ? null : vm.ContactNo.Trim(),
+                EmailAddress = string.IsNullOrWhiteSpace(vm.EmailAddress) ? null : vm.EmailAddress.Trim(),
+
                 IsActive = vm.IsActive,
                 DateCreated = vm.DateCreated
             };

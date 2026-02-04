@@ -1,7 +1,6 @@
 ﻿using MemberManagement.Application.Business;
 using MemberManagement.Application.Interfaces;
 using MemberManagement.Domain.Entities;
-using MemberManagement.Application.Validation;
 using FluentValidation;
 using FluentValidation.Results;
 using System;
@@ -9,13 +8,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace MemberManagement.Application.Core
 {
+    // Application-layer orchestration for member-related operations
     public class MemberCore
     {
         private readonly IMemberService _memberService;
         private readonly IValidator<Member> _validator;
+
+        // Maps domain Member entity to MemberDTO
+        private static MemberDTO MapToDto(Member m) => new()
+        {
+            MemberID = m.MemberID,
+            FirstName = m.FirstName,
+            LastName = m.LastName,
+            BirthDate = m.BirthDate.ToDateTime(TimeOnly.MinValue),
+            Address = m.Address,
+            Branch = m.Branch,
+            ContactNo = m.ContactNo,
+            EmailAddress = m.EmailAddress,
+            IsActive = m.IsActive,
+            DateCreated = m.DateCreated
+        };
 
         public MemberCore(IMemberService memberService, IValidator<Member> validator)
         {
@@ -28,19 +42,7 @@ namespace MemberManagement.Application.Core
         {
             var members = await _memberService.GetActiveMembersAsync();
 
-            return members.Select(m => new MemberDTO
-            {
-                MemberID = m.MemberID,
-                FirstName = m.FirstName,
-                LastName = m.LastName,
-                BirthDate = m.BirthDate.ToDateTime(TimeOnly.MinValue),
-                Address = m.Address,
-                Branch = m.Branch,
-                ContactNo = m.ContactNo,
-                EmailAddress = m.EmailAddress,
-                IsActive = m.IsActive,
-                DateCreated = m.DateCreated
-            });
+            return members.Select(MapToDto);
         }
 
         public async Task<MemberDTO?> GetMemberByIdAsync(int id)
@@ -48,19 +50,7 @@ namespace MemberManagement.Application.Core
             var member = await _memberService.GetByIdAsync(id);
             if (member == null) return null;
 
-            return new MemberDTO
-            {
-                MemberID = member.MemberID,
-                FirstName = member.FirstName,
-                LastName = member.LastName,
-                BirthDate = member.BirthDate.ToDateTime(TimeOnly.MinValue),
-                Address = member.Address,
-                Branch = member.Branch,
-                ContactNo = member.ContactNo,
-                EmailAddress = member.EmailAddress,
-                IsActive = member.IsActive,
-                DateCreated = member.DateCreated
-            };
+            return MapToDto(member);
         }
 
         // Create a new member using DTO
@@ -78,7 +68,6 @@ namespace MemberManagement.Application.Core
                 EmailAddress = dto.EmailAddress!
             };
 
-            // Validate entity
             ValidationResult result = _validator.Validate(member);
             if (!result.IsValid)
             {
@@ -93,7 +82,7 @@ namespace MemberManagement.Application.Core
         {
             var member = await _memberService.GetByIdAsync(dto.MemberID);
             if (member == null)
-                throw new Exception("Member not found.");
+                throw new KeyNotFoundException("Member not found.");
 
             // Map DTO → Entity
             member.FirstName = dto.FirstName!;
@@ -104,7 +93,7 @@ namespace MemberManagement.Application.Core
             member.ContactNo = dto.ContactNo!;
             member.EmailAddress = dto.EmailAddress!;
 
-            // Validate updated entity
+            // Ensure updated member data is valid before saving
             ValidationResult result = _validator.Validate(member);
             if (!result.IsValid)
             {
@@ -127,10 +116,8 @@ namespace MemberManagement.Application.Core
 
         // Get members for index with filtering, sorting, and pagination
         public async Task<MemberIndexResult> GetMembersForIndexAsync(
-            string searchLastName,
-            string branch,
-            string sortColumn = "MemberID",    // default sort column
-            string sortOrder = "asc")          // default sort order
+            string searchLastName, string branch, 
+            string sortColumn = "MemberID", string sortOrder = "asc") 
         {
             var dtos = (await GetActiveMembersAsync()).ToList();
 

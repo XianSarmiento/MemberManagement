@@ -1,24 +1,31 @@
-﻿using MemberManagement.Application.Interfaces;
-using MemberManagement.Application.Validation;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using MemberManagement.Application.Interfaces;
 using MemberManagement.Domain.Entities;
 using MemberManagement.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using FluentValidation;
-using FluentValidation.Results;
 
 namespace MemberManagement.Application.Services
 {
-    public class MemberService(IMemberRepository repository) : IMemberService
+    public class MemberService : IMemberService
     {
-        private readonly IMemberRepository _repository =
-            repository ?? throw new ArgumentNullException(nameof(repository));
+        private readonly IMemberRepository _repository;
+        private readonly IValidator<Member> _validator;
+
+        public MemberService(IMemberRepository repository, IValidator<Member> validator)
+        {
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
+        }
 
         public async Task<IEnumerable<Member>> GetActiveMembersAsync()
         {
+            // Ideally, move filtering to repository
             var all = await _repository.GetAllAsync();
-            return all.Where(m => m.IsActive); // ensure only active members
+            return all.Where(m => m.IsActive);
         }
 
         public async Task<Member?> GetByIdAsync(int id)
@@ -28,31 +35,21 @@ namespace MemberManagement.Application.Services
 
         public async Task CreateAsync(Member member)
         {
-            // Validation using FluentValidation
-            var validator = new MemberValidator();
-            FluentValidation.Results.ValidationResult result = validator.Validate(member);
-
+            var result = await _validator.ValidateAsync(member);
             if (!result.IsValid)
-            {
-                throw new FluentValidation.ValidationException(result.Errors);
-            }
+                throw new ValidationException(result.Errors);
 
-            // Business rules go here
             member.IsActive = true;
-            member.DateCreated = DateTime.Now;
+            member.DateCreated = DateTime.UtcNow;
 
             await _repository.AddAsync(member);
         }
 
         public async Task UpdateAsync(Member member)
         {
-            var validator = new MemberValidator();
-            FluentValidation.Results.ValidationResult result = validator.Validate(member);
-
+            var result = await _validator.ValidateAsync(member);
             if (!result.IsValid)
-            {
-                throw new FluentValidation.ValidationException(result.Errors);
-            }
+                throw new ValidationException(result.Errors);
 
             await _repository.UpdateAsync(member);
         }

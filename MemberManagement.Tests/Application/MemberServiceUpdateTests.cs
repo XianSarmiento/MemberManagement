@@ -1,6 +1,8 @@
-﻿using MemberManagement.Application.Services;
+﻿using FluentValidation;
+using MemberManagement.Application.Services;
 using MemberManagement.Domain.Entities;
 using MemberManagement.Domain.Interfaces;
+using FluentValidation.Results;
 using Moq;
 using System;
 using System.Threading.Tasks;
@@ -15,7 +17,11 @@ namespace MemberManagement.Tests.Application
         {
             // Arrange
             var mockRepo = new Mock<IMemberRepository>();
-            var service = new MemberService(mockRepo.Object);
+            var mockValidator = new Mock<IValidator<Member>>();
+            mockValidator.Setup(v => v.ValidateAsync(It.IsAny<Member>(), default))
+                         .ReturnsAsync(new ValidationResult()); // always valid
+
+            var service = new MemberService(mockRepo.Object, mockValidator.Object);
 
             var member = new Member
             {

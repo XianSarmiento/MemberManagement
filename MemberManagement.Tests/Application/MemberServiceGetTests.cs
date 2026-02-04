@@ -1,6 +1,8 @@
-﻿using MemberManagement.Application.Services;
+﻿using FluentValidation;
+using MemberManagement.Application.Services;
 using MemberManagement.Domain.Entities;
 using MemberManagement.Domain.Interfaces;
+using FluentValidation.Results;
 using Moq;
 using System.Threading.Tasks;
 using Xunit;
@@ -27,13 +29,17 @@ namespace MemberManagement.Tests.Application
             };
             mockRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(member);
 
-            var service = new MemberService(mockRepo.Object);
+            var mockValidator = new Mock<IValidator<Member>>();
+            mockValidator.Setup(v => v.ValidateAsync(It.IsAny<Member>(), default))
+                         .ReturnsAsync(new ValidationResult()); // always valid
+
+            var service = new MemberService(mockRepo.Object, mockValidator.Object);
 
             // Act
             var result = await service.GetByIdAsync(1);
 
             // Assert
-            Assert.Equal("John", result.FirstName);
+            Assert.Equal("John", result!.FirstName);
             Assert.Equal("Sarmiento", result.LastName);
         }
     }
