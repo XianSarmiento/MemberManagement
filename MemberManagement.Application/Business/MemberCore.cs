@@ -54,7 +54,7 @@ namespace MemberManagement.Application.Core
         }
 
         // Create a new member using DTO
-        public async Task CreateMemberAsync(MemberDTO dto)
+        public async Task<string> CreateMemberAsync(MemberDTO dto)
         {
             // Map DTO → Entity
             var member = new Member
@@ -75,14 +75,15 @@ namespace MemberManagement.Application.Core
             }
 
             await _memberService.CreateAsync(member);
+            return OperationMessage.User.Created;
         }
 
         // Update existing member using DTO
-        public async Task UpdateMemberAsync(MemberDTO dto)
+        public async Task<string> UpdateMemberAsync(MemberDTO dto)
         {
             var member = await _memberService.GetByIdAsync(dto.MemberID);
             if (member == null)
-                throw new KeyNotFoundException("Member not found.");
+                throw new KeyNotFoundException(OperationMessage.Error.NotFound);
 
             // Map DTO → Entity
             member.FirstName = dto.FirstName!;
@@ -97,27 +98,29 @@ namespace MemberManagement.Application.Core
             ValidationResult result = _validator.Validate(member);
             if (!result.IsValid)
             {
-                throw new ValidationException(result.Errors);
+                throw new ValidationException(OperationMessage.Error.InvalidInput, result.Errors);
             }
 
             await _memberService.UpdateAsync(member);
+            return OperationMessage.User.Updated;
         }
 
         // Soft delete
-        public async Task DeleteMemberAsync(int id)
+        public async Task<string> DeleteMemberAsync(int id)
         {
             var member = await _memberService.GetByIdAsync(id);
             if (member == null)
-                throw new Exception("Member not found.");
+                throw new KeyNotFoundException(OperationMessage.Error.NotFound);
 
             member.IsActive = false;
             await _memberService.UpdateAsync(member);
+            return OperationMessage.User.Deleted;
         }
 
         // Get members for index with filtering, sorting, and pagination
         public async Task<MemberIndexResult> GetMembersForIndexAsync(
             string searchLastName, string branch, 
-            string sortColumn = "MemberID", string sortOrder = "asc") 
+            string sortColumn = "MemberId", string sortOrder = "asc") 
         {
             var dtos = (await GetActiveMembersAsync()).ToList();
 

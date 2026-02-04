@@ -12,25 +12,25 @@ namespace MemberManagement.Application.Services
 {
     public class MemberService : IMemberService
     {
-        private readonly IMemberRepository _repository;
+        private readonly IMemberRepository _memberRepository;
         private readonly IValidator<Member> _validator;
 
         public MemberService(IMemberRepository repository, IValidator<Member> validator)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _memberRepository = repository ?? throw new ArgumentNullException(nameof(repository));
             _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
         public async Task<IEnumerable<Member>> GetActiveMembersAsync()
         {
             // Ideally, move filtering to repository
-            var all = await _repository.GetAllAsync();
-            return all.Where(m => m.IsActive);
+            var allMembers = await _memberRepository.GetAllAsync();
+            return allMembers.Where(member => member.IsActive);
         }
 
         public async Task<Member?> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            return await _memberRepository.GetByIdAsync(id);
         }
 
         public async Task CreateAsync(Member member)
@@ -42,7 +42,7 @@ namespace MemberManagement.Application.Services
             member.IsActive = true;
             member.DateCreated = DateTime.UtcNow;
 
-            await _repository.AddAsync(member);
+            await _memberRepository.AddAsync(member);
         }
 
         public async Task UpdateAsync(Member member)
@@ -51,12 +51,12 @@ namespace MemberManagement.Application.Services
             if (!result.IsValid)
                 throw new ValidationException(result.Errors);
 
-            await _repository.UpdateAsync(member);
+            await _memberRepository.UpdateAsync(member);
         }
 
         public async Task DeleteAsync(int id)
         {
-            await _repository.SoftDeleteAsync(id);
+            await _memberRepository.SoftDeleteAsync(id);
         }
     }
 }

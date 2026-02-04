@@ -5,51 +5,50 @@ namespace MemberManagement.Web.Mappers
 {
     public static class MemberMapper
     {
-        // DTO → VM
-        public static MemberVM ToViewModel(this MemberDTO dto)
+        // Convert DTO → ViewModel
+        public static MemberVM ToViewModel(this MemberDTO memberDto)
         {
-            if (dto == null) return null;
+            if (memberDto == null) return null;
 
             return new MemberVM
             {
-                MemberID = dto.MemberID,
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                BirthDate = dto.BirthDate,
-                Address = dto.Address,
-                Branch = dto.Branch,
-                ContactNo = dto.ContactNo,
-                EmailAddress = dto.EmailAddress,
-                IsActive = dto.IsActive,
-                DateCreated = dto.DateCreated
+                MemberID = memberDto.MemberID,
+                FirstName = memberDto.FirstName,
+                LastName = memberDto.LastName,
+                BirthDate = memberDto.BirthDate,
+                Address = memberDto.Address,
+                Branch = memberDto.Branch,
+                ContactNo = memberDto.ContactNo,
+                EmailAddress = memberDto.EmailAddress,
+                IsActive = memberDto.IsActive,
+                DateCreated = memberDto.DateCreated
             };
         }
 
-        public static List<MemberVM> ToViewModels(this IEnumerable<MemberDTO> dtos)
-        {
-            return dtos?.Select(d => d.ToViewModel()).ToList() ?? new List<MemberVM>();
-        }
+        // Convert IEnumerable<DTO> → List<ViewModel>
+        public static List<MemberVM> ToViewModels(this IEnumerable<MemberDTO> memberDtos) =>
+            memberDtos?.Select(d => d.ToViewModel()).ToList() ?? new List<MemberVM>();
 
-        // VM → DTO
-        public static MemberDTO ToDTO(this MemberVM vm)
+        // Convert ViewModel → DTO
+        public static MemberDTO ToDTO(this MemberVM memberVm)
         {
-            if (vm == null) return null;
+            if (memberVm == null) return null;
 
             return new MemberDTO
             {
-                MemberID = vm.MemberID,
-                FirstName = vm.FirstName,
-                LastName = vm.LastName,
-                BirthDate = vm.BirthDate,
+                MemberID = memberVm.MemberID,
+                FirstName = memberVm.FirstName,
+                LastName = memberVm.LastName,
+                BirthDate = memberVm.BirthDate,
 
-                // Convert empty strings to null for optional fields
-                Address = string.IsNullOrWhiteSpace(vm.Address) ? null : vm.Address.Trim(),
-                Branch = string.IsNullOrWhiteSpace(vm.Branch) ? null : vm.Branch.Trim(),
-                ContactNo = string.IsNullOrWhiteSpace(vm.ContactNo) ? null : vm.ContactNo.Trim(),
-                EmailAddress = string.IsNullOrWhiteSpace(vm.EmailAddress) ? null : vm.EmailAddress.Trim(),
+                // Optional fields: convert empty strings to null
+                Address = string.IsNullOrWhiteSpace(memberVm.Address) ? null : memberVm.Address.Trim(),
+                Branch = string.IsNullOrWhiteSpace(memberVm.Branch) ? null : memberVm.Branch.Trim(),
+                ContactNo = string.IsNullOrWhiteSpace(memberVm.ContactNo) ? null : memberVm.ContactNo.Trim(),
+                EmailAddress = string.IsNullOrWhiteSpace(memberVm.EmailAddress) ? null : memberVm.EmailAddress.Trim(),
 
-                IsActive = vm.IsActive,
-                DateCreated = vm.DateCreated
+                IsActive = memberVm.IsActive,
+                DateCreated = memberVm.DateCreated
             };
         }
     }

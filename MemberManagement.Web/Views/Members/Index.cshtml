@@ -1,21 +1,22 @@
 ﻿@using X.PagedList
 @using X.PagedList.Mvc.Core
-@model X.PagedList.IPagedList<MemberManagement.Web.ViewModels.MemberVM>
+@using MemberManagement.Web.ViewModels
+@model MemberIndexVM
 
 
 @* What it is: A Razor code block. Purpose: Run server-side C# code inside a view. *@
 @{
     ViewData["Title"] = "Members List";
-    var searchLastName = ViewBag.SearchLastName as string;
-    var branch = ViewBag.SelectedBranch as string;
-    var pageSize = ViewBag.RawPageSize ?? 10;
-    var sortColumn = ViewBag.SortColumn as string;
-    var sortOrder = ViewBag.SortOrder as string;
+    var searchLastName = Model.SearchLastName;
+    var branch = Model.SelectedBranch;
+    var pageSize = Model.PageSize;
+    var sortColumn = Model.SortColumn;
+    var sortOrder = Model.SortOrder;
 
     // Logic for "No Results" message
     string noResultsMessage;
 
-    if (!Model.Any() && string.IsNullOrWhiteSpace(searchLastName) && string.IsNullOrWhiteSpace(branch))
+    if (!Model.Members.Any() && string.IsNullOrWhiteSpace(searchLastName) && string.IsNullOrWhiteSpace(branch))
     {
         // First-ever page load, no records yet
         noResultsMessage = "No records available at the moment.";
@@ -38,7 +39,7 @@
     }
 
     // Helper function to toggle sort direction and keep the table headers clean
-    Func<string, string> GetToggleOrder = (col) => (sortColumn == col && sortOrder == "asc") ? "desc" : "asc";
+    Func<string, string> getToggleOrder = (col) => (sortColumn == col && sortOrder == "asc") ? "desc" : "asc";
 }
 
 @* What it is: A Razor conditional statement. Purpose: Conditionally render HTML depending on server-side data. *@
@@ -57,8 +58,6 @@
 @section Scripts {
     <script src="~/js/memberpg/memberindex.js"></script>
 }
-
-
 
 <br />
 <div class="card shadow-lg">
@@ -101,7 +100,7 @@
                                    placeholder="Filter by Branch"
                                    value="@branch" />
                             <datalist id="branchList">
-                                @foreach (var b in (ViewBag.Branches as List<string> ?? new List<string>()))
+                                @foreach (var b in Model.Branches)
                                 {
                                     <option value="@b"></option>
                                 }
@@ -128,25 +127,25 @@
                 <thead class="table-primary">
                     <tr>
                         <th>
-                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "MemberID", sortOrder = GetToggleOrder("MemberID") })">
+                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "MemberID", sortOrder = getToggleOrder("MemberID") })">
                                 @if (sortColumn == "MemberID")
                                 { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } ID
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "FirstName", sortOrder = GetToggleOrder("FirstName") })">
+                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "FirstName", sortOrder = getToggleOrder("FirstName") })">
                                 @if (sortColumn == "FirstName")
                                 { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } First Name
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "LastName", sortOrder = GetToggleOrder("LastName") })">
+                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "LastName", sortOrder = getToggleOrder("LastName") })">
                                 @if (sortColumn == "LastName")
-                                {  <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Last Name
+                                { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Last Name
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "Branch", sortOrder = GetToggleOrder("Branch") })">
+                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "Branch", sortOrder = getToggleOrder("Branch") })">
                                 @if (sortColumn == "Branch")
                                 { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Branch
                             </a>
@@ -159,7 +158,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (!Model.Any())
+                    @if (!Model.Members.Any())
                     {
                         <tr>
                             <td colspan="9" class="text-center text-muted py-5">
@@ -168,7 +167,7 @@
                             </td>
                         </tr>
                     }
-                    @foreach (var m in (Model ?? Enumerable.Empty<MemberManagement.Web.ViewModels.MemberVM>()))
+                    @foreach (var m in Model.Members)
                     {
                         <tr>
                             <td>@m.MemberID</td>
@@ -181,8 +180,14 @@
                             <td>@m.EmailAddress</td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <a asp-action="Edit" asp-route-id="@m.MemberID" class="btn btn-sm btn-outline-primary" title="Edit Member"> <i class="bi bi-pencil-square"></i> </a>
-                                    <a asp-action="Detail" asp-route-id="@m.MemberID" class="btn btn-sm btn-outline-success" title="Member Details"> <i class="bi bi-info-circle"></i> </a>
+                                    <a asp-action="Edit" asp-route-id="@m.MemberID"
+                                        class="btn btn-sm btn-outline-primary" title="Edit Member">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a asp-action="Detail" asp-route-id="@m.MemberID"
+                                        class="btn btn-sm btn-outline-success" title="Member Details">
+                                        <i class="bi bi-info-circle"></i>
+                                    </a>
                                     <button type="button" class="btn btn-sm btn-outline-secondary btn-delete-hover"
                                             data-bs-toggle="modal" data-bs-target="#deleteModal"
                                             data-id="@m.MemberID" data-name="@($"{m.FirstName} {m.LastName}")"
@@ -213,27 +218,28 @@
             </div>
 
             <div class="text-center flex-grow-1 member-pagination-info">
-                Total Members: <strong>@(Model?.TotalItemCount ?? 0)</strong> |
-                Page: <strong>@(Model?.PageNumber ?? 1)</strong> of
-                <strong>@(Model?.PageCount ?? 1)</strong> |
-                Showing <strong>@(Model?.Count ?? 0)</strong> items
+                Total Members: <strong>@Model.Members.TotalItemCount</strong> |
+                Page: <strong>@Model.Members.PageNumber</strong> of
+                <strong>@Model.Members.PageCount</strong> |
+                Showing <strong>@Model.Members.Count</strong> items
             </div>
 
             <div>
-                @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchLastName, branch, pageSize
-                }),
-                    new PagedListRenderOptions
-                        {
-                        LiElementClasses = new[] { "page-item" },
-                        PageClasses = new[] { "page-link" },
-                        UlElementClasses = new[] { "pagination pagination-sm mb-0" },
-                        MaximumPageNumbersToDisplay = 3,
-                        DisplayLinkToFirstPage = PagedListDisplayMode.Never,
-                        DisplayLinkToLastPage = PagedListDisplayMode.Never,
-                        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
-                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
-                        DisplayEllipsesWhenNotShowingAllPageNumbers = true
-                    })
+                @Html.PagedListPager(
+                Model.Members,
+                                page => Url.Action("Index", new { page, searchLastName, branch, pageSize }),
+                                new PagedListRenderOptions
+                                {
+                                    LiElementClasses = new[] { "page-item" },
+                                    PageClasses = new[] { "page-link" },
+                                    UlElementClasses = new[] { "pagination pagination-sm mb-0" },
+                                    MaximumPageNumbersToDisplay = 3,
+                                    DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+                                    DisplayLinkToLastPage = PagedListDisplayMode.Never,
+                                    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                                    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                                    DisplayEllipsesWhenNotShowingAllPageNumbers = true
+                                })
             </div>
         </div>
 
@@ -262,5 +268,3 @@
 
     </div>
 </div>
-
-

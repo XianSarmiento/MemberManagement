@@ -130,7 +130,7 @@ namespace MemberManagement.Tests.Application
 
             var core = new MemberCore(mockService.Object, new Mock<IValidator<Member>>().Object);
 
-            await Assert.ThrowsAsync<Exception>(() => core.DeleteMemberAsync(1));
+            await Assert.ThrowsAsync<KeyNotFoundException>(() => core.DeleteMemberAsync(1));
         }
 
         [Fact]

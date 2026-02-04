@@ -4,7 +4,6 @@ using MemberManagement.Web.ViewModels;
 
 namespace MemberManagement.Web.ValidationsVM
 {
-    // install FluentValidation via NuGet if not already installed
     public class MemberVMValidator : AbstractValidator<MemberVM>
     {
         public MemberVMValidator()

@@ -11,31 +11,38 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
 {
     private readonly MemberCore _memberCore = memberCore;
     private readonly IValidator<MemberVM> _vmValidator = vmValidator;
-    private readonly IPagedList<MemberVM>? pagedMembers;
 
     public async Task<IActionResult> Index(
         string searchLastName = "", string branch = "", 
-        string sortColumn = "MemberID", string sortOrder = "asc",
+        string sortColumn = "MemberId", string sortOrder = "asc",
         int page = 1, int pageSize = 10)
     {
         var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, sortColumn, sortOrder);                  // Fetch DTOs from service
 
+        var memberVMs = result.Members.ToViewModels();                                                                          // Use mapper instead of repeating mapping logic (Map to VMs)
 
-        var vms = result.Members.ToViewModels();                                                                                // Use mapper instead of repeating mapping logic (Map to VMs)
+        ViewBag.rawPageSize = pageSize;                                                                                         // Save the raw selection for the UI
+        int actualPageSize = pageSize < 1 ? memberVMs.Count : pageSize;                                                         // If pageSize < 1, show all items
+        var pagedList = memberVMs.ToPagedList(page, actualPageSize);                                                            // Build paged list correctly
 
-        ViewBag.RawPageSize = pageSize;                                                                                         // Save the raw selection for the UI
-        int actualPageSize = pageSize < 1 ? vms.Count : pageSize;                                                               // If pageSize < 1, show all items
-        var pagedList = vms.ToPagedList(page, actualPageSize);                                                                  // Build paged list correctly
+        ViewBag.branches = result.Branches ?? new List<string>();                                                               // ViewBag for filters
+        ViewBag.searchLastName = searchLastName;
+        ViewBag.selectedBranch = branch;
+        ViewBag.currentPageSize = pageSize;
 
-        ViewBag.Branches = result.Branches ?? new List<string>();                                                               // ViewBag for filters
-        ViewBag.SearchLastName = searchLastName;
-        ViewBag.SelectedBranch = branch;
-        ViewBag.CurrentPageSize = pageSize;
+        ViewBag.sortColumn = sortColumn;                                                                                        // Keep track of sorting for the view
+        ViewBag.sortOrder = sortOrder;
 
-        ViewBag.SortColumn = sortColumn;                                                                                        // Keep track of sorting for the view
-        ViewBag.SortOrder = sortOrder;
-
-        return View(pagedList);
+        return View(new MemberIndexVM
+        {
+            Members = pagedList,
+            SearchLastName = searchLastName,
+            SelectedBranch = branch,
+            PageSize = pageSize,
+            SortColumn = sortColumn,
+            SortOrder = sortOrder,
+            Branches = result.Branches ?? new List<string>()
+        });
     }
 
     [HttpGet]
@@ -43,18 +50,18 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(MemberVM vm)
+    public async Task<IActionResult> Create(MemberVM memberVM)
     {
-        var validationResult = await _vmValidator.ValidateAsync(vm);                        // Validate VM first
+        var validationResult = await _vmValidator.ValidateAsync(memberVM);                        // Validate VM first
         if (!validationResult.IsValid)
         {
             foreach (var error in validationResult.Errors)
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
-            return View(vm);
+            return View(memberVM);
         }
 
-        var dto = vm.ToDTO();                                                               // Use mapper from DTO
+        var dto = memberVM.ToDTO();                                                               // Use mapper from DTO
 
         try
         {
@@ -67,7 +74,7 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
         {
             ModelState.AddModelError(string.Empty, OperationMessage.Error.SaveFailed);
             Console.WriteLine(OperationMessage.Error.SaveFailed);
-            return View(vm);
+            return View(memberVM);
         }
     }
 
@@ -77,25 +84,25 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
         var dto = await _memberCore.GetMemberByIdAsync(id);
         if (dto == null) return NotFound();
 
-        var vm = dto.ToViewModel();
+        var memberVM = dto.ToViewModel();
 
-        return View(vm);
+        return View(memberVM);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(MemberVM vm)
+    public async Task<IActionResult> Edit(MemberVM memberVM)
     {
-        var validationResult = await _vmValidator.ValidateAsync(vm);                        // Validate VM first
+        var validationResult = await _vmValidator.ValidateAsync(memberVM);                        // Validate VM first
         if (!validationResult.IsValid)
         {
             foreach (var error in validationResult.Errors)
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
-            return View(vm);                                                                // Use mapper from DTO
+            return View(memberVM);                                                                // Use mapper from DTO
         }
 
-        var dto = vm.ToDTO();
+        var dto = memberVM.ToDTO();
 
         try
         {
@@ -110,7 +117,7 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
         {
             ModelState.AddModelError(string.Empty, OperationMessage.Error.SaveFailed);
             Console.WriteLine(OperationMessage.Error.SaveFailed);
-            return View(vm);
+            return View(memberVM);
         }
     }
 
@@ -120,9 +127,9 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
         var dto = await _memberCore.GetMemberByIdAsync(id);
         if (dto == null) return NotFound();
 
-        var vm = dto.ToViewModel();
+        var memberVM = dto.ToViewModel();
 
-        return View(vm);
+        return View(memberVM);
     }
 
     [HttpPost]
