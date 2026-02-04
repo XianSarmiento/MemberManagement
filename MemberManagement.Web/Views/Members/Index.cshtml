@@ -3,46 +3,10 @@
 @using MemberManagement.Web.ViewModels
 @model MemberIndexVM
 
-
-@* What it is: A Razor code block. Purpose: Run server-side C# code inside a view. *@
 @{
     ViewData["Title"] = "Members List";
-    var searchLastName = Model.SearchLastName;
-    var branch = Model.SelectedBranch;
-    var pageSize = Model.PageSize;
-    var sortColumn = Model.SortColumn;
-    var sortOrder = Model.SortOrder;
-
-    // Logic for "No Results" message
-    string noResultsMessage;
-
-    if (!Model.Members.Any() && string.IsNullOrWhiteSpace(searchLastName) && string.IsNullOrWhiteSpace(branch))
-    {
-        // First-ever page load, no records yet
-        noResultsMessage = "No records available at the moment.";
-    }
-    else if (!string.IsNullOrWhiteSpace(searchLastName) && string.IsNullOrWhiteSpace(branch))
-    {
-        noResultsMessage = $"No members found matching \"{searchLastName}\".";
-    }
-    else if (string.IsNullOrWhiteSpace(searchLastName) && !string.IsNullOrWhiteSpace(branch))
-    {
-        noResultsMessage = $"No branch filtered named \"{branch}\".";
-    }
-    else if (!string.IsNullOrWhiteSpace(searchLastName) && !string.IsNullOrWhiteSpace(branch))
-    {
-        noResultsMessage = $"No members found matching \"{searchLastName}\" in branch \"{branch}\".";
-    }
-    else
-    {
-        noResultsMessage = "No results for your current filters.";
-    }
-
-    // Helper function to toggle sort direction and keep the table headers clean
-    Func<string, string> getToggleOrder = (col) => (sortColumn == col && sortOrder == "asc") ? "desc" : "asc";
 }
 
-@* What it is: A Razor conditional statement. Purpose: Conditionally render HTML depending on server-side data. *@
 @if (TempData["SuccessMessage"] != null)
 {
     <div id="successAlert" class="alert alert-success text-center">
@@ -51,7 +15,6 @@
     </div>
 }
 
-@* What it is: Razor sections. Purpose: Define named content sections that can be rendered in a layout page (_Layout.cshtml). *@
 @section Styles {
     <link rel="stylesheet" href="~/css/memberpg/memberindex.css" />
 }
@@ -75,16 +38,11 @@
                 </div>
 
                 <form method="get" class="d-flex align-items-center gap-3">
-                    <input type="hidden" name="pageSize" value="@pageSize" />
+                    <input type="hidden" name="pageSize" value="@Model.PageSize" />
 
                     <div class="d-flex align-items-center gap-1">
                         <div style="width:160px;">
-                            <input type="text"
-                                   name="searchLastName"
-                                   id="searchLastName"
-                                   class="form-control form-control-sm"
-                                   placeholder="Search Last Name"
-                                   value="@searchLastName" />
+                            <input type="text" name="searchLastName" id="searchLastName" class="form-control form-control-sm" placeholder="Search Last Name" value="@Model.SearchLastName" />
                         </div>
                         <button type="submit" class="btn btn-sm btn-primary" title="Search by Last Name">
                             <i class="bi bi-search"></i>
@@ -93,12 +51,7 @@
 
                     <div class="d-flex align-items-center gap-1">
                         <div style="width:160px;">
-                            <input list="branchList"
-                                   name="branch"
-                                   id="branchFilter"
-                                   class="form-control form-control-sm"
-                                   placeholder="Filter by Branch"
-                                   value="@branch" />
+                            <input list="branchList" name="branch" id="branchFilter" class="form-control form-control-sm" placeholder="Filter by Branch" value="@Model.SelectedBranch" />
                             <datalist id="branchList">
                                 @foreach (var b in Model.Branches)
                                 {
@@ -112,9 +65,8 @@
                     </div>
 
                     <a href="@Url.Action("Index")"
-                       class="btn btn-sm btn-outline-secondary"
-                       title="Reset filters">
-                        <i class="bi bi-arrow-clockwise"></i>
+                       class="btn btn-sm btn-outline-secondary" title="Reset filters">
+                       <i class="bi bi-arrow-clockwise"></i>
                     </a>
                 </form>
 
@@ -127,27 +79,51 @@
                 <thead class="table-primary">
                     <tr>
                         <th>
-                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "MemberID", sortOrder = getToggleOrder("MemberID") })">
-                                @if (sortColumn == "MemberID")
-                                { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } ID
+                            <a href="@Url.Action("Index", new { 
+                                searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, 
+                                pageSize = Model.PageSize, sortColumn = "MemberID", 
+                                sortOrder = Model.GetToggleOrder("MemberID") })">
+                                @if (Model.SortColumn == "MemberID")
+                                {
+                                    <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i>
+                                }
+                                ID
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "FirstName", sortOrder = getToggleOrder("FirstName") })">
-                                @if (sortColumn == "FirstName")
-                                { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } First Name
+                            <a href="@Url.Action("Index", new { 
+                                searchLastName = Model.SearchLastName, branch = Model.SelectedBranch,
+                                pageSize = Model.PageSize, sortColumn = "FirstName", 
+                                sortOrder = Model.GetToggleOrder("FirstName") })">
+                                @if (Model.SortColumn == "FirstName")
+                                {
+                                    <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i>
+                                }
+                                First Name
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "LastName", sortOrder = getToggleOrder("LastName") })">
-                                @if (sortColumn == "LastName")
-                                { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Last Name
+                            <a href="@Url.Action("Index", new {
+                                searchLastName = Model.SearchLastName, branch = Model.SelectedBranch,
+                                pageSize = Model.PageSize, sortColumn = "LastName",
+                                sortOrder = Model.GetToggleOrder("LastName") })">
+                                @if (Model.SortColumn == "LastName")
+                                {
+                                    <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i>
+                                }
+                                Last Name
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new { searchLastName, branch, pageSize, sortColumn = "Branch", sortOrder = getToggleOrder("Branch") })">
-                                @if (sortColumn == "Branch")
-                                { <i class="bi @(sortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Branch
+                            <a href="@Url.Action("Index", new {
+                                searchLastName = Model.SearchLastName, branch = Model.SelectedBranch,
+                                pageSize = Model.PageSize, sortColumn = "Branch",
+                                sortOrder = Model.GetToggleOrder("Branch") })">
+                                @if (Model.SortColumn == "Branch")
+                                {
+                                    <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i>
+                                }
+                                Branch
                             </a>
                         </th>
                         <th>Birth Date</th>
@@ -163,7 +139,7 @@
                         <tr>
                             <td colspan="9" class="text-center text-muted py-5">
                                 <i class="bi bi-emoji-frown d-block mb-2" style="font-size: 2rem;"></i>
-                                @noResultsMessage
+                                @Model.NoResultsMessage
                             </td>
                         </tr>
                     }
@@ -181,11 +157,11 @@
                             <td class="text-center">
                                 <div class="btn-group">
                                     <a asp-action="Edit" asp-route-id="@m.MemberID"
-                                        class="btn btn-sm btn-outline-primary" title="Edit Member">
+                                       class="btn btn-sm btn-outline-primary" title="Edit Member">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <a asp-action="Detail" asp-route-id="@m.MemberID"
-                                        class="btn btn-sm btn-outline-success" title="Member Details">
+                                       class="btn btn-sm btn-outline-success" title="Member Details">
                                         <i class="bi bi-info-circle"></i>
                                     </a>
                                     <button type="button" class="btn btn-sm btn-outline-secondary btn-delete-hover"
@@ -208,12 +184,12 @@
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <form method="get" class="d-flex align-items-center gap-2">
                     <select name="pageSize" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
-                        <option value="10" selected="@(pageSize == 10)">10 per page</option>
-                        <option value="20" selected="@(pageSize == 20)">20 per page</option>
-                        <option value="-1" selected="@(pageSize == -1)">Show All</option>
+                        <option value="10" selected="@(Model.PageSize == 10)">10 per page</option>
+                        <option value="20" selected="@(Model.PageSize == 20)">20 per page</option>
+                        <option value="-1" selected="@(Model.PageSize == -1)">Show All</option>
                     </select>
-                    <input type="hidden" name="searchLastName" value="@searchLastName" />
-                    <input type="hidden" name="branch" value="@branch" />
+                    <input type="hidden" name="searchLastName" value="@Model.SearchLastName" />
+                    <input type="hidden" name="branch" value="@Model.SelectedBranch" />
                 </form>
             </div>
 
@@ -227,7 +203,7 @@
             <div>
                 @Html.PagedListPager(
                 Model.Members,
-                                page => Url.Action("Index", new { page, searchLastName, branch, pageSize }),
+                                page => Url.Action("Index", new { page, searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize }),
                                 new PagedListRenderOptions
                                 {
                                     LiElementClasses = new[] { "page-item" },
