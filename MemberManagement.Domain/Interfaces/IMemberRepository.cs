@@ -9,6 +9,9 @@ namespace MemberManagement.Domain.Interfaces
         // Member List Page
         Task<IEnumerable<Member>> GetAllAsync();
 
+        // Member List Page (only active members)
+        Task<IEnumerable<Member>> GetActiveAsync();
+
         // Get Member ID
         Task<Member?> GetByIdAsync(int memberId);
 

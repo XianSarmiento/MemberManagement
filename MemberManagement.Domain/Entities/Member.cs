@@ -26,5 +26,12 @@ namespace MemberManagement.Domain.Entities
         // System Fields
         public bool IsActive { get; set; }
         public DateTime DateCreated { get; set; }
+
+        
+        public void Initialize()
+        {
+            this.IsActive = true;
+            this.DateCreated = DateTime.UtcNow;
+        }
     }
 }

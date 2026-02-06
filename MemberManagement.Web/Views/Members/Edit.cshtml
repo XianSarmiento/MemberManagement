@@ -89,3 +89,24 @@
         </form>
     </div>
 </div>
+
+@* HOW THIS VIEW WORKS:
+   1. MODEL BINDING: The '@model MemberVM' directive at the top tells Razor to expect a MemberVM object. 
+      The 'asp-for' tag helpers automatically bind the input values to the corresponding properties 
+      (like FirstName, LastName) of that object.
+
+   2. FORM SUBMISSION: The 'asp-action="Edit"' tag helper in the <form> tag ensures that when 
+      the "Save" button is clicked, the data is sent to the 'Edit' method (POST) in the Controller. 
+      The 'input type="hidden"' for MemberID ensures the database knows which user to update 
+      without showing the ID on the screen.
+
+   3. VALIDATION: 
+      - The 'asp-validation-for' tags display error messages if the data entered doesn't match 
+        the rules defined in the ViewModel (e.g., [Required] or [EmailAddress]).
+      - The '_ValidationScriptsPartial' enables client-side validation, meaning the form 
+        checks for errors in the browser before even hitting the server.
+
+   4. ASSETS: 
+      - The '@section Styles' and '@section Scripts' blocks inject page-specific CSS and JS 
+        into the main Layout, keeping the global environment clean.
+*@

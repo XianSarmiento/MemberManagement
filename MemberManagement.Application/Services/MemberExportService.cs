@@ -1,7 +1,7 @@
 ﻿using ClosedXML.Excel;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-using MemberManagement.Application.Business;
+using MemberManagement.Application.DTOs;
 using MemberManagement.Application.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -81,3 +81,31 @@ namespace MemberManagement.Application.Services
         }
     }
 }
+
+/* HOW IT WORKS:
+  This service provides two different file-generation engines under one roof.
+
+  1. CLOSEDXML (Excel Generation):
+     - It creates a virtual 'XLWorkbook' and a worksheet named "Members."
+     - It manually maps headers to the first row (Cell 1, 1-8).
+     - It loops through the members, filling the grid starting from row 2.
+     - Finally, it saves the file into a 'MemoryStream' and returns a byte 
+       array. This is better than saving to a hard drive because it works 
+       instantly in web environments without needing file permissions.
+
+  2. ITEXTSHARP (PDF Generation):
+     - It creates a 'Document' object and a 'PdfPTable' with 8 columns.
+     - Cells are added sequentially (left-to-right, row-by-row).
+     - Because PDFs are "drawn" rather than just filled like a grid, the 
+       code opens the document, draws the table, and then closes it to 
+       finalize the formatting.
+
+  3. MEMORYSTREAM PATTERN: Both methods use 'MemoryStream'. This is a 
+     performance-friendly way to handle binary data in RAM. Once the 
+     data is converted to 'byte[]', it can be sent over HTTP as a 
+     downloadable file (e.g., application/pdf or application/vnd.ms-excel).
+
+  4. DATE FORMATTING: Note the use of .ToString("yyyy-MM-dd"). This 
+     standardizes the date format for the reports so they look clean 
+     regardless of the server's regional settings.
+*/

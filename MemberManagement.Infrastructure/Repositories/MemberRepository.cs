@@ -28,6 +28,11 @@ namespace MemberManagement.Infrastructure.Repositories
         {
             return await _context.Members.FindAsync(memberId);
         }
+        public async Task<IEnumerable<Member>> GetActiveAsync()
+        {
+            // Return only active members
+            return await _context.Members.Where(m => m.IsActive).ToListAsync();
+        }
 
         public async Task AddAsync(Member member)
         {
@@ -54,3 +59,32 @@ namespace MemberManagement.Infrastructure.Repositories
         }
     }
 }
+
+/* HOW IT WORKS:
+  The Repository acts as a wrapper around the Entity Framework 'DbContext'. 
+  Its goal is to hide complex SQL/EF logic from the rest of your application.
+
+  1. DB CONTEXT INJECTION: It receives 'MMSDbContext' through the constructor. 
+     This context is the gateway to your database tables.
+
+  2. SOFT DELETE LOGIC:
+     - Notice that 'GetAllAsync' and 'GetActiveAsync' filter by 'IsActive == true'.
+     - 'SoftDeleteAsync' doesn't call a SQL DELETE command. Instead, it updates 
+       the 'IsActive' flag to false. This is a business best practice as it 
+       preserves data for audits while making it "disappear" from the UI.
+
+  3. DATABASE INITIALIZATION: In 'AddAsync', the repository sets the 
+     'DateCreated' and ensures 'IsActive' is true. While some developers put 
+     this in the Domain entity, putting it here ensures the database 
+     record is stamped correctly the moment it is inserted.
+
+  4. CHANGE TRACKING: 
+     - 'FindAsync' is used for efficiency as it first checks if the record is 
+       already in memory before hitting the database.
+     - 'SaveChangesAsync' is the most important call; it triggers the actual 
+       SQL 'INSERT', 'UPDATE', or 'DELETE' command within a transaction.
+
+  5. ABSTRACTION: By implementing 'IMemberRepository', you can swap this 
+     SQL-based repository for a "MockRepository" during Unit Testing, 
+     allowing you to test your logic without a real database.
+*/

@@ -137,3 +137,33 @@
         </div>
     </div>
 </div>
+
+@* EXPLANATION OF THE DETAILS VIEW:
+    This Razor View serves as the Read-Only "Profile" or "Details" page for a specific member.
+
+    1. DATA DISPLAY (Plaintext): 
+       Unlike Create/Edit views that use <input> tags, this view uses 'form-control-plaintext' 
+       and standard <p> tags. This ensures the data is readable but not editable on this page.
+
+    2. DYNAMIC LOGIC (Age Calculation): 
+       The @{ ... } block inside the HTML is C# code that calculates the member's age in 
+       real-time based on their BirthDate. It even accounts for whether their birthday 
+       has already occurred this year.
+
+    3. CONDITIONAL STYLING (Status): 
+       The status badge uses a ternary operator (@(Model.IsActive ? "active" : "inactive")) 
+       to apply different CSS classes. This allows the UI to show a green badge for Active 
+       members and a different color for Inactive ones.
+
+    4. NAVIGATION & UX:
+       - The back arrow (btn-icon-back) uses 'asp-action="Index"' for easy navigation.
+       - The Edit button passes 'asp-route-id="@Model.MemberID"', which tells the 
+         controller exactly which member the user wants to modify.
+       - Icons (FontAwesome 'fa-solid' and Bootstrap Icons 'bi') provide visual 
+         anchors for different data sections.
+
+    5. AUDIT TRAIL: 
+       The bottom section displays system-level data like 'DateCreated'. Note that 'Last Modified' 
+       and 'Created By' are currently placeholders ("—"), which could be linked to an 
+       Authentication system later.
+*@

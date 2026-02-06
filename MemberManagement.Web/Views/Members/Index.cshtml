@@ -22,6 +22,8 @@
     <script src="~/js/memberpg/memberindex.js"></script>
 }
 
+
+
 <br />
 <div class="card shadow-lg">
     <div class="card-body">
@@ -264,3 +266,23 @@
 
     </div>
 </div>
+
+@* HOW THIS VIEW WORKS:
+   1. PAGING & SEARCHING: Uses the X.PagedList library. The 'searchLastName' and 'branch' values 
+      are passed through the URL (GET request) so that when you change pages, the filters 
+      remain applied.
+
+   2. DYNAMIC SORTING: The table headers contain links that pass 'sortColumn' and 'sortOrder' 
+      back to the Controller. The 'GetToggleOrder' helper logic (in the ViewModel) decides 
+      whether to switch between ASC and DESC when a header is clicked.
+
+   3. DATA FEEDBACK: 'TempData' is used to show a one-time success message (e.g., after 
+      editing or deleting). This is common for "Fire and Forget" notifications.
+
+   4. DELETE MODAL LOGIC: Instead of a separate page for deleting, it uses a Bootstrap Modal. 
+      The JS file ('memberindex.js') captures the 'data-id' and 'data-name' from the trash 
+      button and injects them into the modal form before submission.
+
+   5. EXPORTING: The Excel and PDF links pass the current filter parameters to specific 
+      controller actions to ensure the user only exports what they are currently seeing.
+*@

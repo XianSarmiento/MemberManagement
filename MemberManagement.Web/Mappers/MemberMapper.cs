@@ -1,55 +1,70 @@
-﻿using MemberManagement.Application.Business;
+﻿using MemberManagement.Application.DTOs;
 using MemberManagement.Web.ViewModels;
 
+// Converts DTO : ViewModel
 namespace MemberManagement.Web.Mappers
 {
     public static class MemberMapper
     {
-        // Convert DTO → ViewModel
-        public static MemberVM ToViewModel(this MemberDTO memberDto)
+        public static MemberVM ToViewModel(this MemberDTO dto)
         {
-            if (memberDto == null) return null;
-
             return new MemberVM
             {
-                MemberID = memberDto.MemberID,
-                FirstName = memberDto.FirstName,
-                LastName = memberDto.LastName,
-                BirthDate = memberDto.BirthDate,
-                Address = memberDto.Address,
-                Branch = memberDto.Branch,
-                ContactNo = memberDto.ContactNo,
-                EmailAddress = memberDto.EmailAddress,
-                IsActive = memberDto.IsActive,
-                DateCreated = memberDto.DateCreated
+                MemberID = dto.MemberID,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                BirthDate = dto.BirthDate,
+                Address = dto.Address,
+                Branch = dto.Branch,
+                ContactNo = dto.ContactNo,
+                EmailAddress = dto.EmailAddress
             };
         }
 
-        // Convert IEnumerable<DTO> → List<ViewModel>
-        public static List<MemberVM> ToViewModels(this IEnumerable<MemberDTO> memberDtos) =>
-            memberDtos?.Select(d => d.ToViewModel()).ToList() ?? new List<MemberVM>();
-
-        // Convert ViewModel → DTO
-        public static MemberDTO ToDTO(this MemberVM memberVm)
+        public static MemberDTO ToDTO(this MemberVM vm)
         {
-            if (memberVm == null) return null;
-
             return new MemberDTO
             {
-                MemberID = memberVm.MemberID,
-                FirstName = memberVm.FirstName,
-                LastName = memberVm.LastName,
-                BirthDate = memberVm.BirthDate,
-
-                // Optional fields: convert empty strings to null
-                Address = string.IsNullOrWhiteSpace(memberVm.Address) ? null : memberVm.Address.Trim(),
-                Branch = string.IsNullOrWhiteSpace(memberVm.Branch) ? null : memberVm.Branch.Trim(),
-                ContactNo = string.IsNullOrWhiteSpace(memberVm.ContactNo) ? null : memberVm.ContactNo.Trim(),
-                EmailAddress = string.IsNullOrWhiteSpace(memberVm.EmailAddress) ? null : memberVm.EmailAddress.Trim(),
-
-                IsActive = memberVm.IsActive,
-                DateCreated = memberVm.DateCreated
+                MemberID = vm.MemberID,
+                FirstName = vm.FirstName,
+                LastName = vm.LastName,
+                BirthDate = vm.BirthDate,
+                Address = vm.Address,
+                Branch = vm.Branch,
+                ContactNo = vm.ContactNo,
+                EmailAddress = vm.EmailAddress
             };
+        }
+
+        public static List<MemberVM> ToViewModels(this IEnumerable<MemberDTO> dtos)
+        {
+            return dtos.Select(ToViewModel).ToList();
         }
     }
 }
+
+/* HOW IT WORKS:
+  This static class serves as the mapping bridge specifically between the Web Layer 
+  (ViewModels) and the Application Layer (DTOs). 
+
+  1. UI ISOLATION: By having a separate MemberVM and this mapper, you ensure that 
+     changes to the User Interface (like adding a 'ConfirmPassword' field or a 
+     'FullName' property) don't force you to change your Application or Domain layers.
+
+  2. EXTENSION METHODS: The use of the 'this' keyword (e.g., 'this MemberDTO dto') 
+     allows these methods to be called directly on the objects. In your Controller, 
+     you can simply write 'myDto.ToViewModel()', making the code very clean.
+
+  3. TWO-WAY TRANSLATION:
+     - ToViewModel: Converts data coming FROM the server to a format ready for 
+       the View (.cshtml files).
+     - ToDTO: Converts data coming FROM a submitted form back into an object 
+       that the business logic Handlers can understand.
+
+  4. BULK CONVERSION: The 'ToViewModels' method uses LINQ (.Select) to transform 
+     an entire collection of DTOs into a list of ViewModels at once. This is 
+     primarily used for the Index page to display all members in a table.
+
+  5. TYPE CONSISTENCY: It ensures that specific types (like nullable DateTimes or 
+     Strings) are moved correctly between the layers without data loss.
+*/
