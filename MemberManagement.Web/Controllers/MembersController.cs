@@ -1,21 +1,27 @@
 ﻿using FluentValidation;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using MemberManagement.Application.Business;
 using MemberManagement.Application.Core;
+using MemberManagement.Application.Interfaces;
 using MemberManagement.Web.Mappers;
 using MemberManagement.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 using X.PagedList.Extensions;
 
-/// <summary>
-/// Controller responsible for managing Member entities in the application.
-/// It provides CRUD operations (Create, Read, Update, Delete) and supports
-/// paging, sorting, filtering, and validation using FluentValidation.
-/// </summary>
-public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmValidator) : Controller
+public class MembersController : Controller
 {
-    private readonly MemberCore _memberCore = memberCore;
-    private readonly IValidator<MemberVM> _vmValidator = vmValidator;
+    private readonly MemberCore _memberCore;
+    private readonly IValidator<MemberVM> _vmValidator;
+    private readonly IMemberExportService _exportService;
+
+    public MembersController(MemberCore memberCore, IValidator<MemberVM> vmValidator, IMemberExportService exportService)
+    {
+        _memberCore = memberCore ?? throw new ArgumentNullException(nameof(memberCore));
+        _vmValidator = vmValidator ?? throw new ArgumentNullException(nameof(vmValidator));
+        _exportService = exportService ?? throw new ArgumentNullException(nameof(exportService));
+    }
 
     public async Task<IActionResult> Index(
         string searchLastName = "", string branch = "", 
@@ -98,13 +104,13 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(MemberVM memberVM)
     {
-        var validationResult = await _vmValidator.ValidateAsync(memberVM);                        // Validate VM first
+        var validationResult = await _vmValidator.ValidateAsync(memberVM);
         if (!validationResult.IsValid)
         {
             foreach (var error in validationResult.Errors)
                 ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
-            return View(memberVM);                                                                // Use mapper from DTO
+            return View(memberVM);
         }
 
         var dto = memberVM.ToDTO();
@@ -155,5 +161,29 @@ public class MembersController(MemberCore memberCore, IValidator<MemberVM> vmVal
         }
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ExportToExcel(string searchLastName = "", string branch = "")
+    {
+        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, "MemberId", "asc");
+        var members = result.Members;
+
+        var fileContent = _exportService.GenerateExcel(members);
+        var fileName = $"Members_{DateTime.Now:yyyyMMdd}.xlsx";
+
+        return File(fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ExportToPdf(string searchLastName = "", string branch = "")
+    {
+        var result = await _memberCore.GetMembersForIndexAsync(searchLastName, branch, "MemberId", "asc");
+        var members = result.Members;
+
+        var fileContent = _exportService.GeneratePdf(members);
+        var fileName = $"Members_{DateTime.Now:yyyyMMdd}.pdf";
+
+        return File(fileContent, "application/pdf", fileName);
     }
 }

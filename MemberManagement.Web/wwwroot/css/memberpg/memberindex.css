@@ -219,3 +219,18 @@
     margin-bottom: 0.5rem;
 }
 
+/* Make export buttons same size as pagination */
+.btn-pg-size {
+    font-size: 0.75rem; /* match page-link font size */
+    padding: 0.25rem 0.5rem; /* tight padding like pagination */
+    height: 30px; /* optional, match pagination height */
+    width: 30px; /* make square if you want icon only */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .btn-pg-size i {
+        font-size: 0.85rem; /* scale icon to match pagination */
+    }
+

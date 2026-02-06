@@ -39,6 +39,7 @@ namespace MemberManagement.Web
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
             builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<MemberCore>();
+            builder.Services.AddScoped<IMemberExportService, MemberExportService>();
 
             var app = builder.Build();
 
