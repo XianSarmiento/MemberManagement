@@ -1,11 +1,12 @@
 ﻿using MemberManagement.Application.DTOs;
 using MemberManagement.Web.ViewModels;
 
-// Converts DTO : ViewModel
+// Converts MemberDTO → MemberVM
 namespace MemberManagement.Web.Mappers
 {
     public static class MemberMapper
     {
+        // Converts MemberDTO → MemberVM
         public static MemberVM ToViewModel(this MemberDTO dto)
         {
             return new MemberVM
@@ -21,6 +22,7 @@ namespace MemberManagement.Web.Mappers
             };
         }
 
+        // Converts MemberVM → MemberDTO
         public static MemberDTO ToDTO(this MemberVM vm)
         {
             return new MemberDTO
@@ -36,6 +38,7 @@ namespace MemberManagement.Web.Mappers
             };
         }
 
+        // Converts a collection of DTOs → ViewModels
         public static List<MemberVM> ToViewModels(this IEnumerable<MemberDTO> dtos)
         {
             return dtos.Select(ToViewModel).ToList();

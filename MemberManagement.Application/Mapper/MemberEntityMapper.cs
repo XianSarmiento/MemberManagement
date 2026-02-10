@@ -1,10 +1,12 @@
 ﻿using MemberManagement.Application.DTOs;
 using MemberManagement.Domain.Entities;
 
+// Converts Entity → DTO
 namespace MemberManagement.Application.Mappers
 {
     public static class MemberEntityMapper
     {
+        // Converts Member (Entity) → MemberDTO
         public static MemberDTO ToDto(this Member member)
         {
             return new MemberDTO
@@ -21,6 +23,8 @@ namespace MemberManagement.Application.Mappers
                 DateCreated = member.DateCreated
             };
         }
+
+        // Converts MemberDTO → Member (Entity)
         public static Member ToEntity(this MemberDTO dto)
         {
             return new Member
