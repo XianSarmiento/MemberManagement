@@ -32,6 +32,7 @@ namespace MemberManagement.Application.Mappers
                 dto.LastName!,
                 DateOnly.FromDateTime(dto.BirthDate!.Value),
                 dto.BranchId,
+                dto.MembershipTypeId,
                 dto.Address,
                 dto.ContactNo,
                 dto.EmailAddress

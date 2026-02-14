@@ -32,16 +32,20 @@ namespace MemberManagement.Domain.Entities
 
         // Branch Integration
         public int BranchId { get; private set; }
-
         public void ChangeBranch(int branchId)
         {
             BranchId = branchId;
         }
-
         public virtual Branch Branch { get; private set; } = null!;
 
+
+        // Membership Type Integration
+        public int MembershipTypeId { get; private set; }
+        public virtual MembershipType MembershipType { get; private set; } = null!;
+
+
         // Constructor for Branch Feature
-        public Member(string firstName, string lastName, DateOnly birthDate, int branchId, string? address = null, string? contactNo = null, string? emailAddress = null)
+        public Member(string firstName, string lastName, DateOnly birthDate, int branchId, int membershipTypeId, string? address = null, string? contactNo = null, string? emailAddress = null)
         {
             ValidateAge(birthDate);
 
@@ -49,6 +53,7 @@ namespace MemberManagement.Domain.Entities
             LastName = lastName;
             BirthDate = birthDate;
             BranchId = branchId;
+            MembershipTypeId = membershipTypeId;
             Address = address;
             ContactNo = contactNo;
             EmailAddress = emailAddress;
@@ -66,7 +71,7 @@ namespace MemberManagement.Domain.Entities
             if (birthDate > latest) throw new InvalidOperationException("Member must be at least 18 years old.");
             if (birthDate < earliest) throw new InvalidOperationException("Member exceeds age limit.");
         }
-
+        
         public Member() { }
     }
 }
