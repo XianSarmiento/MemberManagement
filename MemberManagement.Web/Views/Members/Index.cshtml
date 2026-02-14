@@ -52,14 +52,14 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-1">
-                        <div style="width:160px;">
-                            <input list="branchList" name="branch" id="branchFilter" class="form-control form-control-sm" placeholder="Filter by Branch" value="@Model.SelectedBranch" />
-                            <datalist id="branchList">
+                        <div style="width:180px;">
+                            <select name="branch" id="branchFilter" class="form-select form-select-sm">
+                                <option value="">All Branches</option>
                                 @foreach (var b in Model.Branches)
                                 {
-                                    <option value="@b"></option>
+                                    <option value="@b" selected="@(Model.SelectedBranch == b)">@b</option>
                                 }
-                            </datalist>
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-sm btn-primary" title="Filter by Branch">
                             <i class="bi bi-funnel"></i>
@@ -128,6 +128,7 @@
                                 Branch
                             </a>
                         </th>
+                        <th>Membership Type</th>
                         <th>Birth Date</th>
                         <th>Address</th>
                         <th>Contact No</th>
@@ -152,6 +153,7 @@
                             <td>@m.FirstName</td>
                             <td>@m.LastName</td>
                             <td>@m.Branch</td>
+                            <td>@m.MembershipType</td>
                             <td>@(m.BirthDate.HasValue ? m.BirthDate.Value.ToString("yyyy-MM-dd") : "")</td>
                             <td>@m.Address</td>
                             <td>@m.ContactNo</td>
@@ -266,23 +268,3 @@
 
     </div>
 </div>
-
-@* HOW THIS VIEW WORKS:
-   1. PAGING & SEARCHING: Uses the X.PagedList library. The 'searchLastName' and 'branch' values 
-      are passed through the URL (GET request) so that when you change pages, the filters 
-      remain applied.
-
-   2. DYNAMIC SORTING: The table headers contain links that pass 'sortColumn' and 'sortOrder' 
-      back to the Controller. The 'GetToggleOrder' helper logic (in the ViewModel) decides 
-      whether to switch between ASC and DESC when a header is clicked.
-
-   3. DATA FEEDBACK: 'TempData' is used to show a one-time success message (e.g., after 
-      editing or deleting). This is common for "Fire and Forget" notifications.
-
-   4. DELETE MODAL LOGIC: Instead of a separate page for deleting, it uses a Bootstrap Modal. 
-      The JS file ('memberindex.js') captures the 'data-id' and 'data-name' from the trash 
-      button and injects them into the modal form before submission.
-
-   5. EXPORTING: The Excel and PDF links pass the current filter parameters to specific 
-      controller actions to ensure the user only exports what they are currently seeing.
-*@

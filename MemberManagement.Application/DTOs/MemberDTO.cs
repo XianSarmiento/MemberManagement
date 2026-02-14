@@ -17,4 +17,3 @@
         public DateTime DateCreated { get; set; }
     }
 }
-
