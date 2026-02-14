@@ -34,12 +34,17 @@ namespace MemberManagement.Infrastructure
 
             base.OnModelCreating(modelBuilder);
 
-            // Configure the relationship between Member and Branch with Restrict delete behavior
+            // Relationships and Constraints for Member Entity
             modelBuilder.Entity<Member>(entity =>
             {
                 entity.HasOne(m => m.Branch)
                       .WithMany()
                       .HasForeignKey(m => m.BranchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(m => m.MembershipType)
+                      .WithMany()
+                      .HasForeignKey(m => m.MembershipTypeId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
         }
