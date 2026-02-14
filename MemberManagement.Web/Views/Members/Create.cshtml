@@ -88,32 +88,3 @@
         </form>
     </div>
 </div>
-
-@* EXPLANATION OF THE CREATE VIEW:
-    This Razor View serves as the Data Entry interface for the Member Management system.
-
-    1. MODEL BINDING (@model): 
-       Links the HTML fields to the MemberVM properties. When the form is submitted, 
-       ASP.NET Core matches the input "names" to the object properties in the Controller.
-
-    2. ASSET MANAGEMENT (@section): 
-       - Styles: Injects page-specific CSS into the layout header.
-       - Scripts: Injects JS at the bottom of the body. 'Partial' loads jQuery Validation 
-         logic so that errors appear instantly without a full page refresh.
-
-    3. TAG HELPERS (asp-for, asp-validation-for):
-       - 'asp-for': Generates standard HTML attributes (id, name) based on the C# property.
-       - 'asp-validation-for': Generates a placeholder for error messages defined in 
-         your MemberVMValidator.
-
-    4. UI/UX DETAILS:
-       - type="date": Ensures the browser provides a calendar picker for BirthDate.
-       - inputmode="numeric": Forces a number pad to appear on mobile devices for ContactNo.
-       - Floating Labels: The structure of <input> followed by <label> inside an 'input-wrapper' 
-         is a modern UI pattern often used for CSS-based floating label animations.
-
-    5. FORM SUBMISSION: 
-       The form uses 'method="post"' and 'asp-action="Create"' to securely send the data 
-       to the server. The Cancel link uses 'asp-action="Index"' to navigate away without 
-       triggering any server-side validation.
-*@
