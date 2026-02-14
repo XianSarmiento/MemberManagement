@@ -17,6 +17,7 @@ namespace MemberManagement.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configuration for Member
             modelBuilder.Entity<Member>(entity =>
             {
                 entity.Property(e => e.BirthDate)
@@ -32,6 +33,15 @@ namespace MemberManagement.Infrastructure
             });
 
             base.OnModelCreating(modelBuilder);
+
+            // Configure the relationship between Member and Branch with Restrict delete behavior
+            modelBuilder.Entity<Member>(entity =>
+            {
+                entity.HasOne(m => m.Branch)
+                      .WithMany()
+                      .HasForeignKey(m => m.BranchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }
