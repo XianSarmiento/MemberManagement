@@ -36,10 +36,15 @@ namespace MemberManagement.Web
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
 
-            // Add Dependency Injection
+            // Add DI for Repositories
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+            builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+
+            // Add DI for Services
             builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<IMemberExportService, MemberExportService>();
+
+            // Handlers for Commands and Queries
             builder.Services.AddScoped<CreateMemberHandler>();
             builder.Services.AddScoped<UpdateMemberHandler>();
             builder.Services.AddScoped<GetMembersQueryHandler>();
