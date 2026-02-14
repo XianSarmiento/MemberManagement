@@ -15,18 +15,18 @@ namespace MemberManagement.UnitTests.Application.Mappers
         public void ToDto_ShouldMapEntityToDtoCorrectly()
         {
             // Arrange
-            var entity = new Member
+            var entity = new Member(
+                firstName: "Jane",
+                lastName: "Smith",
+                birthDate: new DateOnly(1995, 5, 20),
+                branchId: 1,        
+                membershipTypeId: 1,
+                address: "456 Oak St",
+                contactNo: "555-0199",
+                emailAddress: "jane.smith@email.com"
+            )
             {
-                MemberID = 101,
-                FirstName = "Jane",
-                LastName = "Smith",
-                BirthDate = new DateOnly(1995, 5, 20),
-                Address = "456 Oak St",
-                Branch = "Main",
-                ContactNo = "555-0199",
-                EmailAddress = "jane.smith@email.com",
-                IsActive = true,
-                DateCreated = DateTime.Now
+                MemberID = 101
             };
 
             // Act
@@ -36,11 +36,9 @@ namespace MemberManagement.UnitTests.Application.Mappers
             Assert.Equal(entity.MemberID, dto.MemberID);
             Assert.Equal(entity.FirstName, dto.FirstName);
             Assert.Equal(entity.LastName, dto.LastName);
-            // Verify DateOnly to DateTime conversion
             Assert.Equal(entity.BirthDate?.Year, dto.BirthDate?.Year);
             Assert.Equal(entity.IsActive, dto.IsActive);
         }
-
         [Fact]
         public void ToEntity_ShouldMapDtoToEntityCorrectly()
         {

@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MemberManagement.Domain\MemberManagement.Domain.csproj" />
+    <ProjectReference Include="..\MemberManagement.Infrastructure\MemberManagement.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

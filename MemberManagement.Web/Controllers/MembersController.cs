@@ -22,6 +22,8 @@ namespace MemberManagement.Web.Controllers
         private readonly IMemberService _memberService;
         private readonly IValidator<MemberVM> _vmValidator;
         private readonly IMemberExportService _exportService;
+        private readonly IBranchService _branchService;
+        private readonly IMembershipTypeService _typeService;
 
         public MembersController(
             GetMembersQueryHandler getQueryHandler,
@@ -29,7 +31,9 @@ namespace MemberManagement.Web.Controllers
             UpdateMemberHandler updateHandler,
             IMemberService memberService,
             IValidator<MemberVM> vmValidator,
-            IMemberExportService exportService)
+            IMemberExportService exportService,
+            IBranchService branchService,
+            IMembershipTypeService typeService)
         {
             _getQueryHandler = getQueryHandler;
             _createHandler = createHandler;
@@ -37,13 +41,12 @@ namespace MemberManagement.Web.Controllers
             _memberService = memberService;
             _vmValidator = vmValidator;
             _exportService = exportService;
+            _branchService = branchService;
+            _typeService = typeService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(
-            string searchLastName = "", string branch = "",
-            string sortColumn = "MemberId", string sortOrder = "asc",
-            int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string searchLastName = "", string branch = "", string sortColumn = "MemberId", string sortOrder = "asc", int page = 1, int pageSize = 10)
         {
             var result = await _getQueryHandler.HandleAsync(searchLastName, branch, sortColumn, sortOrder);
 
@@ -66,7 +69,11 @@ namespace MemberManagement.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create() => View();
+        public async Task<IActionResult> Create()
+        {
+            await PopulateSelectionLists();
+            return View();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -78,6 +85,7 @@ namespace MemberManagement.Web.Controllers
                 foreach (var error in validationResult.Errors)
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
+                await PopulateSelectionLists();
                 return View(memberVM);
             }
 
@@ -87,9 +95,10 @@ namespace MemberManagement.Web.Controllers
                 TempData["SuccessMessage"] = OperationMessage.User.Created;
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, OperationMessage.Error.SaveFailed);
+                await PopulateSelectionLists();
                 return View(memberVM);
             }
         }
@@ -103,6 +112,7 @@ namespace MemberManagement.Web.Controllers
             var dto = MemberEntityMapper.ToDto(member);
             var memberVM = dto.ToViewModel();
 
+            await PopulateSelectionLists();
             return View(memberVM);
         }
 
@@ -180,40 +190,11 @@ namespace MemberManagement.Web.Controllers
 
             return File(fileContent, "application/pdf", fileName);
         }
+
+        private async Task PopulateSelectionLists()
+        {
+            ViewBag.Branches = await _branchService.GetAllAsync();
+            ViewBag.MembershipTypes = await _typeService.GetAllAsync();
+        }
     }
 }
-
-/* HOW IT WORKS:
-  This controller manages the communication between the web browser and the application layer. 
-  It handles HTTP requests (GET, POST), manages UI state, and coordinates file downloads.
-
-  1. DEPENDENCY INJECTION: The constructor receives Handlers (for writing/querying) 
-     and Services (for simple tasks and exports). This keeps the controller "Thin"—it 
-     doesn't contain business logic, it just delegates work.
-
-  2. INDEX & PAGINATION (GET):
-     - It calls the 'GetMembersQueryHandler' to fetch filtered/sorted data.
-     - It uses 'X.PagedList' to split a large list of members into smaller, 
-       manageable pages (e.g., 10 per page).
-     - It prepares a 'MemberIndexVM' containing the data and the current filter 
-       settings so the search bar stays populated after the page refreshes.
-
-  3. FORM HANDLING (POST):
-     - 'ValidateAntiForgeryToken': Protects against CSRF security attacks.
-     - 'ModelState': If FluentValidation finds an error, the controller adds it to 
-       ModelState. This allows the View to display red error messages next to 
-       the specific input fields.
-     - 'TempData': Stores "Success" messages that survive a redirect, so the user 
-       sees "Member successfully created" after being sent back to the Index page.
-
-  4. MAPPING LAYERS:
-     - Notice the transition: ViewModel (UI) <-> DTO (Application) <-> Entity (Domain).
-     - By converting 'memberVM.ToDTO()', the controller ensures the Handler 
-       remains pure and doesn't know anything about Web ViewModels.
-
-  5. FILE EXPORTS (ActionResults):
-     - 'ExportToExcel' and 'ExportToPdf' call the export service to get a raw 
-       byte array.
-     - The 'File()' method then tells the browser: "Don't display this as text; 
-       download it as a file with this specific name and type."
-*/
