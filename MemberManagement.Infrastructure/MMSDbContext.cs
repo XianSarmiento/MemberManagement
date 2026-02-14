@@ -11,6 +11,7 @@ namespace MemberManagement.Infrastructure
         }
 
         public DbSet<Member> Members { get; set; }
+        public DbSet<Branch> Branches { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
