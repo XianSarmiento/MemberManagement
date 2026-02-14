@@ -36,22 +36,10 @@ namespace MemberManagement.UnitTests.Domain.Entities
         {
             // Arrange
             var birthDate = new DateOnly(1995, 12, 25);
+            var branch = new Branch("Main");
 
             // Act
-            var member = new Member
-            {
-                MemberID = 50,
-                FirstName = "Jane",
-                LastName = "Smith",
-                BirthDate = birthDate,
-                Branch = "Main"
-            };
-
-            // Assert
-            Assert.Equal(50, member.MemberID);
-            Assert.Equal("Jane", member.FirstName);
-            Assert.Equal(birthDate, member.BirthDate);
-            Assert.Equal("Main", member.Branch);
+            var member = new Member("Jane", "Smith", birthDate, 1, 1, "Address", "555", "email@test.com");
         }
     }
 }

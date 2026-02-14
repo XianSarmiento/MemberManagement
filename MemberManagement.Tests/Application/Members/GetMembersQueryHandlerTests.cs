@@ -24,12 +24,15 @@ namespace MemberManagement.UnitTests.Application.Members
 
         private List<Member> GetFakeMembers()
         {
+            var branchNorth = new Branch("North");
+            var branchSouth = new Branch("South");
+
             return new List<Member>
-            {
-                new Member { MemberID = 1, FirstName = "Alice", LastName = "Smith", Branch = "North", IsActive = true },
-                new Member { MemberID = 2, FirstName = "Charlie", LastName = "Brown", Branch = "South", IsActive = true },
-                new Member { MemberID = 3, FirstName = "Bob", LastName = "Smith", Branch = "North", IsActive = true }
-            };
+    {
+        new Member("Alice", "Smith", new DateOnly(1990, 1, 1), 1, 1) { MemberID = 1 },
+        new Member("Charlie", "Brown", new DateOnly(1990, 1, 1), 2, 1) { MemberID = 2 },
+        new Member("Bob", "Smith", new DateOnly(1990, 1, 1), 1, 1) { MemberID = 3 }
+    };
         }
 
         [Fact]
@@ -70,7 +73,6 @@ namespace MemberManagement.UnitTests.Application.Members
             var result = await _handler.HandleAsync(null!, null!, "FirstName", "desc");
 
             // Assert
-            // Order should be: Charlie, Bob, Alice
             Assert.Equal("Charlie", result.Members[0].FirstName);
             Assert.Equal("Bob", result.Members[1].FirstName);
             Assert.Equal("Alice", result.Members[2].FirstName);
@@ -86,8 +88,8 @@ namespace MemberManagement.UnitTests.Application.Members
             var result = await _handler.HandleAsync(null!, null!, "", "");
 
             // Assert
-            Assert.Equal(2, result.Branches.Count); // North and South
-            Assert.Equal("North", result.Branches[0]); // Alphabetical
+            Assert.Equal(2, result.Branches.Count); 
+            Assert.Equal("North", result.Branches[0]); 
             Assert.Equal("South", result.Branches[1]);
         }
     }

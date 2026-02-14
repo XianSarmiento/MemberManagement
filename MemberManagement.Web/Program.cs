@@ -32,9 +32,7 @@ namespace MemberManagement.Web
             builder.Services.AddFluentValidationClientsideAdapters();
 
             // Add DbContext
-            builder.Services.AddDbContext<MMSDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-            );
+            builder.Services.AddDbContext<MMSDbContext>(options =>options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add DI for Repositories
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
@@ -44,12 +42,15 @@ namespace MemberManagement.Web
             // Add DI for Services
             builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<IMemberExportService, MemberExportService>();
+            builder.Services.AddScoped<IBranchService, BranchService>();
+            builder.Services.AddScoped<IMembershipTypeService, MembershipTypeService>();
 
             // Handlers for Commands and Queries
             builder.Services.AddScoped<CreateMemberHandler>();
             builder.Services.AddScoped<UpdateMemberHandler>();
             builder.Services.AddScoped<GetMembersQueryHandler>();
 
+            // Add AutoMapper
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -61,45 +62,12 @@ namespace MemberManagement.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-
             app.Run();
         }
     }
 }
-
-/* HOW THIS CODE WORKS:
-   1. DEPENDENCY INJECTION (DI) CONTAINER: 
-      Everything registered under 'builder.Services' is added to the DI container. 
-      - 'AddScoped' means a new instance of the class is created for every single 
-        HTTP request (the most common lifetime for web apps).
-      - This allows your Controllers to "ask" for 'IMemberService' without 
-        manually creating it with the 'new' keyword.
-
-   2. FLUENT VALIDATION: 
-      - 'AddValidatorsFromAssemblyContaining' scans your project for validation rules.
-      - 'AddFluentValidationAutoValidation' makes it so that when a user submits a form, 
-        ASP.NET automatically checks those rules before your Controller code even runs.
-
-   3. DATABASE CONFIGURATION: 
-      'AddDbContext' connects the app to SQL Server using the "DefaultConnection" string 
-      found in your 'appsettings.json' file.
-
-   4. THE MIDDLEWARE PIPELINE (The 'app' section): 
-      This is the order in which a request is handled. 
-      - 'UseStaticFiles' allows the app to serve CSS and JS.
-      - 'UseRouting' and 'MapControllerRoute' determine which Controller and 
-        Action method should handle the incoming URL.
-
-   5. ARCHITECTURE PATTERN: 
-      By registering 'Handlers' (CreateMemberHandler, etc.), this file shows that the 
-      app follows a "Command/Query" or "Clean Architecture" style, separating 
-      the "How to do it" logic from the Controller.
-*/
