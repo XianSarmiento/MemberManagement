@@ -39,6 +39,7 @@ namespace MemberManagement.Web
             // Add DI for Repositories
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
             builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+            builder.Services.AddScoped<IMembershipTypeRepository, MembershipTypeRepository>();
 
             // Add DI for Services
             builder.Services.AddScoped<IMemberService, MemberService>();
