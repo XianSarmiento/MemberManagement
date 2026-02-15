@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using MemberManagement.Application.Core;
 using MemberManagement.Application.DTOs;
 using MemberManagement.Application.Interfaces;
 using MemberManagement.Application.Members;
@@ -11,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using X.PagedList.Extensions;
+using MemberManagement.SharedKernel.Constant;
 
 namespace MemberManagement.Web.Controllers
 {
@@ -50,7 +50,6 @@ namespace MemberManagement.Web.Controllers
         {
             var result = await _getQueryHandler.HandleAsync(searchLastName, branch, sortColumn, sortOrder);
 
-            // Fixed: Explicitly use MemberEntityMapper to avoid ambiguity
             var memberVMs = result.Members.ToViewModels();
 
             int actualPageSize = pageSize < 1 ? (memberVMs.Count > 0 ? memberVMs.Count : 10) : pageSize;
@@ -95,7 +94,13 @@ namespace MemberManagement.Web.Controllers
                 TempData["SuccessMessage"] = OperationMessage.User.Created;
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("BirthDate", ex.Message);
+                await PopulateSelectionLists();
+                return View(memberVM);
+            }
+            catch (Exception)
             {
                 ModelState.AddModelError(string.Empty, OperationMessage.Error.SaveFailed);
                 await PopulateSelectionLists();
@@ -126,6 +131,7 @@ namespace MemberManagement.Web.Controllers
                 foreach (var error in validationResult.Errors)
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
+                await PopulateSelectionLists();
                 return View(memberVM);
             }
 
@@ -135,9 +141,16 @@ namespace MemberManagement.Web.Controllers
                 TempData["SuccessMessage"] = OperationMessage.User.Updated;
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError("BirthDate", ex.Message);
+                await PopulateSelectionLists();
+                return View(memberVM);
+            }
+            catch (Exception)
             {
                 ModelState.AddModelError(string.Empty, OperationMessage.Error.SaveFailed);
+                await PopulateSelectionLists();
                 return View(memberVM);
             }
         }

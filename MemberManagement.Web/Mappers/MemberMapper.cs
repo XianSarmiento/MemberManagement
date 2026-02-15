@@ -15,10 +15,15 @@ namespace MemberManagement.Web.Mappers
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 BirthDate = dto.BirthDate,
-                Address = dto.Address,
+                BranchId = dto.BranchId,
+                MembershipTypeId = dto.MembershipTypeId,
                 Branch = dto.Branch,
+                MembershipType = dto.MembershipType,
+                Address = dto.Address,
                 ContactNo = dto.ContactNo,
-                EmailAddress = dto.EmailAddress
+                EmailAddress = dto.EmailAddress,
+                IsActive = dto.IsActive,
+                DateCreated = dto.DateCreated
             };
         }
 
@@ -31,10 +36,15 @@ namespace MemberManagement.Web.Mappers
                 FirstName = vm.FirstName,
                 LastName = vm.LastName,
                 BirthDate = vm.BirthDate,
-                Address = vm.Address,
+                BranchId = vm.BranchId,
+                MembershipTypeId = vm.MembershipTypeId,
                 Branch = vm.Branch,
+                MembershipType = vm.MembershipType,
+                Address = vm.Address,
                 ContactNo = vm.ContactNo,
-                EmailAddress = vm.EmailAddress
+                EmailAddress = vm.EmailAddress,
+                IsActive = vm.IsActive,
+                DateCreated = vm.DateCreated
             };
         }
 
@@ -45,29 +55,3 @@ namespace MemberManagement.Web.Mappers
         }
     }
 }
-
-/* HOW IT WORKS:
-  This static class serves as the mapping bridge specifically between the Web Layer 
-  (ViewModels) and the Application Layer (DTOs). 
-
-  1. UI ISOLATION: By having a separate MemberVM and this mapper, you ensure that 
-     changes to the User Interface (like adding a 'ConfirmPassword' field or a 
-     'FullName' property) don't force you to change your Application or Domain layers.
-
-  2. EXTENSION METHODS: The use of the 'this' keyword (e.g., 'this MemberDTO dto') 
-     allows these methods to be called directly on the objects. In your Controller, 
-     you can simply write 'myDto.ToViewModel()', making the code very clean.
-
-  3. TWO-WAY TRANSLATION:
-     - ToViewModel: Converts data coming FROM the server to a format ready for 
-       the View (.cshtml files).
-     - ToDTO: Converts data coming FROM a submitted form back into an object 
-       that the business logic Handlers can understand.
-
-  4. BULK CONVERSION: The 'ToViewModels' method uses LINQ (.Select) to transform 
-     an entire collection of DTOs into a list of ViewModels at once. This is 
-     primarily used for the Index page to display all members in a table.
-
-  5. TYPE CONSISTENCY: It ensures that specific types (like nullable DateTimes or 
-     Strings) are moved correctly between the layers without data loss.
-*/

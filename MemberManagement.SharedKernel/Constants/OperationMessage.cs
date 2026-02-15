@@ -1,0 +1,22 @@
+﻿namespace MemberManagement.SharedKernel.Constant
+{
+    public static class OperationMessage
+    {
+        public static class User
+        {
+            public const string Created = "Member successfully created.";
+            public const string Updated = "Member successfully updated.";
+            public const string Deleted = "Member successfully deactivated.";
+        }
+
+        public static class Error
+        {
+            public const string NotFound = "Member record not found in database.";
+            public const string SaveFailed = "Database save operation failed.";
+            public const string InvalidInput = "Provided member data is invalid.";
+            public const string BirthDateRequired = "Birth Date is required.";
+            public const string Underage = "Member must be at least 18 years old.";
+            public const string ExceedsAgeLimit = "Member exceeds age limit (65y 6m 1d).";
+        }
+    }
+}

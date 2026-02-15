@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MemberManagement.SharedKernel.Constant;
 
 namespace MemberManagement.Domain.Entities
 {
@@ -14,7 +15,7 @@ namespace MemberManagement.Domain.Entities
         public string LastName { get; set; } = null!;
         public DateOnly? BirthDate { get; set; }
 
-        // Optional Member Fields → allow NULL
+        // Optional Member Fields
         public string? Address { get; set; }
         public string? ContactNo { get; set; }
         public string? EmailAddress { get; set; }
@@ -22,13 +23,12 @@ namespace MemberManagement.Domain.Entities
         // System Fields
         public bool IsActive { get; set; }
         public DateTime DateCreated { get; set; }
-        
+
         public void Initialize()
         {
             this.IsActive = true;
             this.DateCreated = DateTime.UtcNow;
         }
-
 
         // Branch Integration
         public int BranchId { get; private set; }
@@ -38,16 +38,16 @@ namespace MemberManagement.Domain.Entities
         }
         public virtual Branch Branch { get; private set; } = null!;
 
-
         // Membership Type Integration
         public int MembershipTypeId { get; private set; }
         public virtual MembershipType MembershipType { get; private set; } = null!;
 
-
-        // Constructor for Branch Feature
-        public Member(string firstName, string lastName, DateOnly birthDate, int branchId, int membershipTypeId, string? address = null, string? contactNo = null, string? emailAddress = null)
+        public Member(string firstName, string lastName, DateOnly? birthDate, int branchId, int membershipTypeId, string? address = null, string? contactNo = null, string? emailAddress = null)
         {
-            ValidateAge(birthDate);
+            if (!birthDate.HasValue)
+                throw new InvalidOperationException(OperationMessage.Error.BirthDateRequired);
+
+            ValidateAge(birthDate.Value);
 
             FirstName = firstName;
             LastName = lastName;
@@ -59,19 +59,23 @@ namespace MemberManagement.Domain.Entities
             EmailAddress = emailAddress;
 
             IsActive = true;
-            DateCreated = DateTime.UtcNow;
+            this.DateCreated = DateTime.UtcNow;
         }
 
         private void ValidateAge(DateOnly birthDate)
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
-            var latest = today.AddYears(-18);
-            var earliest = today.AddYears(-65).AddMonths(-6).AddDays(-1);
 
-            if (birthDate > latest) throw new InvalidOperationException("Member must be at least 18 years old.");
-            if (birthDate < earliest) throw new InvalidOperationException("Member exceeds age limit.");
+            var latestAllowedBirthDate = today.AddYears(-18);
+            var earliestAllowedBirthDate = today.AddYears(-65).AddMonths(-6).AddDays(-1);
+
+            if (birthDate > latestAllowedBirthDate)
+                throw new InvalidOperationException(OperationMessage.Error.Underage);
+
+            if (birthDate < earliestAllowedBirthDate)
+                throw new InvalidOperationException(OperationMessage.Error.ExceedsAgeLimit);
         }
-        
+
         public Member() { }
     }
 }

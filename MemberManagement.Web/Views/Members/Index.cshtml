@@ -129,8 +129,8 @@
                             </a>
                         </th>
                         <th>Membership Type</th>
-                        <th>Birth Date</th>
                         <th>Address</th>
+                        <th>Birth Date</th>
                         <th>Contact No</th>
                         <th>Email Address</th>
                         <th>Manage</th>
@@ -154,8 +154,8 @@
                             <td>@m.LastName</td>
                             <td>@m.Branch</td>
                             <td>@m.MembershipType</td>
-                            <td>@(m.BirthDate.HasValue ? m.BirthDate.Value.ToString("yyyy-MM-dd") : "")</td>
                             <td>@m.Address</td>
+                            <td>@(m.BirthDate.HasValue ? m.BirthDate.Value.ToString("yyyy-MM-dd") : "")</td>
                             <td>@m.ContactNo</td>
                             <td>@m.EmailAddress</td>
                             <td class="text-center">

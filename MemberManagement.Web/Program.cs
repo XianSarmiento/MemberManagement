@@ -1,6 +1,6 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MemberManagement.Application.Core;
+using MemberManagement.SharedKernel.Constant;
 using MemberManagement.Application.Interfaces;
 using MemberManagement.Application.Members;
 using MemberManagement.Application.Services;
