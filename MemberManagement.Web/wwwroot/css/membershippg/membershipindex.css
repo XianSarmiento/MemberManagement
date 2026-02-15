@@ -1,0 +1,136 @@
+﻿/* Reuse the core styles from Branch, but with membership-specific class names */
+
+.membership-top-bar {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.membership-input-container {
+    position: relative;
+}
+
+.btn-membership-icon {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: default;
+}
+
+.membership-table {
+    width: 100%;
+    font-size: 14px;
+}
+
+/* Float alerts and animations (copy from your branch CSS) */
+#successAlert, #errorAlert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    min-width: 350px;
+    border-radius: 50px;
+    animation: slideDown 0.5s forwards;
+}
+
+@keyframes slideDown {
+    from {
+        top: -100px;
+        opacity: 0;
+    }
+
+    to {
+        top: 20px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.scrollable-table {
+    max-height: 500px;
+    overflow-y: auto;
+}
+/* Reuse the core styles from Branch, but with membership-specific class names */
+
+.membership-top-bar {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.membership-input-container {
+    position: relative;
+}
+
+.btn-membership-icon {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: default;
+}
+
+.membership-table {
+    width: 100%;
+    font-size: 14px;
+}
+
+/* Float alerts and animations (copy from your branch CSS) */
+#successAlert, #errorAlert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    min-width: 350px;
+    border-radius: 50px;
+    animation: slideDown 0.5s forwards;
+}
+
+@keyframes slideDown {
+    from {
+        top: -100px;
+        opacity: 0;
+    }
+
+    to {
+        top: 20px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.scrollable-table {
+    max-height: 500px;
+    overflow-y: auto;
+}

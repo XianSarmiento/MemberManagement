@@ -1,7 +1,9 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using MemberManagement.Application.Branches;
 using MemberManagement.Application.Interfaces;
 using MemberManagement.Application.Members;
+using MemberManagement.Application.MembershipTypes;
 using MemberManagement.Application.Services;
 using MemberManagement.Application.Validation;
 using MemberManagement.Domain.Entities;
@@ -11,7 +13,6 @@ using MemberManagement.Infrastructure.Repositories;
 using MemberManagement.Web.ValidationsVM;
 using MemberManagement.Web.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using MemberManagement.Application.Branches;
 
 namespace MemberManagement.Web
 {
@@ -53,6 +54,8 @@ namespace MemberManagement.Web
             builder.Services.AddScoped<GetMembersQueryHandler>();
             builder.Services.AddScoped<GetBranchesHandler>();
             builder.Services.AddScoped<CreateBranchHandler>();
+            builder.Services.AddScoped<GetMembershipTypesHandler>();
+            builder.Services.AddScoped<CreateMembershipTypeHandler>();
 
             var app = builder.Build();
 
