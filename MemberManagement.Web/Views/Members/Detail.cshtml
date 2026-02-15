@@ -2,168 +2,119 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/memberpg/memberdetails.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 }
 
+<div class="member-form-container">
+    <div class="member-form-card">
 
-
-<div class="member-detail-form-container">
-    <div class="member-detail-form-card">
         <div class="member-header">
-            <a asp-action="Index" class="btn-icon-back" title="Back"> <i class="fa-solid fa-arrow-left"></i>
+            <a asp-action="Index" class="btn-icon-circle" title="Back">
+                <i class="fa-solid fa-arrow-left"></i>
             </a>
-
-            <h2 class="card-header-name">MEMBER DETAILS</h2>
-            <div class="header-spacer"></div>
-
-            <a asp-action="Edit" asp-route-id="@Model.MemberID" class="btn-icon-back" title="Edit Member"> <i class="bi bi-pencil-square"></i>
+            <h2 class="card-header-name">Member Profile</h2>
+            <a asp-action="Edit" asp-route-id="@Model.MemberID" class="btn-icon-circle edit-btn" title="Edit Member">
+                <i class="fa-solid fa-pen-to-square"></i>
             </a>
         </div>
 
-        <br />
-        @* PERSONAL INFORMATION *@
-        <h5 class="section-title"> <i class="fa-solid fa-user me-2"></i> PERSONAL INFORMATION </h5>
-        <div class="row">
-            <div class="col-md-6 form-group">
-                <label>Member Name</label>
-                <p class="form-control-plaintext">
-                    @Model.FirstName @Model.LastName
-                </p>
+        <div class="category-grid">
+
+            <div class="category-box">
+                <div class="category-header">
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <span class="category-label">Personal Information</span>
+                </div>
+
+                <div class="detail-group">
+                    <label>Full Name</label>
+                    <p>@Model.FirstName @Model.LastName</p>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-group">
+                        <label>Birthdate</label>
+                        <p>@Model.BirthDate?.ToString("MMMM dd, yyyy")</p>
+                    </div>
+                    @{
+                        int? age = null;
+                        if (Model.BirthDate.HasValue)
+                        {
+                            var today = DateTime.Today;
+                            age = today.Year - Model.BirthDate.Value.Year;
+                            if (Model.BirthDate.Value.Date > today.AddYears(-age.Value)) { age--; }
+                        }
+                    }
+                    <div class="detail-group">
+                        <label>Age</label>
+                        <p>@((age.HasValue) ? $"{age.Value} yrs old" : "—")</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="col-md-3 form-group">
-                <label>Birthdate</label>
-                <p class="form-control-plaintext">
-                    @Model.BirthDate?.ToString("yyyy-MM-dd")
-                </p>
+            <div class="category-box">
+                <div class="category-header">
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-address-book"></i>
+                    </div>
+                    <span class="category-label">Contact & Membership</span>
+                </div>
+
+                <div class="detail-group">
+                    <label>Address</label>
+                    <p>@Model.Address</p>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-group">
+                        <label>Branch</label>
+                        <p>@Model.Branch</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Membership Type</label>
+                        <p>@Model.MembershipType</p>
+                    </div>
+                </div>
+
+                <div class="detail-group">
+                    <label>Email & Mobile</label>
+                    <p>@Model.EmailAddress</p>
+                    <p class="sub-detail">@Model.ContactNo</p>
+                </div>
             </div>
 
-            @{
-                int? age = null;
-                if (Model.BirthDate.HasValue)
-                {
-                    var today = DateTime.Today;
-                    age = today.Year - Model.BirthDate.Value.Year;
-                    if (Model.BirthDate.Value.Date > today.AddYears(-age.Value)) { age--; }
-                }
-            }
+            <div class="category-box full-width">
+                <div class="category-header">
+                    <div class="icon-circle">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <span class="category-label">System Audit Details</span>
+                </div>
 
-            <div class="col-md-3 form-group">
-                <label>Age</label>
-                <p class="form-control-plaintext">@((age.HasValue) ? age.Value.ToString() : "—")</p>
-            </div>
-        </div>
-
-        <br />
-        @* CONTACT INFORMATION *@
-        <h5 class="section-title mt-3"> <i class="fa-solid fa-address-book me-2"></i> CONTACT INFORMATION </h5>
-        <div class="row">
-            <div class="col-md-6 form-group">
-                <label>Address</label>
-                <p class="form-control-plaintext">@Model.Address</p>
-            </div>
-
-            <div class="col-md-3 form-group">
-                <label>Mobile Number</label>
-                <p class="form-control-plaintext">@Model.ContactNo</p>
-            </div>
-
-            <div class="col-md-3 form-group">
-                <label>Email Address</label>
-                <p class="form-control-plaintext">@Model.EmailAddress</p>
-            </div>
-        </div>
-
-        <br />
-        @* MEMBER ORGANIZATION INFORMATION *@
-        <h5 class="section-title mt-3"> <i class="fa-solid fa-building me-2"> </i> MEMBER ORGANIZATION</h5>
-        <div class="row">
-            <div class="col-md-6 form-group">
-                <label>Member ID</label>
-                <p class="form-control-plaintext">@Model.MemberID</p>
-            </div>
-
-            <div class="col-md-6 form-group">
-                <label>Branch</label>
-                <p class="form-control-plaintext">@Model.Branch</p>
-            </div>
-
-        </div>
-
-        <br />
-        @* AUDIT DETAILS *@
-        <h5 class="section-title mt-3"> <i class="fa-solid fa-gear me-2"></i> AUDIT DETAILS </h5>
-        <div class="system-info">
-            <div class="system-info-item">
-                <label>
-                    <i class="fa-solid fa-circle-check status-icon"></i>
-                    Status:
-                </label>
-                <span class="status-text @(Model.IsActive ? "active" : "inactive")">
-                    @(Model.IsActive ? "Active" : "Inactive")
-                </span>
-            </div>
-
-            <div class="system-info-item">
-                <label>
-                    <i class="fa-solid fa-calendar-plus"></i>
-                    Date Created:
-                </label>
-                <span>@Model.DateCreated.ToString("MMMM dd, yyyy · hh:mm tt")</span>
-            </div>
-
-            <div class="system-info-item">
-                <label>
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    Last Modified:
-                </label>
-                <span>—</span>
-            </div>
-
-            <div class="system-info-item">
-                <label>
-                    <i class="fa-solid fa-user-plus"></i>
-                    Created By:
-                </label>
-                <span>—</span>
-            </div>
-
-            <div class="system-info-item">
-                <label>
-                    <i class="fa-solid fa-user-pen"></i>
-                    Updated By:
-                </label>
-                <span>—</span>
+                <div class="audit-grid">
+                    <div class="audit-item">
+                        <label>Status</label>
+                        <span class="status-pill @(Model.IsActive ? "active" : "inactive")">
+                            @(Model.IsActive ? "Active Account" : "Inactive")
+                        </span>
+                    </div>
+                    <div class="audit-item">
+                        <label>Member ID</label>
+                        <span>#@Model.MemberID</span>
+                    </div>
+                    <div class="audit-item">
+                        <label>Created On</label>
+                        <span>@Model.DateCreated.ToString("MMM dd, yyyy · hh:mm tt")</span>
+                    </div>
+                    <div class="audit-item">
+                        <label>Last Modified</label>
+                        <span>—</span>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
-
-@* EXPLANATION OF THE DETAILS VIEW:
-    This Razor View serves as the Read-Only "Profile" or "Details" page for a specific member.
-
-    1. DATA DISPLAY (Plaintext): 
-       Unlike Create/Edit views that use <input> tags, this view uses 'form-control-plaintext' 
-       and standard <p> tags. This ensures the data is readable but not editable on this page.
-
-    2. DYNAMIC LOGIC (Age Calculation): 
-       The @{ ... } block inside the HTML is C# code that calculates the member's age in 
-       real-time based on their BirthDate. It even accounts for whether their birthday 
-       has already occurred this year.
-
-    3. CONDITIONAL STYLING (Status): 
-       The status badge uses a ternary operator (@(Model.IsActive ? "active" : "inactive")) 
-       to apply different CSS classes. This allows the UI to show a green badge for Active 
-       members and a different color for Inactive ones.
-
-    4. NAVIGATION & UX:
-       - The back arrow (btn-icon-back) uses 'asp-action="Index"' for easy navigation.
-       - The Edit button passes 'asp-route-id="@Model.MemberID"', which tells the 
-         controller exactly which member the user wants to modify.
-       - Icons (FontAwesome 'fa-solid' and Bootstrap Icons 'bi') provide visual 
-         anchors for different data sections.
-
-    5. AUDIT TRAIL: 
-       The bottom section displays system-level data like 'DateCreated'. Note that 'Last Modified' 
-       and 'Created By' are currently placeholders ("—"), which could be linked to an 
-       Authentication system later.
-*@

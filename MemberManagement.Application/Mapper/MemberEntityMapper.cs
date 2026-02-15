@@ -15,8 +15,11 @@ namespace MemberManagement.Application.Mappers
                 FirstName = member.FirstName,
                 LastName = member.LastName,
                 BirthDate = member.BirthDate?.ToDateTime(TimeOnly.MinValue),
-                Address = member.Address,
                 BranchId = member.BranchId,
+                MembershipTypeId = member.MembershipTypeId,
+                Branch = member.Branch?.Name ?? "N/A",
+                MembershipType = member.MembershipType?.Name ?? "N/A",
+                Address = member.Address,
                 ContactNo = member.ContactNo,
                 EmailAddress = member.EmailAddress,
                 IsActive = member.IsActive,
@@ -27,10 +30,14 @@ namespace MemberManagement.Application.Mappers
         // Converts MemberDTO → Member (Entity)
         public static Member ToEntity(this MemberDTO dto)
         {
+            DateOnly? birthDateOnly = dto.BirthDate.HasValue
+                ? DateOnly.FromDateTime(dto.BirthDate.Value)
+                : null;
+
             var member = new Member(
-                dto.FirstName!,
-                dto.LastName!,
-                DateOnly.FromDateTime(dto.BirthDate!.Value),
+                dto.FirstName ?? string.Empty,
+                dto.LastName ?? string.Empty,
+                birthDateOnly,
                 dto.BranchId,
                 dto.MembershipTypeId,
                 dto.Address,
@@ -39,9 +46,7 @@ namespace MemberManagement.Application.Mappers
             );
 
             member.MemberID = dto.MemberID;
-
             return member;
         }
     }
 }
-

@@ -1,89 +1,117 @@
 ﻿@model MemberManagement.Web.ViewModels.MemberVM
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/memberpg/membercreate.css" />
+    <link rel="stylesheet" href="~/css/memberpg/memberCreateEdit.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 }
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/memberpg/membercreate.js"></script>
+    <script src="~/js/memberpg/memberForm.js"></script>
 }
-
-
 
 <div class="member-form-container">
     <div class="member-form-card">
-        <h2 class="card-header-name">CREATE MEMBER</h2>
+        <h2 class="card-header-name">New Member Registration</h2>
 
-        <br />
         <form asp-action="Create" method="post">
+            <div class="category-grid">
 
+                <div class="category-box">
+                    <div class="category-header">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <span class="category-label">Personal Information</span>
+                    </div>
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="FirstName" class="form-control-sm" />
-                    <label asp-for="FirstName">First Name</label>
-                    <span asp-validation-for="FirstName" class="text-danger floating-error"></span>
+                    <div class="category-content">
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="FirstName" class="form-control-sm" placeholder=" " />
+                                <label asp-for="FirstName">First Name</label>
+                                <span asp-validation-for="FirstName" class="floating-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="LastName" class="form-control-sm" placeholder=" " />
+                                <label asp-for="LastName">Last Name</label>
+                                <span asp-validation-for="LastName" class="floating-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="BirthDate" type="date" class="form-control-sm" placeholder=" " />
+                                <label asp-for="BirthDate">Birthdate <span class="text-danger">*</span></label>
+                                <span id="age-badge" class="badge bg-info mt-1" style="display:none; font-size: 0.75rem;"></span>
+                                <span asp-validation-for="BirthDate" class="floating-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="Address" class="form-control-sm" placeholder=" " />
+                                <label asp-for="Address">Address</label>
+                                <span asp-validation-for="Address" class="floating-error"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="category-box">
+                    <div class="category-header">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-id-card"></i>
+                        </div>
+                        <span class="category-label">Membership & Contact</span>
+                    </div>
+
+                    <div class="category-content">
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <select asp-for="BranchId" class="form-control-sm" asp-items="@(new SelectList(ViewBag.Branches, "Id", "Name"))">
+                                    <option value="" disabled selected></option>
+                                </select>
+                                <label asp-for="BranchId">Branch</label>
+                                <span asp-validation-for="BranchId" class="floating-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <select asp-for="MembershipTypeId" class="form-control-sm" asp-items="@(new SelectList(ViewBag.MembershipTypes, "Id", "Name"))">
+                                    <option value="" disabled selected></option>
+                                </select>
+                                <label asp-for="MembershipTypeId">Membership Type</label>
+                                <span asp-validation-for="MembershipTypeId" class="floating-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="ContactNo" id="ContactNo" class="form-control-sm" maxlength="11" inputmode="numeric" placeholder=" " />
+                                <label asp-for="ContactNo">Mobile Number</label>
+                                <span asp-validation-for="ContactNo" class="floating-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="EmailAddress" type="email" class="form-control-sm" placeholder=" " />
+                                <label asp-for="EmailAddress">Email Address</label>
+                                <span asp-validation-for="EmailAddress" class="floating-error"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="LastName" class="form-control-sm" />
-                    <label asp-for="LastName">Last Name</label>
-                    <span asp-validation-for="LastName" class="text-danger floating-error"></span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="BirthDate" type="date" class="form-control-sm" />
-                    <label asp-for="BirthDate">Birthdate</label>
-                    <span asp-validation-for="BirthDate" class="text-danger floating-error"></span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="Address" class="form-control-sm" />
-                    <label asp-for="Address">Address</label>
-                    <span asp-validation-for="Address" class="text-danger floating-error"></span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="Branch" class="form-control-sm" />
-                    <label asp-for="Branch">Branch</label>
-                    <span asp-validation-for="Branch" class="text-danger floating-error"></span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="ContactNo" id="ContactNo" class="form-control-sm" maxlength="11" inputmode="numeric" />
-                    <label asp-for="ContactNo">Mobile Number</label>
-                    <span asp-validation-for="ContactNo" class="text-danger floating-error"></span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="EmailAddress" class="form-control-sm" />
-                    <label asp-for="EmailAddress">Email Address</label>
-                    <span asp-validation-for="EmailAddress" class="text-danger floating-error"></span>
-                </div>
-            </div>
-
-            <br />
             <div class="form-buttons">
-                <button type="submit" class="btn-create-member">
-                    <span class="btn-text">Create</span>
-                </button>
-
-                <a asp-action="Index" class="btn-create-cancel">
-                    <span class="btn-text">Cancel</span>
-
-                </a>
+                <a asp-action="Index" class="btn-create-cancel">Cancel</a>
+                <button type="submit" class="btn-create-member">Register Member</button>
             </div>
         </form>
     </div>

@@ -1,112 +1,121 @@
 ﻿@model MemberManagement.Web.ViewModels.MemberVM
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/memberpg/memberedit.css" />
+    <link rel="stylesheet" href="~/css/memberpg/memberCreateEdit.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 }
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/memberpg/memberedit.js"></script>
+    <script src="~/js/memberpg/memberForm.js"></script>
 }
-
-
 
 <div class="member-form-container">
     <div class="member-form-card">
-        <h2 class="card-header-name">EDIT MEMBER</h2>
-
-        <br />
+        <h2 class="card-header-name">Edit Member Profile</h2>
 
         <form asp-action="Edit" method="post">
             <input type="hidden" asp-for="MemberID" />
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="FirstName" class="form-control-sm" />
-                    <label asp-for="FirstName">First Name</label>
-                    <span asp-validation-for="FirstName" class="text-danger floating-error"></span>
-                </div>
-            </div>
+            <div class="category-grid">
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="LastName" class="form-control-sm" />
-                    <label asp-for="LastName">Last Name</label>
-                    <span asp-validation-for="LastName" class="text-danger floating-error"></span>
-                </div>
-            </div>
+                <div class="category-box">
+                    <div class="category-header">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-user-pen"></i>
+                        </div>
+                        <span class="category-label">Personal Information</span>
+                    </div>
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="BirthDate" type="date" class="form-control-sm" />
-                    <label asp-for="BirthDate">Birthdate</label>
-                    <span asp-validation-for="BirthDate" class="text-danger floating-error"></span>
-                </div>
-            </div>
+                    <div class="category-content">
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="FirstName" class="form-control-sm" placeholder=" " />
+                                <label asp-for="FirstName">First Name</label>
+                                <span asp-validation-for="FirstName" class="floating-error"></span>
+                            </div>
+                        </div>
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="Address" class="form-control-sm" />
-                    <label asp-for="Address">Address</label>
-                    <span asp-validation-for="Address" class="text-danger floating-error"></span>
-                </div>
-            </div>
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="LastName" class="form-control-sm" placeholder=" " />
+                                <label asp-for="LastName">Last Name</label>
+                                <span asp-validation-for="LastName" class="floating-error"></span>
+                            </div>
+                        </div>
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="Branch" class="form-control-sm" />
-                    <label asp-for="Branch">Branch</label>
-                    <span asp-validation-for="Branch" class="text-danger floating-error"></span>
-                </div>
-            </div>
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="BirthDate" type="date" class="form-control-sm" placeholder=" " />
+                                <label asp-for="BirthDate">Birthdate <span class="text-danger">*</span></label>
+                                <span id="age-badge" class="badge bg-info mt-1" style="display:none; font-size: 0.75rem;"></span>
+                                <span asp-validation-for="BirthDate" class="floating-error"></span>
+                            </div>
+                        </div>
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="ContactNo" id="ContactNo" class="form-control-sm" maxlength="11" inputmode="numeric" />
-                    <label asp-for="ContactNo">Mobile Number</label>
-                    <span asp-validation-for="ContactNo" class="text-danger floating-error"></span>
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="Address" class="form-control-sm" placeholder=" " />
+                                <label asp-for="Address">Address</label>
+                                <span asp-validation-for="Address" class="floating-error"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <div class="input-wrapper">
-                    <input asp-for="EmailAddress" class="form-control-sm" />
-                    <label asp-for="EmailAddress">Email Address</label>
-                    <span asp-validation-for="EmailAddress" class="text-danger floating-error"></span>
+                <div class="category-box">
+                    <div class="category-header">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-address-book"></i>
+                        </div>
+                        <span class="category-label">Membership & Contact</span>
+                    </div>
+
+                    <div class="category-content">
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <select asp-for="BranchId" class="form-control-sm" asp-items="@(new SelectList(ViewBag.Branches, "Id", "Name"))">
+                                    <option value="" disabled selected></option>
+                                </select>
+                                <label asp-for="BranchId">Branch</label>
+                                <span asp-validation-for="BranchId" class="floating-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <select asp-for="MembershipTypeId" class="form-control-sm" asp-items="@(new SelectList(ViewBag.MembershipTypes, "Id", "Name"))">
+                                    <option value="" disabled selected></option>
+                                </select>
+                                <label asp-for="MembershipTypeId">Membership Type</label>
+                                <span asp-validation-for="MembershipTypeId" class="floating-error"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="ContactNo" id="ContactNo" class="form-control-sm" maxlength="11" inputmode="numeric" placeholder=" " />
+                                <label asp-for="ContactNo">Mobile Number</label>
+                                <span asp-validation-for="ContactNo" class="floating-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input asp-for="EmailAddress" type="email" class="form-control-sm" placeholder=" " />
+                                <label asp-for="EmailAddress">Email Address</label>
+                                <span asp-validation-for="EmailAddress" class="floating-error"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <br />
+            </div>
 
             <div class="form-buttons">
-                <button type="submit" class="btn-edit-member">
-                    <span class="btn-text">Save</span>
-                </button>
-
-                <a asp-action="Index" class="btn-edit-cancel">
-                    <span class="btn-text">Cancel</span>
-                </a>
+                <a asp-action="Index" class="btn-create-cancel">Cancel</a>
+                <button type="submit" class="btn-create-member">Update Profile</button>
             </div>
         </form>
     </div>
 </div>
-
-@* HOW THIS VIEW WORKS:
-   1. MODEL BINDING: The '@model MemberVM' directive at the top tells Razor to expect a MemberVM object. 
-      The 'asp-for' tag helpers automatically bind the input values to the corresponding properties 
-      (like FirstName, LastName) of that object.
-
-   2. FORM SUBMISSION: The 'asp-action="Edit"' tag helper in the <form> tag ensures that when 
-      the "Save" button is clicked, the data is sent to the 'Edit' method (POST) in the Controller. 
-      The 'input type="hidden"' for MemberID ensures the database knows which user to update 
-      without showing the ID on the screen.
-
-   3. VALIDATION: 
-      - The 'asp-validation-for' tags display error messages if the data entered doesn't match 
-        the rules defined in the ViewModel (e.g., [Required] or [EmailAddress]).
-      - The '_ValidationScriptsPartial' enables client-side validation, meaning the form 
-        checks for errors in the browser before even hitting the server.
-
-   4. ASSETS: 
-      - The '@section Styles' and '@section Scripts' blocks inject page-specific CSS and JS 
-        into the main Layout, keeping the global environment clean.
-*@

@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MemberManagement.Domain\MemberManagement.Domain.csproj" />
     <ProjectReference Include="..\MemberManagement.Infrastructure\MemberManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\MemberManagement.SharedKernel\MemberManagement.SharedKernel.csproj" />
   </ItemGroup>
 
 </Project>

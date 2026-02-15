@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemberManagement.Web", "Mem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemberManagement.Tests", "MemberManagement.Tests\MemberManagement.Tests.csproj", "{285F34D2-9AA5-4E17-BC15-72E25B0B9E06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemberManagement.SharedKernel", "MemberManagement.SharedKernel\MemberManagement.SharedKernel.csproj", "{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{285F34D2-9AA5-4E17-BC15-72E25B0B9E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{285F34D2-9AA5-4E17-BC15-72E25B0B9E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{285F34D2-9AA5-4E17-BC15-72E25B0B9E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

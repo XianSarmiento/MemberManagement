@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using MemberManagement.Application.Core;
 using MemberManagement.Application.DTOs;
 using MemberManagement.Application.Interfaces;
 using MemberManagement.Domain.Entities;
+using MemberManagement.SharedKernel.Constant;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
