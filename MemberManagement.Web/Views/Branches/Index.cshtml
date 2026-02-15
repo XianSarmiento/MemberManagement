@@ -1,0 +1,135 @@
+﻿@model IEnumerable<MemberManagement.Application.DTOs.BranchDto>
+
+@{
+    ViewData["Title"] = "Branches List";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="successAlert" class="alert alert-success text-center operation-alert">
+        <i class="fa-solid fa-circle-check"></i>
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="errorAlert" class="alert alert-danger text-center operation-alert">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/branchpg/branchindex.css" />
+}
+
+@section Scripts {
+    <script src="~/js/branchpg/branchindex.js"></script>
+}
+
+<br />
+<div class="card shadow-lg">
+    <div class="card-body">
+
+        @* TOP BAR *@
+        <div class="branch-top-bar mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="btn btn-primary btn-sm btn-branch-icon" title="Branches">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <h2 class="mb-0">BRANCHES LIST</h2>
+                </div>
+
+                <form asp-action="Create" method="post" class="d-flex align-items-center gap-2">
+                    <div class="branch-input-container">
+                        <input type="text" name="name" class="form-control form-control-sm" placeholder="New Branch Name" required>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary" title="Add New Branch">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary" title="Refresh List">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </a>
+                </form>
+            </div>
+        </div>
+
+        @* TABLE *@
+        <div class="table-responsive scrollable-table">
+            <table class="table table-bordered table-striped branch-table">
+                <thead class="table-primary">
+                    <tr>
+                        <th style="width: 100px;">ID</th>
+                        <th>Branch Name</th>
+                        <th class="text-center" style="width: 150px;">Status</th>
+                        <th class="text-center" style="width: 100px;">Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-5">
+                                <i class="bi bi-emoji-frown d-block mb-2" style="font-size: 2rem;"></i>
+                                No branches found.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var b in Model)
+                    {
+                        <tr>
+                            <td>@b.Id</td>
+                            <td><strong>@b.Name</strong></td>
+                            <td class="text-center">
+                                <span class="badge @(b.IsActive ? "bg-success" : "bg-danger")">
+                                    @(b.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-delete-hover"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-id="@b.Id" data-name="@b.Name"
+                                            title="Deactivate Branch">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="branch-info-text">
+                Total Branches: <strong>@Model.Count()</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* DELETE MODAL *@
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="deleteForm" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="deleteBranchId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Deactivate Branch</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to mark <strong id="branchNameLabel"></strong> as inactive?
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

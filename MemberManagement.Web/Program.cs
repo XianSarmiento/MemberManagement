@@ -1,6 +1,5 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using MemberManagement.SharedKernel.Constant;
 using MemberManagement.Application.Interfaces;
 using MemberManagement.Application.Members;
 using MemberManagement.Application.Services;
@@ -10,7 +9,9 @@ using MemberManagement.Domain.Interfaces;
 using MemberManagement.Infrastructure;
 using MemberManagement.Infrastructure.Repositories;
 using MemberManagement.Web.ValidationsVM;
+using MemberManagement.Web.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using MemberManagement.Application.Branches;
 
 namespace MemberManagement.Web
 {
@@ -20,40 +21,41 @@ namespace MemberManagement.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container or MVC
             builder.Services.AddControllersWithViews();
 
-            // Register validators
+            // --- VALIDATORS ---
             builder.Services.AddValidatorsFromAssemblyContaining<MemberVMValidator>();
             builder.Services.AddScoped<IValidator<Member>, MemberValidator>();
+            builder.Services.AddScoped<IValidator<MemberVM>, MemberVMValidator>();
 
-            // Enable FluentValidation integration
             builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
 
-            // Add DbContext
-            builder.Services.AddDbContext<MMSDbContext>(options =>options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            // --- DATABASE ---
+            builder.Services.AddDbContext<MMSDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            );
 
-            // Add DI for Repositories
+            // --- REPOSITORIES ---
             builder.Services.AddScoped<IMemberRepository, MemberRepository>();
             builder.Services.AddScoped<IBranchRepository, BranchRepository>();
             builder.Services.AddScoped<IMembershipTypeRepository, MembershipTypeRepository>();
 
-            // Add DI for Services
+            // --- SERVICES ---
             builder.Services.AddScoped<IMemberService, MemberService>();
             builder.Services.AddScoped<IMemberExportService, MemberExportService>();
             builder.Services.AddScoped<IBranchService, BranchService>();
             builder.Services.AddScoped<IMembershipTypeService, MembershipTypeService>();
 
-            // Handlers for Commands and Queries
+            // --- HANDLERS ---
             builder.Services.AddScoped<CreateMemberHandler>();
             builder.Services.AddScoped<UpdateMemberHandler>();
             builder.Services.AddScoped<GetMembersQueryHandler>();
+            builder.Services.AddScoped<GetBranchesHandler>();
+            builder.Services.AddScoped<CreateBranchHandler>();
 
-            // Add AutoMapper
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -64,9 +66,11 @@ namespace MemberManagement.Web
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
             app.Run();
         }
     }
