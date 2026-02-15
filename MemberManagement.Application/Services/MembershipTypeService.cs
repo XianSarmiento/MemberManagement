@@ -1,16 +1,21 @@
 ﻿using MemberManagement.Application.Interfaces;
 using MemberManagement.Domain.Entities;
-using MemberManagement.Infrastructure;
-using Microsoft.EntityFrameworkCore;
+using MemberManagement.Domain.Interfaces;
 
-public class MembershipTypeService : IMembershipTypeService
+namespace MemberManagement.Application.Services
 {
-    private readonly MMSDbContext _context;
-
-    public MembershipTypeService(MMSDbContext context) => _context = context;
-
-    public async Task<IEnumerable<MembershipType>> GetAllAsync()
+    public class MembershipTypeService : IMembershipTypeService
     {
-        return await _context.MembershipTypes.AsNoTracking().ToListAsync();
+        private readonly IMembershipTypeRepository _repository;
+
+        public MembershipTypeService(IMembershipTypeRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<MembershipType>> GetAllAsync()
+        {
+            return await _repository.GetAllAsync();
+        }
     }
 }
