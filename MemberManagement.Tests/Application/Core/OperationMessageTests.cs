@@ -1,4 +1,4 @@
-﻿using MemberManagement.Application.Core;
+﻿using MemberManagement.SharedKernel.Constant;
 using Xunit;
 using Assert = Xunit.Assert;
 

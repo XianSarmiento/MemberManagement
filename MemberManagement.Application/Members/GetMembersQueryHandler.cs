@@ -2,6 +2,10 @@
 using MemberManagement.Application.Interfaces;
 using MemberManagement.Application.Mappers;
 using MemberManagement.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemberManagement.Application.Members;
 
@@ -14,9 +18,11 @@ public class GetMembersQueryHandler
         _memberService = memberService;
     }
 
-    public async Task<MemberIndexResult> HandleAsync(string searchLastName, string branch, string sortColumn, string sortOrder)
+    public async Task<MemberIndexResult> HandleAsync(string searchLastName, string branch, string sortColumn, string sortOrder, bool getActive = true)
     {
-        var memberEntities = await _memberService.GetActiveMembersAsync();
+        var memberEntities = getActive
+            ? await _memberService.GetActiveMembersAsync()
+            : await _memberService.GetInactiveMembersAsync();
 
         var members = memberEntities.Select(m => m.ToDto()).ToList();
 

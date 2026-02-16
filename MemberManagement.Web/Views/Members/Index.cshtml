@@ -10,8 +10,7 @@
 @if (TempData["SuccessMessage"] != null)
 {
     <div id="successAlert" class="alert alert-success text-center">
-        <i class="fa-solid fa-circle-info"></i>
-        @TempData["SuccessMessage"]
+        <i class="fa-solid fa-circle-info"></i> @TempData["SuccessMessage"]
     </div>
 }
 
@@ -23,8 +22,6 @@
 }
 
 
-
-<br />
 <div class="card shadow-lg">
     <div class="card-body">
 
@@ -42,8 +39,9 @@
                 <form method="get" class="d-flex align-items-center gap-3">
                     <input type="hidden" name="pageSize" value="@Model.PageSize" />
 
+                    @* Search *@
                     <div class="d-flex align-items-center gap-1">
-                        <div style="width:160px;">
+                        <div class="search-input-container">
                             <input type="text" name="searchLastName" id="searchLastName" class="form-control form-control-sm" placeholder="Search by Last Name" value="@Model.SearchLastName" />
                         </div>
                         <button type="submit" class="btn btn-sm btn-primary" title="Search by Last Name">
@@ -51,6 +49,7 @@
                         </button>
                     </div>
 
+                    @* Filter *@
                     <div class="d-flex align-items-center gap-1">
                         <div style="width:180px;">
                             <select name="branch" id="branchFilter" class="form-select form-select-sm">
@@ -66,12 +65,10 @@
                         </button>
                     </div>
 
-                    <a href="@Url.Action("Index")"
-                       class="btn btn-sm btn-outline-secondary" title="Reset filters">
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary" title="Reset filters">
                        <i class="bi bi-arrow-clockwise"></i>
                     </a>
                 </form>
-
             </div>
         </div>
 
@@ -81,15 +78,8 @@
                 <thead class="table-primary">
                     <tr>
                         <th>
-                            <a href="@Url.Action("Index", new { 
-                                searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, 
-                                pageSize = Model.PageSize, sortColumn = "MemberID", 
-                                sortOrder = Model.GetToggleOrder("MemberID") })">
-                                @if (Model.SortColumn == "MemberID")
-                                {
-                                    <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i>
-                                }
-                                ID
+                            <a href="@Url.Action("Index", new { searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize, sortColumn = "MemberID", sortOrder = Model.GetToggleOrder("MemberID") })">
+                                @if (Model.SortColumn == "MemberID") { <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } ID
                             </a>
                         </th>
                         <th>
@@ -159,21 +149,23 @@
                             <td>@m.ContactNo</td>
                             <td>@m.EmailAddress</td>
                             <td class="text-center">
-                                <div class="btn-group">
+                                <div class="btn-group gap-1">
                                     <a asp-action="Edit" asp-route-id="@m.MemberID"
-                                       class="btn btn-sm btn-outline-primary" title="Edit Member">
+                                       class="btn btn-sm btn-edit-hover" title="Edit Member">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
+
                                     <a asp-action="Detail" asp-route-id="@m.MemberID"
-                                       class="btn btn-sm btn-outline-success" title="Member Details">
-                                        <i class="bi bi-info-circle"></i>
+                                       class="btn btn-sm btn-detail-hover" title="Member Details">
+                                        <i class="bi bi-eye-fill"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-delete-hover"
+
+                                    <button type="button" class="btn btn-sm btn-delete-hover"
                                             data-bs-toggle="modal" data-bs-target="#deleteModal"
                                             data-id="@m.MemberID" data-name="@($"{m.FirstName} {m.LastName}")"
                                             data-url="@Url.Action("Delete", "Members")"
-                                            title="Delete Member">
-                                        <i class="bi bi-trash"></i>
+                                            title="Deactivate Member">
+                                        <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 </div>
                             </td>
@@ -200,21 +192,11 @@
                 </form>
 
                 @* Export Buttons *@
-                <a asp-action="ExportToExcel" 
-                   asp-route-searchLastName="@Model.SearchLastName" 
-                   asp-route-branch="@Model.SelectedBranch" 
-                   class="btn btn-outline-success btn-sm btn-pg-size icon-btn" 
-                   title="Export to Excel">
-                    <i class="bi bi-file-earmark-excel"></i>
-                </a>
-
-                <a asp-action="ExportToPdf" 
-                   asp-route-searchLastName="@Model.SearchLastName" 
-                   asp-route-branch="@Model.SelectedBranch" 
-                   class="btn btn-outline-danger btn-sm btn-pg-size icon-btn" 
-                   title="Export to PDF">
-                    <i class="bi bi-file-earmark-pdf"></i>
-                </a>
+                <span class="text-muted mx-2">|</span>
+                <a asp-action="ExportToExcel" asp-route-searchLastName="@Model.SearchLastName" asp-route-branch="@Model.SelectedBranch" class="btn btn-outline-success btn-sm btn-pg-size icon-btn"  title="Export to Excel"> <i class="bi bi-file-earmark-excel"></i> </a>
+                <a asp-action="ExportToPdf" asp-route-searchLastName="@Model.SearchLastName" asp-route-branch="@Model.SelectedBranch" class="btn btn-outline-danger btn-sm btn-pg-size icon-btn" title="Export to PDF"> <i class="bi bi-file-earmark-pdf"></i> </a>
+                <span class="text-muted mx-2">|</span>
+                <a asp-action="Inactive" class="btn btn-outline-secondary btn-sm" title="View Inactive List"> <i class="bi bi-person-x"></i> </a>
             </div>
 
             <div class="text-center flex-grow-1 member-pagination-info">

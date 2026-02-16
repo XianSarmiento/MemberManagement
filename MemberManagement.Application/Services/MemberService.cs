@@ -23,6 +23,23 @@ namespace MemberManagement.Application.Services
             return await _memberRepository.GetAllAsync();
         }
 
+        public async Task<IEnumerable<Member>> GetInactiveMembersAsync()
+        {
+            var allMembers = await _memberRepository.GetAllAsync(onlyActive: false);
+            return allMembers.Where(m => !m.IsActive);
+        }
+
+        public async Task RestoreAsync(int id)
+        {
+            var member = await _memberRepository.GetByIdAsync(id);
+
+            if (member != null)
+            {
+                member.IsActive = true;
+                await _memberRepository.UpdateAsync(member);
+            }
+        }
+
         public async Task<Member?> GetByIdAsync(int id)
         {
             return await _memberRepository.GetByIdAsync(id);
