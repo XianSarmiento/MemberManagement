@@ -16,6 +16,25 @@ if (deleteModal) {
     });
 }
 
+// RESTORE MODAL DYNAMIC DATA
+var restoreModal = document.getElementById('restoreModal');
+if (restoreModal) {
+    restoreModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        if (!button) return;
+
+        var memberId = button.getAttribute('data-id') ?? '';
+        var memberName = button.getAttribute('data-name') ?? '';
+
+        // Match the IDs from your HTML: restoreMemberName and restoreMemberId
+        var displayName = restoreModal.querySelector('#restoreMemberName');
+        var inputId = restoreModal.querySelector('#restoreMemberId');
+
+        if (displayName) displayName.textContent = memberName;
+        if (inputId) inputId.value = memberId;
+    });
+}
+
 // FLOATING ALERT AUTO-REMOVE
 window.addEventListener('DOMContentLoaded', (event) => {
     const alert = document.getElementById('successAlert');

@@ -18,13 +18,19 @@ namespace MemberManagement.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Member>> GetAllAsync()
+        public async Task<IEnumerable<Member>> GetAllAsync(bool onlyActive = true)
         {
-            return await _context.Members
+            var query = _context.Members
                 .Include(m => m.Branch)
                 .Include(m => m.MembershipType)
-                .Where(m => m.IsActive)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (onlyActive)
+            {
+                query = query.Where(m => m.IsActive);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<Member?> GetByIdAsync(int memberId)

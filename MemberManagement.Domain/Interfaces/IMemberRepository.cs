@@ -6,8 +6,8 @@ namespace MemberManagement.Domain.Interfaces
 {
     public interface IMemberRepository
     {
-        // Member List Page
-        Task<IEnumerable<Member>> GetAllAsync();
+        // Modified to allow fetching inactive records
+        Task<IEnumerable<Member>> GetAllAsync(bool onlyActive = true);
 
         // Member List Page (only active members)
         Task<IEnumerable<Member>> GetActiveAsync();

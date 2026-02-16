@@ -180,7 +180,6 @@ namespace MemberManagement.Web.Controllers
             {
                 TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
             }
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -202,6 +201,43 @@ namespace MemberManagement.Web.Controllers
             var fileName = $"Members_{DateTime.Now:yyyyMMdd}.pdf";
 
             return File(fileContent, "application/pdf", fileName);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Inactive(string searchLastName = "", string branch = "", string sortColumn = "MemberId", string sortOrder = "asc", int page = 1, int pageSize = 10)
+        {
+            var result = await _getQueryHandler.HandleAsync(searchLastName, branch, sortColumn, sortOrder, false);
+
+            var memberVMs = result.Members.ToViewModels();
+            int actualPageSize = pageSize < 1 ? (memberVMs.Count > 0 ? memberVMs.Count : 10) : pageSize;
+            var pagedList = memberVMs.ToPagedList(page, actualPageSize);
+
+            return View(new MemberIndexVM
+            {
+                Members = pagedList,
+                SearchLastName = searchLastName,
+                SelectedBranch = branch,
+                PageSize = pageSize,
+                SortColumn = sortColumn,
+                SortOrder = sortOrder,
+                Branches = result.Branches ?? new List<string>()
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(int id)
+        {
+            try
+            {
+                await _memberService.RestoreAsync(id);
+                TempData["SuccessMessage"] = OperationMessage.User.Restored;
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = OperationMessage.Error.RestoreFailed;
+            }
+            return RedirectToAction(nameof(Inactive));
         }
 
         private async Task PopulateSelectionLists()
