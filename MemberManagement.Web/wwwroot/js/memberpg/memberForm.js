@@ -9,18 +9,15 @@
     const form = document.querySelector('form');
     const cancelLink = document.querySelector('a.btn-create-cancel');
 
-    // 2. INITIALIZE UNOBTRUSIVE VALIDATION (Critical for Edit views)
+    // 2. INITIALIZE UNOBTRUSIVE VALIDATION
     if (form) {
-        // Force jQuery to re-parse the form attributes
         $.validator.unobtrusive.parse(form);
-
-        // Ensure validation triggers as soon as user leaves a field
         const validator = $(form).validate();
+
         validator.settings.onfocusout = function (element) {
             $(element).valid();
         };
     }
-
     // 3. CONTACT NUMBER FORMATTING
     if (contactInput) {
         contactInput.addEventListener("input", function () {
@@ -41,14 +38,20 @@
     // 5. EMAIL FORMATTING & IMMEDIATE VALIDATION
     if (emailInput) {
         emailInput.addEventListener("blur", function () {
-            this.value = this.value.trim().toLowerCase();
-            // Trigger the red cloud immediately on blur
+            let val = this.value.trim().toLowerCase();
+
+            // Automatic @gmail.com logic
+            if (val && !val.includes("@")) {
+                val += "@gmail.com";
+            }
+
+            this.value = val;
+
             if (typeof $(this).valid === "function") {
                 $(this).valid();
             }
         });
 
-        // If email is pre-filled (Edit View) and invalid, show error after a short delay
         if (emailInput.value && typeof $(emailInput).valid === "function") {
             setTimeout(() => { $(emailInput).valid(); }, 600);
         }
@@ -74,8 +77,8 @@
                 if (cancelLink) cancelLink.style.display = 'none';
                 submitBtn.style.width = '30%';
             } else {
-                // Restore button state if validation fails
                 submitBtn.disabled = false;
+                // If validation fails, don't clear the errors
                 if (submitBtn.innerHTML.includes("Processing")) {
                     const headerText = document.querySelector('.card-header-name').innerText;
                     submitBtn.innerHTML = headerText.includes("Edit") ? 'Update Profile' : 'Register Member';
@@ -85,7 +88,7 @@
         });
     }
 
-    // 8. DIRTY CHECKING (Unsaved changes alert)
+    // 8. DIRTY CHECKING
     document.querySelectorAll('input, select, textarea').forEach(el => {
         el.addEventListener('change', () => isDirty = true);
     });
@@ -97,9 +100,9 @@
         }
     });
 
-    // 9. AGE CALCULATION
+    // 9. AGE CALCULATION & STICKY VALIDATION
     if (birthDateInput && ageBadge) {
-        const calculateAndDisplayAge = function () {
+        const calculateAndDisplayAge = function (triggerValidation = false) {
             if (!birthDateInput.value) {
                 ageBadge.style.display = 'none';
                 return;
@@ -107,6 +110,8 @@
 
             const birthDate = new Date(birthDateInput.value);
             const today = new Date();
+            if (isNaN(birthDate.getTime())) return;
+
             let ageYears = today.getFullYear() - birthDate.getFullYear();
             let ageMonths = today.getMonth() - birthDate.getMonth();
             let ageDays = today.getDate() - birthDate.getDate();
@@ -126,15 +131,18 @@
 
             const isTooYoung = ageYears < 18;
             const isTooOld = ageYears > 65 || (ageYears === 65 && ageMonths > 6) || (ageYears === 65 && ageMonths === 6 && ageDays > 1);
-
             ageBadge.className = (isTooYoung || isTooOld) ? "badge bg-danger mt-1" : "badge bg-success mt-1";
 
-            if (typeof $(birthDateInput).valid === "function") {
+            if (triggerValidation && typeof $(birthDateInput).valid === "function") {
                 $(birthDateInput).valid();
             }
         };
 
-        birthDateInput.addEventListener("input", calculateAndDisplayAge);
-        calculateAndDisplayAge(); // Run once on load for Edit view
+        birthDateInput.addEventListener("input", () => calculateAndDisplayAge(false));
+        birthDateInput.addEventListener("blur", () => calculateAndDisplayAge(true));
+
+        if (birthDateInput.value) {
+            calculateAndDisplayAge(false);
+        }
     }
 });

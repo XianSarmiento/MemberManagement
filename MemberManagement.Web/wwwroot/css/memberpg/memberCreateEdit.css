@@ -75,7 +75,7 @@
 
 /* Form Elements Consistency */
 .form-group {
-    margin-bottom: 22px; /* Increased to allow room for the tooltip */
+    margin-bottom: 25px; /* Slightly increased for better spacing with badges */
     position: relative;
 }
 
@@ -121,7 +121,7 @@
     .input-wrapper input:focus + label,
     .input-wrapper input:not(:placeholder-shown) + label,
     .input-wrapper select:focus + label,
-    .input-wrapper select:valid + label,
+    .input-wrapper select:not([value=""]):not(:focus):valid + label,
     .input-wrapper input[type="date"] + label {
         top: 8px;
         font-size: 10px;
@@ -130,10 +130,10 @@
         text-transform: uppercase;
     }
 
-/* Cloud Validation Tooltip - FIXED FOR EDIT VIEW */
+/* Cloud Validation Tooltip */
 .floating-error {
     position: absolute;
-    top: -14px; /* Sits on the top border of the input */
+    top: -14px;
     right: 8px;
     background: var(--error-red);
     color: white !important;
@@ -141,11 +141,11 @@
     border-radius: 4px;
     font-size: 10px;
     font-weight: 700;
-    z-index: 100; /* Higher than the label */
+    z-index: 100;
     display: none;
     white-space: nowrap;
     box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    pointer-events: none; /* Prevents blocking clicks to the input */
+    pointer-events: none; /* Crucial: clicks go through to input */
 }
 
     .floating-error::after {
@@ -157,9 +157,14 @@
         border-top-color: var(--error-red);
     }
 
-/* Ensure the error is visible when jQuery validation triggers it */
+/* jQuery Unobtrusive Trigger */
 .field-validation-error.floating-error {
     display: block !important;
+}
+
+/* Hide when valid */
+.field-validation-valid.floating-error {
+    display: none !important;
 }
 
 /* Age Badge Styling */
@@ -168,6 +173,7 @@
     bottom: -18px;
     left: 2px;
     font-size: 0.7rem;
+    z-index: 5;
 }
 
 /* Buttons Row */
