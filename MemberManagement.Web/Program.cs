@@ -28,8 +28,6 @@ namespace MemberManagement.Web
             builder.Services.AddValidatorsFromAssemblyContaining<MemberVMValidator>();
             builder.Services.AddScoped<IValidator<Member>, MemberValidator>();
             builder.Services.AddScoped<IValidator<MemberVM>, MemberVMValidator>();
-
-            builder.Services.AddFluentValidationAutoValidation();
             builder.Services.AddFluentValidationClientsideAdapters();
 
             // --- DATABASE ---

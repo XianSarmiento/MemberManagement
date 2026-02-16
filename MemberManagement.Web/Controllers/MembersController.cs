@@ -79,10 +79,13 @@ namespace MemberManagement.Web.Controllers
         public async Task<IActionResult> Create(MemberVM memberVM)
         {
             var validationResult = await _vmValidator.ValidateAsync(memberVM);
+
             if (!validationResult.IsValid)
             {
                 foreach (var error in validationResult.Errors)
+                {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
 
                 await PopulateSelectionLists();
                 return View(memberVM);
@@ -126,10 +129,13 @@ namespace MemberManagement.Web.Controllers
         public async Task<IActionResult> Edit(MemberVM memberVM)
         {
             var validationResult = await _vmValidator.ValidateAsync(memberVM);
+
             if (!validationResult.IsValid)
             {
                 foreach (var error in validationResult.Errors)
+                {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
 
                 await PopulateSelectionLists();
                 return View(memberVM);
