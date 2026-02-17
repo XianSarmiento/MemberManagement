@@ -50,8 +50,9 @@ namespace MemberManagement.Web
             builder.Services.AddScoped<CreateMemberHandler>();
             builder.Services.AddScoped<UpdateMemberHandler>();
             builder.Services.AddScoped<GetMembersQueryHandler>();
-            builder.Services.AddScoped<GetBranchesHandler>();
             builder.Services.AddScoped<CreateBranchHandler>();
+            builder.Services.AddScoped<UpdateBranchHandler>();
+            builder.Services.AddScoped<GetBranchesHandler>();
             builder.Services.AddScoped<GetMembershipTypesHandler>();
             builder.Services.AddScoped<CreateMembershipTypeHandler>();
 

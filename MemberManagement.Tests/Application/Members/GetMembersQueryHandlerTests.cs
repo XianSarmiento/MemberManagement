@@ -24,15 +24,17 @@ namespace MemberManagement.UnitTests.Application.Members
 
         private List<Member> GetFakeMembers()
         {
-            var branchNorth = new Branch("North");
-            var branchSouth = new Branch("South");
+            // Fix: Added dummy address and branch code to satisfy the updated constructor
+            var branchNorth = new Branch("North", "123 North St", "BN01");
+            var branchSouth = new Branch("South", "456 South St", "BS02");
 
             return new List<Member>
-    {
-        new Member("Alice", "Smith", new DateOnly(1990, 1, 1), 1, 1) { MemberID = 1 },
-        new Member("Charlie", "Brown", new DateOnly(1990, 1, 1), 2, 1) { MemberID = 2 },
-        new Member("Bob", "Smith", new DateOnly(1990, 1, 1), 1, 1) { MemberID = 3 }
-    };
+            {
+                // Note: Ensure your Member constructor matches your current Domain logic
+                new Member("Alice", "Smith", new DateOnly(1990, 1, 1), 1, 1) { MemberID = 1 },
+                new Member("Charlie", "Brown", new DateOnly(1990, 1, 1), 2, 1) { MemberID = 2 },
+                new Member("Bob", "Smith", new DateOnly(1990, 1, 1), 1, 1) { MemberID = 3 }
+            };
         }
 
         [Fact]

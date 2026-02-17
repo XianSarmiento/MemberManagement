@@ -1,23 +1,28 @@
 ﻿using MemberManagement.Application.DTOs;
 using MemberManagement.Domain.Interfaces;
 
-public class GetBranchesHandler
+namespace MemberManagement.Application.Branches
 {
-    private readonly IBranchRepository _repository;
-
-    public GetBranchesHandler(IBranchRepository repository)
+    public class GetBranchesHandler
     {
-        _repository = repository;
-    }
+        private readonly IBranchRepository _repository;
 
-    public async Task<IEnumerable<BranchDto>> Handle()
-    {
-        var branches = await _repository.GetAllAsync();
-        return branches.Select(b => new BranchDto
+        public GetBranchesHandler(IBranchRepository repository)
         {
-            Id = b.Id,
-            Name = b.Name,
-            IsActive = b.IsActive
-        });
+            _repository = repository;
+        }
+
+        public async Task<IEnumerable<BranchDto>> Handle()
+        {
+            var branches = await _repository.GetAllAsync();
+            return branches.Select(b => new BranchDto
+            {
+                Id = b.Id,
+                Name = b.Name,
+                Address = b.Address,
+                BranchCode = b.BranchCode,
+                IsActive = b.IsActive
+            });
+        }
     }
 }

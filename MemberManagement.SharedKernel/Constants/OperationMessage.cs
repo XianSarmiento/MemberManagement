@@ -13,6 +13,7 @@
         public static class Branch
         {
             public const string Created = "Branch successfully created.";
+            public const string Updated = "Branch successfully updated.";
             public const string Deleted = "Branch successfully deactivated.";
         }
 

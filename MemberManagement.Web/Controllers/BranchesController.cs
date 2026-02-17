@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MemberManagement.Application.Branches;
 using MemberManagement.Domain.Interfaces;
-using MemberManagement.SharedKernel.Constant; // Added this
+using MemberManagement.SharedKernel.Constant;
 
 namespace MemberManagement.Web.Controllers
 {
@@ -9,15 +9,18 @@ namespace MemberManagement.Web.Controllers
     {
         private readonly GetBranchesHandler _getHandler;
         private readonly CreateBranchHandler _createHandler;
+        private readonly UpdateBranchHandler _updateHandler;
         private readonly IBranchRepository _repository;
 
         public BranchesController(
             GetBranchesHandler getHandler,
             CreateBranchHandler createHandler,
+            UpdateBranchHandler updateHandler,
             IBranchRepository repository)
         {
             _getHandler = getHandler;
             _createHandler = createHandler;
+            _updateHandler = updateHandler;
             _repository = repository;
         }
 
@@ -28,9 +31,9 @@ namespace MemberManagement.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string name)
+        public async Task<IActionResult> Create(string name, string address, string branchCode)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(branchCode))
             {
                 TempData["ErrorMessage"] = OperationMessage.Error.InvalidInput;
                 return RedirectToAction(nameof(Index));
@@ -38,8 +41,30 @@ namespace MemberManagement.Web.Controllers
 
             try
             {
-                await _createHandler.Handle(name);
+                await _createHandler.Handle(name, address, branchCode);
                 TempData["SuccessMessage"] = OperationMessage.Branch.Created;
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, string name, string address, string branchCode)
+        {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(branchCode))
+            {
+                TempData["ErrorMessage"] = OperationMessage.Error.InvalidInput;
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                await _updateHandler.Handle(id, name, address, branchCode);
+                TempData["SuccessMessage"] = OperationMessage.Branch.Updated;
             }
             catch
             {

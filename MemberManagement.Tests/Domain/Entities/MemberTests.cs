@@ -36,10 +36,17 @@ namespace MemberManagement.UnitTests.Domain.Entities
         {
             // Arrange
             var birthDate = new DateOnly(1995, 12, 25);
-            var branch = new Branch("Main");
+
+            // FIX: Added dummy branch code and address to satisfy the new Branch constructor
+            var branch = new Branch("Main", "123 Main Street", "M001");
 
             // Act
+            // Note: Ensure the Member constructor parameters match your current Member entity definition
             var member = new Member("Jane", "Smith", birthDate, 1, 1, "Address", "555", "email@test.com");
+
+            // Assert (Added a basic assertion to ensure the test is meaningful)
+            Assert.Equal("Jane", member.FirstName);
+            Assert.Equal("Smith", member.LastName);
         }
     }
 }

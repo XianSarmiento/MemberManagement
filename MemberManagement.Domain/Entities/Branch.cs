@@ -4,22 +4,31 @@
     {
         public int Id { get; private set; }
         public string Name { get; private set; }
+        public string Address { get; private set; }
+        public string BranchCode { get; private set; }
         public bool IsActive { get; private set; }
 
-        // Constructor for enforcing valid object creation
-        public Branch(string name)
+        public Branch(string name, string address, string branchCode)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Branch name is required.");
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Branch name is required.");
+            if (string.IsNullOrWhiteSpace(branchCode)) throw new ArgumentException("Branch code is required.");
 
             Name = name;
+            Address = address;
+            BranchCode = branchCode;
             IsActive = true;
         }
 
-        // Required for EF Core
         protected Branch() { }
 
-        public void UpdateName(string newName) => Name = newName;
+        public void Update(string name, string address, string branchCode)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty.");
+            Name = name;
+            Address = address;
+            BranchCode = branchCode;
+        }
+
         public void Deactivate() => IsActive = false;
     }
 }
