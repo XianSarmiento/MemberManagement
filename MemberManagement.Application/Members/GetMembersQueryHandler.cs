@@ -26,6 +26,7 @@ public class GetMembersQueryHandler
 
         var members = memberEntities.Select(m => m.ToDto()).ToList();
 
+        // Filtering
         if (!string.IsNullOrWhiteSpace(searchLastName))
         {
             members = members.Where(m => m.LastName?.Contains(searchLastName, StringComparison.OrdinalIgnoreCase) == true).ToList();
@@ -36,15 +37,36 @@ public class GetMembersQueryHandler
             members = members.Where(m => m.Branch == branch).ToList();
         }
 
+        // UPDATED SORTING LOGIC
+        bool isDesc = sortOrder == "desc";
+
         members = sortColumn switch
         {
-            "FirstName" => sortOrder == "desc"
+            "MemberID" => isDesc
+                ? members.OrderByDescending(m => m.MemberID).ToList()
+                : members.OrderBy(m => m.MemberID).ToList(),
+
+            "FirstName" => isDesc
                 ? members.OrderByDescending(m => m.FirstName).ToList()
                 : members.OrderBy(m => m.FirstName).ToList(),
-            "LastName" => sortOrder == "desc"
+
+            "LastName" => isDesc
                 ? members.OrderByDescending(m => m.LastName).ToList()
                 : members.OrderBy(m => m.LastName).ToList(),
-            _ => members.OrderBy(m => m.MemberID).ToList()
+
+            "Branch" => isDesc
+                ? members.OrderByDescending(m => m.Branch).ToList()
+                : members.OrderBy(m => m.Branch).ToList(),
+
+            // Matches the "Membership Type" string from your View's Url.Action
+            "Membership Type" => isDesc
+                ? members.OrderByDescending(m => m.MembershipType).ToList()
+                : members.OrderBy(m => m.MembershipType).ToList(),
+
+            // Default case (MemberID ascending)
+            _ => isDesc
+                ? members.OrderByDescending(m => m.MemberID).ToList()
+                : members.OrderBy(m => m.MemberID).ToList()
         };
 
         return new MemberIndexResult

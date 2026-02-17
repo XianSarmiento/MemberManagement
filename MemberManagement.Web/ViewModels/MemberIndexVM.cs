@@ -32,5 +32,12 @@ public class MemberIndexVM
     }
 
     public string GetToggleOrder(string column)
-        => (SortColumn == column && SortOrder == "asc") ? "desc" : "asc";
+    {
+        if (SortColumn == column)
+        {
+            return SortOrder == "asc" ? "desc" : "asc";
+        }
+        return "asc";
+    }
+
 }

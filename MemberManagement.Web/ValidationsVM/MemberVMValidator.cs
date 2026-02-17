@@ -1,20 +1,41 @@
 ﻿using FluentValidation;
 using MemberManagement.Web.ViewModels;
 using MemberManagement.SharedKernel.Constant;
+using MemberManagement.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace MemberManagement.Web.ValidationsVM
 {
     public class MemberVMValidator : AbstractValidator<MemberVM>
     {
-        public MemberVMValidator()
+        private readonly MMSDbContext _context;
+
+        public MemberVMValidator(MMSDbContext context)
         {
+            _context = context;
+
             RuleFor(x => x.FirstName)
                 .NotEmpty().WithMessage("First Name is required.")
-                .MaximumLength(50).WithMessage("First Name is too long.");
+                .MaximumLength(50).WithMessage("First Name is too long.")
+                .Matches(@"^[a-zA-Z\s]*$").WithMessage("First Name should only contain letters.");
 
             RuleFor(x => x.LastName)
                 .NotEmpty().WithMessage("Last Name is required.")
-                .MaximumLength(50).WithMessage("Last Name is too long.");
+                .MaximumLength(50).WithMessage("Last Name is too long.")
+                .Matches(@"^[a-zA-Z\s]*$").WithMessage("Last Name should only contain letters.");
+
+            RuleFor(x => x)
+                .MustAsync(async (x, cancellation) =>
+                {
+                    var exists = await _context.Members.AnyAsync(m =>
+                        m.FirstName.ToLower() == x.FirstName.ToLower() &&
+                        m.LastName.ToLower() == x.LastName.ToLower() &&
+                        m.BirthDate == DateOnly.FromDateTime(x.BirthDate.Value) &&
+                        m.MemberID != x.MemberID, cancellation);
+                    return !exists;
+                })
+                .WithMessage("A member with this name and birthdate already exists.")
+                .When(x => !string.IsNullOrEmpty(x.FirstName) && !string.IsNullOrEmpty(x.LastName) && x.BirthDate.HasValue);
 
             RuleFor(x => x.BirthDate)
                 .NotEmpty().WithMessage(OperationMessage.Error.BirthDateRequired)
@@ -46,13 +67,27 @@ namespace MemberManagement.Web.ValidationsVM
 
             RuleFor(m => m.ContactNo)
                 .Matches(@"^09\d{9}$")
-                .WithMessage("Format: 09XXXXXXXXX (11 digits)")
-                .When(m => !string.IsNullOrWhiteSpace(m.ContactNo));
+                    .WithMessage("Format: 09XXXXXXXXX (11 digits)")
+                    .When(m => !string.IsNullOrEmpty(m.ContactNo)) // Only validate regex if not empty
+                .MustAsync(async (x, contact, cancellation) =>
+                {
+                    if (string.IsNullOrEmpty(contact)) return true; // Ignore unique check if empty
+                    return !await _context.Members.AnyAsync(m => m.ContactNo == contact && m.MemberID != x.MemberID, cancellation);
+                })
+                .WithMessage("This contact number is already in use.")
+                .When(m => !string.IsNullOrEmpty(m.ContactNo)); // Only run DB check if not empty
 
             RuleFor(m => m.EmailAddress)
                 .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-                .WithMessage("Please enter a valid email.")
-                .When(m => !string.IsNullOrWhiteSpace(m.EmailAddress));
+                    .WithMessage("Please enter a valid email.")
+                    .When(m => !string.IsNullOrEmpty(m.EmailAddress)) // Only validate regex if not empty
+                .MustAsync(async (x, email, cancellation) =>
+                {
+                    if (string.IsNullOrEmpty(email)) return true; // Ignore unique check if empty
+                    return !await _context.Members.AnyAsync(m => m.EmailAddress == email && m.MemberID != x.MemberID, cancellation);
+                })
+                .WithMessage("This email address is already registered.")
+                .When(m => !string.IsNullOrEmpty(m.EmailAddress)); // Only run DB check if not empty
         }
     }
 }

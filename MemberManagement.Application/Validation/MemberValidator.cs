@@ -1,13 +1,19 @@
 ﻿using FluentValidation;
 using MemberManagement.Domain.Entities;
 using MemberManagement.SharedKernel.Constant;
+using MemberManagement.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace MemberManagement.Application.Validation
 {
     public class MemberValidator : AbstractValidator<Member>
     {
-        public MemberValidator()
+        private readonly MMSDbContext _context;
+
+        public MemberValidator(MMSDbContext context)
         {
+            _context = context;
+
             RuleFor(m => m.FirstName)
                 .NotEmpty().WithMessage("First Name is required.")
                 .MaximumLength(50);
@@ -35,11 +41,27 @@ namespace MemberManagement.Application.Validation
                 .GreaterThan(0).WithMessage("Please select a valid membership type.");
 
             RuleFor(m => m.ContactNo)
-                .Matches(@"^09\d{9}$").WithMessage("Invalid PH number. Format: 09XXXXXXXXX")
-                .When(m => !string.IsNullOrWhiteSpace(m.ContactNo));
+                .Matches(@"^09\d{9}$")
+                    .WithMessage("Invalid PH number. Format: 09XXXXXXXXX")
+                    .When(m => !string.IsNullOrEmpty(m.ContactNo))
+                .MustAsync(async (member, contact, cancellation) =>
+                {
+                    if (string.IsNullOrEmpty(contact)) return true; // Allow null/empty
+                    return !await _context.Members.AnyAsync(m => m.ContactNo == contact && m.MemberID != member.MemberID, cancellation);
+                })
+                .WithMessage("Contact number already exists.")
+                .When(m => !string.IsNullOrEmpty(m.ContactNo));
 
             RuleFor(m => m.EmailAddress)
-                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Invalid email address.")
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+                    .WithMessage("Invalid email address.")
+                    .When(m => !string.IsNullOrEmpty(m.EmailAddress))
+                .MustAsync(async (member, email, cancellation) =>
+                {
+                    if (string.IsNullOrEmpty(email)) return true; // Allow null/empty
+                    return !await _context.Members.AnyAsync(m => m.EmailAddress == email && m.MemberID != member.MemberID, cancellation);
+                })
+                .WithMessage("Email address already exists.")
                 .When(m => !string.IsNullOrEmpty(m.EmailAddress));
         }
 
