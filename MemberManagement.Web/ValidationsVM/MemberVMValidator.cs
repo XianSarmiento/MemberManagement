@@ -66,20 +66,28 @@ namespace MemberManagement.Web.ValidationsVM
                 .When(m => !string.IsNullOrEmpty(m.Address));
 
             RuleFor(m => m.ContactNo)
-                .NotEmpty().WithMessage("Contact Number is required.")
-                .Matches(@"^09\d{9}$").WithMessage("Format: 09XXXXXXXXX (11 digits)")
+                .Matches(@"^09\d{9}$")
+                    .WithMessage("Format: 09XXXXXXXXX (11 digits)")
+                    .When(m => !string.IsNullOrEmpty(m.ContactNo)) // Only validate regex if not empty
                 .MustAsync(async (x, contact, cancellation) =>
                 {
+                    if (string.IsNullOrEmpty(contact)) return true; // Ignore unique check if empty
                     return !await _context.Members.AnyAsync(m => m.ContactNo == contact && m.MemberID != x.MemberID, cancellation);
-                }).WithMessage("This contact number is already in use.");
+                })
+                .WithMessage("This contact number is already in use.")
+                .When(m => !string.IsNullOrEmpty(m.ContactNo)); // Only run DB check if not empty
 
             RuleFor(m => m.EmailAddress)
-                .NotEmpty().WithMessage("Email Address is required.")
-                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Please enter a valid email.")
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+                    .WithMessage("Please enter a valid email.")
+                    .When(m => !string.IsNullOrEmpty(m.EmailAddress)) // Only validate regex if not empty
                 .MustAsync(async (x, email, cancellation) =>
                 {
+                    if (string.IsNullOrEmpty(email)) return true; // Ignore unique check if empty
                     return !await _context.Members.AnyAsync(m => m.EmailAddress == email && m.MemberID != x.MemberID, cancellation);
-                }).WithMessage("This email address is already registered.");
+                })
+                .WithMessage("This email address is already registered.")
+                .When(m => !string.IsNullOrEmpty(m.EmailAddress)); // Only run DB check if not empty
         }
     }
 }

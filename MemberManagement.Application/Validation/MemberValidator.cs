@@ -41,20 +41,28 @@ namespace MemberManagement.Application.Validation
                 .GreaterThan(0).WithMessage("Please select a valid membership type.");
 
             RuleFor(m => m.ContactNo)
-                .NotEmpty()
-                .Matches(@"^09\d{9}$").WithMessage("Invalid PH number. Format: 09XXXXXXXXX")
+                .Matches(@"^09\d{9}$")
+                    .WithMessage("Invalid PH number. Format: 09XXXXXXXXX")
+                    .When(m => !string.IsNullOrEmpty(m.ContactNo))
                 .MustAsync(async (member, contact, cancellation) =>
                 {
+                    if (string.IsNullOrEmpty(contact)) return true; // Allow null/empty
                     return !await _context.Members.AnyAsync(m => m.ContactNo == contact && m.MemberID != member.MemberID, cancellation);
-                }).WithMessage("Contact number already exists.");
+                })
+                .WithMessage("Contact number already exists.")
+                .When(m => !string.IsNullOrEmpty(m.ContactNo));
 
             RuleFor(m => m.EmailAddress)
-                .NotEmpty()
-                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").WithMessage("Invalid email address.")
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+                    .WithMessage("Invalid email address.")
+                    .When(m => !string.IsNullOrEmpty(m.EmailAddress))
                 .MustAsync(async (member, email, cancellation) =>
                 {
+                    if (string.IsNullOrEmpty(email)) return true; // Allow null/empty
                     return !await _context.Members.AnyAsync(m => m.EmailAddress == email && m.MemberID != member.MemberID, cancellation);
-                }).WithMessage("Email address already exists.");
+                })
+                .WithMessage("Email address already exists.")
+                .When(m => !string.IsNullOrEmpty(m.EmailAddress));
         }
 
         private bool BeAtLeast18(DateOnly? date)
