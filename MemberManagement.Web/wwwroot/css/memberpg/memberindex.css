@@ -275,3 +275,26 @@
     .btn-pg-size i {
         font-size: 0.85rem;
     }
+
+/* 11. Copy Contact and Email*/
+/* Container cell styling */
+.copy-cell {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .copy-cell:hover {
+        background-color: rgba(13, 110, 253, 0.05) !important;
+    }
+
+/* Icon styling - hidden by default */
+.copy-icon {
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Show icon when the cell is hovered */
+.copy-cell:hover .copy-icon {
+    opacity: 1;
+}

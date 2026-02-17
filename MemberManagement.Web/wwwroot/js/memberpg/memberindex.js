@@ -45,3 +45,40 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }, 3000);
     }
 });
+
+function copyToClipboard(text, element) {
+    if (!text || text.trim() === "") return;
+
+    // Modern API
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+            showCopyFeedback(element);
+        });
+    } else {
+        // Fallback for non-HTTPS or older browsers
+        let textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showCopyFeedback(element);
+        } catch (err) {
+            console.error('Fallback copy failed', err);
+        }
+        document.body.removeChild(textArea);
+    }
+}
+
+function showCopyFeedback(element) {
+    const icon = element.querySelector('.copy-icon');
+    if (icon) {
+        icon.className = 'bi bi-check-lg text-success ms-2 copy-icon';
+        icon.style.opacity = '1';
+
+        setTimeout(() => {
+            icon.className = 'bi bi-copy text-primary ms-2 copy-icon';
+            icon.style.opacity = '';
+        }, 1500);
+    }
+}

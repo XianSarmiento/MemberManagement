@@ -79,46 +79,29 @@
                     <tr>
                         <th>
                             <a href="@Url.Action("Index", new { searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize, sortColumn = "MemberID", sortOrder = Model.GetToggleOrder("MemberID") })">
-                                @if (Model.SortColumn == "MemberID") { <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } ID
+                                @if (Model.SortColumn == "MemberID") { <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-numeric-down" : "bi-sort-numeric-up")"></i> } ID
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new { 
-                                searchLastName = Model.SearchLastName, branch = Model.SelectedBranch,
-                                pageSize = Model.PageSize, sortColumn = "FirstName", 
-                                sortOrder = Model.GetToggleOrder("FirstName") })">
-                                @if (Model.SortColumn == "FirstName")
-                                {
-                                    <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i>
-                                }
-                                First Name
+                            <a href="@Url.Action("Index", new { searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize, sortColumn = "FirstName", sortOrder = Model.GetToggleOrder("FirstName") })">
+                                @if (Model.SortColumn == "FirstName") { <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } First Name
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new {
-                                searchLastName = Model.SearchLastName, branch = Model.SelectedBranch,
-                                pageSize = Model.PageSize, sortColumn = "LastName",
-                                sortOrder = Model.GetToggleOrder("LastName") })">
-                                @if (Model.SortColumn == "LastName")
-                                {
-                                    <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i>
-                                }
-                                Last Name
+                            <a href="@Url.Action("Index", new { searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize, sortColumn = "LastName", sortOrder = Model.GetToggleOrder("LastName") })">
+                                @if (Model.SortColumn == "LastName") { <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Last Name
                             </a>
                         </th>
                         <th>
-                            <a href="@Url.Action("Index", new {
-                                searchLastName = Model.SearchLastName, branch = Model.SelectedBranch,
-                                pageSize = Model.PageSize, sortColumn = "Branch",
-                                sortOrder = Model.GetToggleOrder("Branch") })">
-                                @if (Model.SortColumn == "Branch")
-                                {
-                                    <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i>
-                                }
-                                Branch
+                            <a href="@Url.Action("Index", new { searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize, sortColumn = "Branch", sortOrder = Model.GetToggleOrder("Branch") })">
+                                @if (Model.SortColumn == "Branch") { <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Branch
                             </a>
                         </th>
-                        <th>Membership Type</th>
+                        <th>
+                            <a href="@Url.Action("Index", new { searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize, sortColumn = "MembershipType", sortOrder = Model.GetToggleOrder("MembershipType") })">
+                                @if (Model.SortColumn == "MembershipType") { <i class="bi @(Model.SortOrder == "asc" ? "bi-sort-alpha-down" : "bi-sort-alpha-up")"></i> } Membership Type
+                            </a>
+                        </th>
                         <th>Address</th>
                         <th>Birth Date</th>
                         <th>Contact No</th>
@@ -146,8 +129,18 @@
                             <td>@m.MembershipType</td>
                             <td>@m.Address</td>
                             <td>@(m.BirthDate.HasValue ? m.BirthDate.Value.ToString("yyyy-MM-dd") : "")</td>
-                            <td>@m.ContactNo</td>
-                            <td>@m.EmailAddress</td>
+                            <td class="copy-cell" onclick="copyToClipboard('@m.ContactNo', this)" title="Click to copy">
+                                <div class="d-flex align-items-center">
+                                    <span class="me-auto">@m.ContactNo</span>
+                                    <i class="bi bi-copy text-primary ms-2 copy-icon"></i>
+                                </div>
+                            </td>
+                            <td class="copy-cell" onclick="copyToClipboard('@m.EmailAddress', this)" title="Click to copy">
+                                <div class="d-flex align-items-center">
+                                    <span class="me-auto text-truncate" style="max-width: 140px;">@m.EmailAddress</span>
+                                    <i class="bi bi-copy text-primary ms-2 copy-icon"></i>
+                                </div>
+                            </td>
                             <td class="text-center">
                                 <div class="btn-group gap-1">
                                     <a asp-action="Edit" asp-route-id="@m.MemberID"
