@@ -1,6 +1,8 @@
 ﻿using FluentValidation.TestHelper;
 using MemberManagement.Application.Validation;
 using MemberManagement.Domain.Entities;
+using MemberManagement.Infrastructure; // Added for MMSDbContext
+using Microsoft.EntityFrameworkCore; // Added for InMemory options
 using System;
 using Xunit;
 using Assert = Xunit.Assert;
@@ -10,10 +12,19 @@ namespace MemberManagement.UnitTests.Application.Validation
     public class MemberValidatorTests
     {
         private readonly MemberValidator _validator;
+        private readonly MMSDbContext _context;
 
         public MemberValidatorTests()
         {
-            _validator = new MemberValidator();
+            // Setup an In-Memory Database to satisfy the MemberValidator constructor
+            var options = new DbContextOptionsBuilder<MMSDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
+            _context = new MMSDbContext(options);
+
+            // FIX: Pass the context to the validator
+            _validator = new MemberValidator(_context);
         }
 
         [Fact]
