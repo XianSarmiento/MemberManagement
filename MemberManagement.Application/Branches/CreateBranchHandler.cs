@@ -1,6 +1,5 @@
 ﻿using MemberManagement.Domain.Entities;
 using MemberManagement.Domain.Interfaces;
-using MemberManagement.Application.DTOs;
 
 namespace MemberManagement.Application.Branches
 {
@@ -13,10 +12,9 @@ namespace MemberManagement.Application.Branches
             _repository = repository;
         }
 
-        public async Task<int> Handle(string branchName)
+        public async Task<int> Handle(string branchName, string address, string branchCode)
         {
-            // Use the Constructor from Step A
-            var branch = new Branch(branchName);
+            var branch = new Branch(branchName, address, branchCode);
 
             await _repository.AddAsync(branch);
             return branch.Id;
