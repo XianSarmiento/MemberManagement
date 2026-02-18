@@ -31,7 +31,7 @@
 <div class="card shadow-lg">
     <div class="card-body">
 
-        @* TOP BAR - Updated with Address and Branch Code inputs *@
+        @* TOP BAR *@
         <div class="branch-top-bar mb-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
@@ -41,11 +41,17 @@
                     <h2 class="mb-0">BRANCHES LIST</h2>
                 </div>
 
-                <form asp-action="Create" method="post" class="d-flex align-items-center gap-2">
-                    <input type="text" name="branchCode" class="form-control form-control-sm" style="width: 100px;" placeholder="Code" required>
-                    <input type="text" name="name" class="form-control form-control-sm" placeholder="Branch Name" required>
-                    <input type="text" name="address" class="form-control form-control-sm" placeholder="Address/Location" required>
-
+                @* QUICK ADD FORM *@
+                <form asp-action="Create" method="post" class="d-flex align-items-center gap-2 flex-wrap">
+                    <div class="branch-input-container">
+                        <input type="text" name="name" class="form-control form-control-sm" placeholder="Branch Name" required />
+                    </div>
+                    <div class="branch-input-container" style="width: 100px;">
+                        <input type="text" name="branchCode" class="form-control form-control-sm" placeholder="Code" required />
+                    </div>
+                    <div class="branch-input-container">
+                        <input type="text" name="address" class="form-control form-control-sm" placeholder="Address / Location" required />
+                    </div>
                     <button type="submit" class="btn btn-sm btn-primary" title="Add New Branch">
                         <i class="bi bi-plus-lg"></i>
                     </button>
@@ -56,23 +62,22 @@
             </div>
         </div>
 
-        @* TABLE - Added Code and Address Columns *@
+        @* BRANCHES TABLE *@
         <div class="table-responsive scrollable-table">
             <table class="table table-bordered table-striped branch-table">
                 <thead class="table-primary">
                     <tr>
-                        <th style="width: 100px;">Code</th>
-                        <th>Branch Name</th>
-                        <th>Address/Location</th>
+                        <th style="width: 80px;">Code</th>
+                        <th class="text-left">Branch Name</th>
+                        <th>Address / Location</th>
                         <th class="text-center" style="width: 120px;">Status</th>
-                        <th class="text-center" style="width: 120px;">Manage</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-5">
+                            <td colspan="4" class="text-center text-muted py-5">
                                 <i class="bi bi-emoji-frown d-block mb-2" style="font-size: 2rem;"></i>
                                 No branches found.
                             </td>
@@ -82,32 +87,27 @@
                     {
                         <tr>
                             <td><code>@b.BranchCode</code></td>
-                            <td><strong>@b.Name</strong></td>
-                            <td>@b.Address</td>
-                            <td class="text-center">
-                                <span class="badge @(b.IsActive ? "bg-success" : "bg-danger")">
-                                    @(b.IsActive ? "Active" : "Inactive")
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                <div class="btn-group">
-                                    @* EDIT BUTTON *@
-                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                            data-bs-toggle="modal" data-bs-target="#editModal"
-                                            data-id="@b.Id" data-name="@b.Name"
-                                            data-address="@b.Address" data-code="@b.BranchCode"
-                                            title="Edit Branch">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-
-                                    @* DELETE BUTTON *@
-                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-delete-hover"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                            data-id="@b.Id" data-name="@b.Name"
-                                            title="Deactivate Branch">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                            <td class="branch-name-cell">
+                                <div class="d-flex align-items-center justify-content-between clickable-name"
+                                     data-bs-toggle="modal" data-bs-target="#editModal"
+                                     data-id="@b.Id"
+                                     data-name="@b.Name"
+                                     data-code="@b.BranchCode"
+                                     data-address="@b.Address"
+                                     style="cursor: pointer;">
+                                    <strong>@b.Name</strong>
+                                    <i class="bi bi-pencil-fill edit-reveal-icon text-primary ms-2"></i>
                                 </div>
+                            </td>
+                            <td class="text-truncate" style="max-width: 250px;">@b.Address</td>
+                            <td class="text-center">
+                                <button type="button" class="btn-status-toggle"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                        data-id="@b.Id" data-name="@b.Name" data-status="@b.IsActive.ToString().ToLower()">
+                                    <span class="badge rounded-pill @(b.IsActive ? "bg-success" : "bg-danger")">
+                                        @(b.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </button>
                             </td>
                         </tr>
                     }
@@ -116,7 +116,7 @@
         </div>
 
         <div class="d-flex justify-content-between align-items-center mt-2">
-            <div class="branch-info-text">
+            <div class="branch-pagination-info">
                 Total Branches: <strong>@Model.Count()</strong>
             </div>
         </div>
@@ -126,54 +126,66 @@
 @* EDIT MODAL *@
 <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form asp-action="Edit" method="post">
+        <div class="modal-content border-0 shadow">
+            <form asp-action="Update" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" id="editBranchId" />
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Branch</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fs-6"><i class="bi bi-pencil-square me-2"></i>Edit Branch</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Branch Code</label>
-                        <input type="text" name="branchCode" id="editBranchCode" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Branch Name</label>
-                        <input type="text" name="name" id="editBranchName" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Address / Location</label>
-                        <textarea name="address" id="editBranchAddress" class="form-control" rows="2" required></textarea>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Branch Code</label>
+                            <input type="text" name="branchCode" id="editBranchCode" class="form-control form-control-sm" required />
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold small text-muted">Branch Name</label>
+                            <input type="text" name="name" id="editBranchName" class="form-control form-control-sm" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted">Address / Location</label>
+                            <textarea name="address" id="editBranchAddress" class="form-control form-control-sm" rows="3" required></textarea>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <div class="modal-footer border-top-0 px-4 pb-4 d-flex justify-content-center">
+                    <button type="button" class="btn-modal" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-modal">
+                        <i class="bi bi-check-lg"></i> Save Changes
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-@* DELETE MODAL *@
+@* DELETE/DEACTIVATE MODAL *@
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="deleteForm" asp-action="Delete" method="post">
+        <div class="modal-content border-0 shadow">
+            <form id="deleteForm" method="post" asp-action="ToggleStatus">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" id="deleteBranchId" />
-                <div class="modal-header">
-                    <h5 class="modal-title">Deactivate Branch</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fs-6" id="deleteModalTitle">
+                        <i class="bi bi-exclamation-circle me-2"></i>Confirm Action
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    Are you sure you want to mark <strong id="branchNameLabel"></strong> as inactive?
+                <div class="modal-body p-4 text-center">
+                    <p class="mb-0" id="deleteModalBodyText">This text is replaced dynamically by JS</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger">Confirm</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <div class="modal-footer border-top-0 px-4 pb-4 d-flex justify-content-center">
+                    <button type="button" class="btn-modal" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-modal">
+                        <i class="bi bi-check-lg"></i> Yes, Proceed
+                    </button>
                 </div>
             </form>
         </div>

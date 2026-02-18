@@ -15,6 +15,7 @@
             public const string Created = "Branch successfully created.";
             public const string Updated = "Branch successfully updated.";
             public const string Deleted = "Branch successfully deactivated.";
+            public const string NoChanges = "No changes detected.";
         }
 
         public static class Membership

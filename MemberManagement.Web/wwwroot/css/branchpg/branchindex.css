@@ -1,8 +1,4 @@
-﻿/*=================================================*/
-/* BRANCH INDEX UI - branchindex.css */
-/*=================================================*/
-
-/* 1. LAYOUT & CONTAINERS */
+﻿/* 1. LAYOUT & CONTAINERS */
 .card.shadow-lg {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
@@ -16,7 +12,6 @@
     background-color: #fff;
 }
 
-/* Adjusting the input width for the "Quick Add" Branch form */
 .branch-input-container {
     width: 250px;
     position: relative;
@@ -30,32 +25,43 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    transition: transform 0.2s ease-in-out, background-color 0.2s;
-    cursor: default; /* Not a link, just an icon label */
+    transition: transform 0.2s ease-in-out;
+    cursor: default;
 }
 
-.btn-delete-hover {
-    transition: all 0.2s ease-in-out;
+.btn-status-toggle {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    transition: transform 0.2s ease !important;
 }
 
-    .btn-delete-hover:hover {
-        color: #fff !important;
-        background-color: #dc3545 !important;
-        border-color: #dc3545 !important;
+    .btn-status-toggle:hover {
+        transform: scale(1.08);
     }
+
+        .btn-status-toggle:hover .bg-success {
+            background-color: #218838 !important;
+        }
+
+        .btn-status-toggle:hover .bg-danger {
+            background-color: #c82333 !important;
+        }
 
 /* 3. TABLE STYLING */
 .branch-table {
     width: 100%;
-    font-size: 14px; /* Branches usually have less columns, so we can go slightly larger */
+    font-size: 13px;
     border-collapse: separate;
     border-spacing: 0;
 }
 
-    .branch-table th,
-    .branch-table td {
+    .branch-table th, .branch-table td {
         vertical-align: middle;
-        padding: 0.75rem;
+        padding: 0.6rem;
     }
 
     .branch-table th {
@@ -63,56 +69,81 @@
         white-space: nowrap;
     }
 
-    /* Action Column Buttons */
-    .branch-table td .btn-group .btn {
-        padding: 0.25rem 0.5rem;
-        line-height: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+/* Sticky header */
+.scrollable-table {
+    max-height: 450px;
+    overflow-y: auto;
+    display: block;
+}
+
+    .scrollable-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
-/* 4. FORM ELEMENTS */
+/* 4. CLICKABLE NAME + EDIT REVEAL */
+.branch-name-cell {
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+    .branch-name-cell:hover {
+        background-color: rgba(13, 110, 253, 0.04);
+    }
+
+.clickable-name:hover strong {
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
+.edit-reveal-icon {
+    background: #e7f1ff;
+    padding: 4px;
+    border-radius: 4px;
+    opacity: 0;
+}
+
+.clickable-name:hover .edit-reveal-icon {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* 5. STATUS BADGES */
+.branch-table .badge {
+    border-radius: 50rem !important;
+    padding: 0.45em 0.85em;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 6. FORM ELEMENTS */
 .form-control-sm {
     font-size: 0.85rem;
 }
 
-/* 5. INFO SECTION */
-.branch-info-text {
-    font-size: 13px;
-    color: #6c757d;
-}
-
-/* 6. MODALS */
+/* 7. MODALS */
 #deleteModal .modal-content {
     border-radius: 12px;
     border: none;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-#deleteModal .modal-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #eee;
-}
-
-/* 7. FLOATING ALERTS */
+/* 8. FLOATING ALERTS */
 #successAlert, #errorAlert, .operation-alert {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 2000;
-    min-width: 350px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    min-width: 300px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     border-radius: 50px;
     padding: 0.75rem 1.5rem;
     animation: slideDown 0.5s forwards;
-}
-
-#errorAlert {
-    background-color: #f8d7da;
-    border-color: #f5c2c7;
-    color: #842029;
 }
 
 @keyframes slideDown {
@@ -137,7 +168,7 @@
     }
 }
 
-/* 8. RESPONSIVE DESIGN */
+/* 9. RESPONSIVE DESIGN */
 @media (max-width: 768px) {
     .branch-top-bar .d-flex {
         flex-direction: column;
@@ -159,16 +190,34 @@
     }
 }
 
-/* 9. Scrollable table wrapper */
-.scrollable-table {
-    max-height: 500px;
-    overflow-y: auto;
-    display: block;
+/* 10. Unified Modal Buttons (icon + text) */
+.btn-modal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ddd; /* light gray border */
+    background-color: #fff; /* white base */
+    color: #495057; /* default text/icon color */
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-    .scrollable-table thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background-color: #cfe2ff;
+    .btn-modal i {
+        font-size: 1rem;
     }
+
+    /* Hover effect for all modal buttons */
+    .btn-modal:hover {
+        background-color: #0d6efd; /* primary blue */
+        border-color: #0d6efd;
+        color: #fff;
+    }
+
+        .btn-modal:hover i {
+            color: #fff;
+        }
