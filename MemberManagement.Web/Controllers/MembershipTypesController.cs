@@ -93,5 +93,32 @@ namespace MemberManagement.Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            try
+            {
+                var membership = await _repository.GetByIdAsync(id);
+                if (membership == null)
+                {
+                    TempData["ErrorMessage"] = OperationMessage.Error.NotFound;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                if (membership.IsActive)
+                    membership.Deactivate();
+                else
+                    membership.Activate();
+
+                await _repository.UpdateAsync(membership);
+                TempData["SuccessMessage"] = OperationMessage.Membership.Updated;
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
+            }
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
