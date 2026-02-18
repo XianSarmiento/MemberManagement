@@ -9,15 +9,18 @@ namespace MemberManagement.Web.Controllers
     {
         private readonly GetMembershipTypesHandler _getHandler;
         private readonly CreateMembershipTypeHandler _createHandler;
+        private readonly UpdateMembershipTypeHandler _updateHandler;
         private readonly IMembershipTypeRepository _repository;
 
         public MembershipTypesController(
             GetMembershipTypesHandler getHandler,
             CreateMembershipTypeHandler createHandler,
+            UpdateMembershipTypeHandler updateHandler,
             IMembershipTypeRepository repository)
         {
             _getHandler = getHandler;
             _createHandler = createHandler;
+            _updateHandler = updateHandler;
             _repository = repository;
         }
 
@@ -28,9 +31,9 @@ namespace MemberManagement.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string name, decimal fee)
+        public async Task<IActionResult> Create(string name, string membershipCode, decimal fee, string description)
         {
-            if (string.IsNullOrWhiteSpace(name) || fee < 0)
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(membershipCode) || fee < 0)
             {
                 TempData["ErrorMessage"] = OperationMessage.Error.InvalidInput;
                 return RedirectToAction(nameof(Index));
@@ -38,8 +41,34 @@ namespace MemberManagement.Web.Controllers
 
             try
             {
-                await _createHandler.Handle(name, fee);
+                await _createHandler.Handle(name, membershipCode, fee, description);
                 TempData["SuccessMessage"] = OperationMessage.Membership.Created;
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(int id, string name, string membershipCode, decimal fee, string description)
+        {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(membershipCode) || fee < 0)
+            {
+                TempData["ErrorMessage"] = OperationMessage.Error.InvalidInput;
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                await _updateHandler.Handle(id, name, membershipCode, fee, description);
+                TempData["SuccessMessage"] = OperationMessage.Membership.Updated;
+            }
+            catch (KeyNotFoundException)
+            {
+                TempData["ErrorMessage"] = OperationMessage.Error.NotFound;
             }
             catch
             {
@@ -62,6 +91,33 @@ namespace MemberManagement.Web.Controllers
                 TempData["ErrorMessage"] = OperationMessage.Error.NotFound;
             }
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            try
+            {
+                var membership = await _repository.GetByIdAsync(id);
+                if (membership == null)
+                {
+                    TempData["ErrorMessage"] = OperationMessage.Error.NotFound;
+                    return RedirectToAction(nameof(Index));
+                }
+
+                if (membership.IsActive)
+                    membership.Deactivate();
+                else
+                    membership.Activate();
+
+                await _repository.UpdateAsync(membership);
+                TempData["SuccessMessage"] = OperationMessage.Membership.Updated;
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
+            }
             return RedirectToAction(nameof(Index));
         }
     }

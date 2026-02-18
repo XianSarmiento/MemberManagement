@@ -19,7 +19,10 @@ namespace MemberManagement.Application.MembershipTypes
             {
                 Id = t.Id,
                 Name = t.Name,
-                MembershipFee = t.MembershipFee
+                MembershipCode = t.MembershipCode,
+                Description = t.Description,
+                MembershipFee = t.MembershipFee,
+                IsActive = t.IsActive
             });
         }
     }

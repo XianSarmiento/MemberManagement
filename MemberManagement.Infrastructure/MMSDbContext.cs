@@ -29,7 +29,10 @@ namespace MemberManagement.Infrastructure
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.MembershipCode).IsRequired().HasMaxLength(20);
+                entity.Property(e => e.Description).HasMaxLength(250);
                 entity.Property(e => e.MembershipFee).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
             base.OnModelCreating(modelBuilder);
