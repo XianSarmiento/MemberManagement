@@ -17,7 +17,7 @@ namespace MemberManagement.Infrastructure.Repositories
             await _context.Branches.FindAsync(id);
 
         public async Task<IEnumerable<Branch>> GetAllAsync() =>
-            await _context.Branches.Where(b => b.IsActive).ToListAsync();
+            await _context.Branches.ToListAsync();
 
         public async Task AddAsync(Branch branch)
         {
@@ -36,7 +36,7 @@ namespace MemberManagement.Infrastructure.Repositories
             var branch = await _context.Branches.FindAsync(id);
             if (branch != null)
             {
-                branch.Deactivate(); // Soft delete based on your Entity logic
+                branch.Deactivate();
                 await _context.SaveChangesAsync();
             }
         }
