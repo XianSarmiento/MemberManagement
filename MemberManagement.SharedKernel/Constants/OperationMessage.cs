@@ -22,6 +22,7 @@
             public const string Created = "Membership type successfully created.";
             public const string Updated = "Membership type successfully updated.";
             public const string Deleted = "Membership type successfully deleted.";
+            public const string NoChanges = "No changes detected.";
         }
 
         public static class Error
@@ -33,6 +34,7 @@
             public const string BirthDateRequired = "Birth Date is required.";
             public const string Underage = "Member must be at least 18 years old.";
             public const string ExceedsAgeLimit = "Member exceeds age limit (65y 6m 1d).";
+
         }
     }
 }
