@@ -12,10 +12,9 @@ namespace MemberManagement.Application.MembershipTypes
             _repository = repository;
         }
 
-        public async Task<int> Handle(string name, decimal fee)
+        public async Task<int> Handle(string name, string membershipCode, decimal fee, string description)
         {
-            // Enforces the logic defined in your Domain Entity constructor
-            var membershipType = new MembershipType(name, fee);
+            var membershipType = new MembershipType(name, membershipCode, fee, description);
 
             await _repository.AddAsync(membershipType);
             return membershipType.Id;

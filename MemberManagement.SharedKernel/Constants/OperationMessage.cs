@@ -20,6 +20,7 @@
         public static class Membership
         {
             public const string Created = "Membership type successfully created.";
+            public const string Updated = "Membership type successfully updated.";
             public const string Deleted = "Membership type successfully deleted.";
         }
 

@@ -64,9 +64,11 @@
             <table class="table table-bordered table-striped membership-table">
                 <thead class="table-primary">
                     <tr>
-                        <th style="width: 80px;">ID</th>
+                        <th style="width: 80px;">Code</th>
                         <th>Membership Name</th>
+                        <th>Description</th>
                         <th class="text-end" style="width: 150px;">Monthly Fee</th>
+                        <th class="text-center" style="width: 120px;">Status</th>
                         <th class="text-center" style="width: 100px;">Manage</th>
                     </tr>
                 </thead>
@@ -83,11 +85,23 @@
                     @foreach (var m in Model)
                     {
                         <tr>
-                            <td>@m.Id</td>
+                            <td>@m.MembershipCode</td>
                             <td><strong>@m.Name</strong></td>
+                            <td>@m.Description</td>
                             <td class="text-end">@m.MembershipFee.ToString("C")</td>
                             <td class="text-center">
+                                <span class="badge @(m.IsActive ? "bg-success" : "bg-danger")">
+                                    @(m.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td class="text-center">
                                 <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-edit"
+                                            data-bs-toggle="modal" data-bs-target="#editModal"
+                                            data-id="@m.Id" data-name="@m.Name" data-code="@m.MembershipCode"
+                                            data-fee="@m.MembershipFee" data-desc="@m.Description">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary btn-delete-hover"
                                             data-bs-toggle="modal" data-bs-target="#deleteModal"
                                             data-id="@m.Id" data-name="@m.Name"

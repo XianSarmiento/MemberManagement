@@ -54,6 +54,7 @@ namespace MemberManagement.Web
             builder.Services.AddScoped<UpdateBranchHandler>();
             builder.Services.AddScoped<GetBranchesHandler>();
             builder.Services.AddScoped<GetMembershipTypesHandler>();
+            builder.Services.AddScoped<UpdateMembershipTypeHandler>();
             builder.Services.AddScoped<CreateMembershipTypeHandler>();
 
             var app = builder.Build();
