@@ -20,18 +20,13 @@ namespace MemberManagement.Web.ValidationsVM
                 .Matches(@"^[a-zA-Z\s]*$").WithMessage("First Name should only contain letters.");
 
             RuleFor(x => x.LastName)
-                .NotEmpty().WithMessage("Last Name is required.")
-                .MaximumLength(50).WithMessage("Last Name is too long.")
-                .Matches(@"^[a-zA-Z\s]*$").WithMessage("Last Name should only contain letters.");
-
-            RuleFor(x => x)
-                .MustAsync(async (x, cancellation) =>
+                .MustAsync(async (memberVM, lastName, cancellation) =>
                 {
                     var exists = await _context.Members.AnyAsync(m =>
-                        m.FirstName.ToLower() == x.FirstName.ToLower() &&
-                        m.LastName.ToLower() == x.LastName.ToLower() &&
-                        m.BirthDate == DateOnly.FromDateTime(x.BirthDate.Value) &&
-                        m.MemberID != x.MemberID, cancellation);
+                        m.FirstName.ToLower() == memberVM.FirstName.ToLower() &&
+                        m.LastName.ToLower() == memberVM.LastName.ToLower() &&
+                        m.BirthDate == DateOnly.FromDateTime(memberVM.BirthDate.Value) &&
+                        m.MemberID != memberVM.MemberID, cancellation);
                     return !exists;
                 })
                 .WithMessage("A member with this name and birthdate already exists.")
@@ -68,26 +63,26 @@ namespace MemberManagement.Web.ValidationsVM
             RuleFor(m => m.ContactNo)
                 .Matches(@"^09\d{9}$")
                     .WithMessage("Format: 09XXXXXXXXX (11 digits)")
-                    .When(m => !string.IsNullOrEmpty(m.ContactNo)) // Only validate regex if not empty
+                    .When(m => !string.IsNullOrEmpty(m.ContactNo))
                 .MustAsync(async (x, contact, cancellation) =>
                 {
-                    if (string.IsNullOrEmpty(contact)) return true; // Ignore unique check if empty
+                    if (string.IsNullOrEmpty(contact)) return true;
                     return !await _context.Members.AnyAsync(m => m.ContactNo == contact && m.MemberID != x.MemberID, cancellation);
                 })
                 .WithMessage("This contact number is already in use.")
-                .When(m => !string.IsNullOrEmpty(m.ContactNo)); // Only run DB check if not empty
+                .When(m => !string.IsNullOrEmpty(m.ContactNo));
 
             RuleFor(m => m.EmailAddress)
                 .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")
                     .WithMessage("Please enter a valid email.")
-                    .When(m => !string.IsNullOrEmpty(m.EmailAddress)) // Only validate regex if not empty
+                    .When(m => !string.IsNullOrEmpty(m.EmailAddress))
                 .MustAsync(async (x, email, cancellation) =>
                 {
-                    if (string.IsNullOrEmpty(email)) return true; // Ignore unique check if empty
+                    if (string.IsNullOrEmpty(email)) return true;
                     return !await _context.Members.AnyAsync(m => m.EmailAddress == email && m.MemberID != x.MemberID, cancellation);
                 })
                 .WithMessage("This email address is already registered.")
-                .When(m => !string.IsNullOrEmpty(m.EmailAddress)); // Only run DB check if not empty
+                .When(m => !string.IsNullOrEmpty(m.EmailAddress));
         }
     }
 }

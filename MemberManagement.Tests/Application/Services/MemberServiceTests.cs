@@ -1,88 +1,98 @@
-﻿using FluentValidation;
+﻿using FluentAssertions;
+using FluentValidation;
 using FluentValidation.Results;
 using MemberManagement.Application.Services;
 using MemberManagement.Domain.Entities;
 using MemberManagement.Domain.Interfaces;
 using Moq;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
-using Assert = Xunit.Assert;
 
-namespace MemberManagement.UnitTests.Application.Services
+namespace MemberManagement.Test.Services
 {
     public class MemberServiceTests
     {
-        private readonly Mock<IMemberRepository> _mockRepo;
-        private readonly Mock<IValidator<Member>> _mockValidator;
+        private readonly Mock<IMemberRepository> _repoMock;
+        private readonly Mock<IValidator<Member>> _validatorMock;
         private readonly MemberService _service;
 
         public MemberServiceTests()
         {
-            _mockRepo = new Mock<IMemberRepository>();
-            _mockValidator = new Mock<IValidator<Member>>();
-            _service = new MemberService(_mockRepo.Object, _mockValidator.Object);
+            _repoMock = new Mock<IMemberRepository>();
+            _validatorMock = new Mock<IValidator<Member>>();
+            _service = new MemberService(_repoMock.Object, _validatorMock.Object);
         }
 
         [Fact]
-        public async Task CreateAsync_WhenValid_ShouldInitializeAndAddMember()
+        public async Task RestoreAsync_WhenMemberExists_ShouldSetIsActiveAndSave()
         {
             // Arrange
-            var member = new Member { FirstName = "John", LastName = "Doe" };
+            // 1995 is a "safe" year that passes your 18-65 age validation in the constructor
+            var member = new Member("John", "Doe", new DateOnly(1995, 1, 1), 1, 1);
 
-            _mockValidator.Setup(v => v.ValidateAsync(member, It.IsAny<CancellationToken>()))
+            // Directly set property since we aren't touching the entity class
+            member.IsActive = false;
+
+            _repoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(member);
+
+            // Act
+            await _service.RestoreAsync(1);
+
+            // Assert
+            member.IsActive.Should().BeTrue();
+            _repoMock.Verify(r => r.UpdateAsync(member), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateAsync_WhenValid_ShouldInitializeAndAdd()
+        {
+            // Arrange
+            var member = new Member("Jane", "Doe", new DateOnly(1990, 5, 15), 1, 1);
+            _validatorMock.Setup(v => v.ValidateAsync(member, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
             // Act
             await _service.CreateAsync(member);
 
-            // Assert - Use It.IsAny to avoid complex expression matching if the previous didn't work
-            _mockRepo.Verify(r => r.AddAsync(It.IsAny<Member>()), Times.Once);
+            // Assert
+            // Verifies that member.Initialize() was called inside the service
+            member.IsActive.Should().BeTrue();
+            _repoMock.Verify(r => r.AddAsync(member), Times.Once);
         }
 
         [Fact]
         public async Task CreateAsync_WhenInvalid_ShouldThrowValidationException()
         {
             // Arrange
-            var member = new Member();
-            var failures = new List<ValidationFailure> { new("FirstName", "Required") };
+            var member = new Member("John", "Doe", new DateOnly(1995, 1, 1), 1, 1);
+            var failures = new List<ValidationFailure> { new("FirstName", "Invalid name") };
 
-            _mockValidator.Setup(v => v.ValidateAsync(member, It.IsAny<CancellationToken>()))
+            _validatorMock.Setup(v => v.ValidateAsync(member, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult(failures));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ValidationException>(() => _service.CreateAsync(member));
-
-            // Explicitly match the repository call
-            _mockRepo.Verify(r => r.AddAsync(It.IsAny<Member>()), Times.Never);
+            await Xunit.Assert.ThrowsAsync<ValidationException>(() => _service.CreateAsync(member));
+            _repoMock.Verify(r => r.AddAsync(It.IsAny<Member>()), Times.Never);
         }
 
         [Fact]
-        public async Task GetActiveMembersAsync_ShouldCallRepositoryGetAll()
+        public async Task GetInactiveMembersAsync_ShouldOnlyReturnInactiveMembers()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetAllAsync(It.IsAny<bool>()))
-                     .ReturnsAsync(new List<Member>());
+            var m1 = new Member("Active", "User", new DateOnly(1990, 1, 1), 1, 1);
+            var m2 = new Member("Inactive", "User", new DateOnly(1990, 1, 1), 1, 1);
+
+            m1.IsActive = true;
+            m2.IsActive = false;
+
+            _repoMock.Setup(r => r.GetAllAsync(false)).ReturnsAsync(new List<Member> { m1, m2 });
 
             // Act
-            await _service.GetActiveMembersAsync();
+            var result = await _service.GetInactiveMembersAsync();
 
             // Assert
-            _mockRepo.Verify(r => r.GetAllAsync(true), Times.Once);
-        }
-
-        [Fact]
-        public async Task DeleteAsync_ShouldCallSoftDelete()
-        {
-            // Arrange
-            int memberId = 10;
-
-            // Act
-            await _service.DeleteAsync(memberId);
-
-            // Assert
-            _mockRepo.Verify(r => r.SoftDeleteAsync(It.IsAny<int>()), Times.Once);
+            var inactiveList = result.ToList();
+            inactiveList.Should().HaveCount(1);
+            inactiveList.First().FirstName.Should().Be("Inactive");
         }
     }
 }

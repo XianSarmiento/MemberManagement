@@ -83,9 +83,7 @@ namespace MemberManagement.Web.Controllers
             if (!validationResult.IsValid)
             {
                 foreach (var error in validationResult.Errors)
-                {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                }
 
                 await PopulateSelectionLists();
                 return View(memberVM);
@@ -96,6 +94,16 @@ namespace MemberManagement.Web.Controllers
                 await _createHandler.HandleAsync(memberVM.ToDTO());
                 TempData["SuccessMessage"] = OperationMessage.User.Created;
                 return RedirectToAction(nameof(Index));
+            }
+            catch (ValidationException ex)
+            {
+                foreach (var error in ex.Errors)
+                {
+                    var key = string.IsNullOrEmpty(error.PropertyName) ? string.Empty : error.PropertyName;
+                    ModelState.AddModelError(key, error.ErrorMessage);
+                }
+                await PopulateSelectionLists();
+                return View(memberVM);
             }
             catch (InvalidOperationException ex)
             {
@@ -133,9 +141,7 @@ namespace MemberManagement.Web.Controllers
             if (!validationResult.IsValid)
             {
                 foreach (var error in validationResult.Errors)
-                {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                }
 
                 await PopulateSelectionLists();
                 return View(memberVM);
@@ -146,6 +152,16 @@ namespace MemberManagement.Web.Controllers
                 await _updateHandler.HandleAsync(memberVM.ToDTO());
                 TempData["SuccessMessage"] = OperationMessage.User.Updated;
                 return RedirectToAction(nameof(Index));
+            }
+            catch (ValidationException ex)
+            {
+                foreach (var error in ex.Errors)
+                {
+                    var key = string.IsNullOrEmpty(error.PropertyName) ? string.Empty : error.PropertyName;
+                    ModelState.AddModelError(key, error.ErrorMessage);
+                }
+                await PopulateSelectionLists();
+                return View(memberVM);
             }
             catch (InvalidOperationException ex)
             {

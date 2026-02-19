@@ -42,13 +42,17 @@ namespace MemberManagement.Domain.Entities
         public int MembershipTypeId { get; private set; }
         public virtual MembershipType MembershipType { get; private set; } = null!;
 
+        // CONSTRUCTOR: Primary way to create a valid Member
         public Member(string firstName, string lastName, DateOnly? birthDate, int branchId, int membershipTypeId, string? address = null, string? contactNo = null, string? emailAddress = null)
         {
+            // GUARD CLAUSE: Enforcing required birth date logic
             if (!birthDate.HasValue)
                 throw new InvalidOperationException(OperationMessage.Error.BirthDateRequired);
 
+            // BUSINESS RULE VALIDATION: Ensures member meets age requirements before object is created
             ValidateAge(birthDate.Value);
 
+            // FIELD INITIALIZATION: Mapping parameters to properties
             FirstName = firstName;
             LastName = lastName;
             BirthDate = birthDate;
@@ -58,6 +62,7 @@ namespace MemberManagement.Domain.Entities
             ContactNo = contactNo;
             EmailAddress = emailAddress;
 
+            // DEFAULT VALUES: Ensuring new members start with correct system state
             IsActive = true;
             this.DateCreated = DateTime.UtcNow;
         }
@@ -76,6 +81,7 @@ namespace MemberManagement.Domain.Entities
                 throw new InvalidOperationException(OperationMessage.Error.ExceedsAgeLimit);
         }
 
+        // PARAMETERLESS CONSTRUCTOR: Required by ORMs (like Entity Framework) for materializing data
         public Member() { }
     }
 }

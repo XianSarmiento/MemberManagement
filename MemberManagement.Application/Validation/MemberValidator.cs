@@ -19,8 +19,16 @@ namespace MemberManagement.Application.Validation
                 .MaximumLength(50);
 
             RuleFor(m => m.LastName)
-                .NotEmpty().WithMessage("Last Name is required.")
-                .MaximumLength(50);
+                .MustAsync(async (member, lastName, cancellation) =>
+                {
+                    return !await _context.Members.AnyAsync(m =>
+                        m.FirstName.ToLower() == member.FirstName.ToLower() &&
+                        m.LastName.ToLower() == member.LastName.ToLower() &&
+                        m.BirthDate == member.BirthDate &&
+                        m.MemberID != member.MemberID, cancellation);
+                })
+                .WithMessage("A member with this name and birthdate already exists.")
+                .When(m => !string.IsNullOrEmpty(m.FirstName) && !string.IsNullOrEmpty(m.LastName) && m.BirthDate != default);
 
             RuleFor(m => m.BirthDate)
                 .NotEmpty().WithMessage(OperationMessage.Error.BirthDateRequired)

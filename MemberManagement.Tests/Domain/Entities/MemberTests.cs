@@ -1,52 +1,86 @@
 ﻿using MemberManagement.Domain.Entities;
-using System;
+using MemberManagement.SharedKernel.Constant;
+using FluentAssertions;
 using Xunit;
-using Assert = Xunit.Assert;
+using System; // FIX: Added for Action delegate
 
 namespace MemberManagement.UnitTests.Domain.Entities
 {
     public class MemberTests
     {
         [Fact]
-        public void Initialize_ShouldSetDefaultValues()
+        public void Constructor_WithValidData_ShouldInitializeCorrectly()
         {
             // Arrange
-            var member = new Member
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                IsActive = false, // Set to false initially
-                DateCreated = DateTime.MinValue // Set to empty date
-            };
+            var birthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-25);
+
+            // Act
+            var member = new Member("John", "Doe", birthDate, 1, 1, "Manila", "09123456789", "john@test.com");
+
+            // Assert
+            member.FirstName.Should().Be("John");
+            member.IsActive.Should().BeTrue();
+            // BeCloseTo is great for handling the slight delay in execution time
+            member.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        }
+
+        [Fact]
+        public void Constructor_WhenBirthDateNull_ShouldThrowException()
+        {
+            // Act
+            // Use the ! (null-forgiving operator) to tell the compiler you are intentionally passing null
+            Action act = () => new Member("John", "Doe", null!, 1, 1);
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>()
+               .WithMessage(OperationMessage.Error.BirthDateRequired);
+        }
+
+        [Theory]
+        [InlineData(-17)]
+        [InlineData(-5)]
+        public void Constructor_WhenUnderage_ShouldThrowException(int yearsToAdd)
+        {
+            // Arrange
+            var birthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(yearsToAdd);
+
+            // Act
+            Action act = () => new Member("John", "Doe", birthDate, 1, 1);
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>()
+               .WithMessage(OperationMessage.Error.Underage);
+        }
+
+        [Fact]
+        public void Constructor_WhenExceedsAgeLimit_ShouldThrowException()
+        {
+            // Arrange: 70 years ago
+            var birthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-70);
+
+            // Act
+            Action act = () => new Member("Old", "User", birthDate, 1, 1);
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>()
+               .WithMessage(OperationMessage.Error.ExceedsAgeLimit);
+        }
+
+        [Fact]
+        public void Initialize_ShouldResetState()
+        {
+            // Arrange 
+            // If IsActive has a public setter, this works. 
+            // If it's private, you must use the parameterless constructor 
+            // and trust the default state or use Reflection.
+            var member = new Member();
 
             // Act
             member.Initialize();
 
             // Assert
-            Assert.True(member.IsActive, "Initialize should set IsActive to true.");
-
-            // We check if the date is close to 'Now' (within 2 seconds) 
-            // because UtcNow changes every millisecond.
-            var timeDifference = DateTime.UtcNow - member.DateCreated;
-            Assert.True(timeDifference.TotalSeconds < 2, "DateCreated should be set to the current UTC time.");
-        }
-
-        [Fact]
-        public void Member_ShouldHoldDataCorrectly()
-        {
-            // Arrange
-            var birthDate = new DateOnly(1995, 12, 25);
-
-            // FIX: Added dummy branch code and address to satisfy the new Branch constructor
-            var branch = new Branch("Main", "123 Main Street", "M001");
-
-            // Act
-            // Note: Ensure the Member constructor parameters match your current Member entity definition
-            var member = new Member("Jane", "Smith", birthDate, 1, 1, "Address", "555", "email@test.com");
-
-            // Assert (Added a basic assertion to ensure the test is meaningful)
-            Assert.Equal("Jane", member.FirstName);
-            Assert.Equal("Smith", member.LastName);
+            member.IsActive.Should().BeTrue();
+            member.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         }
     }
 }

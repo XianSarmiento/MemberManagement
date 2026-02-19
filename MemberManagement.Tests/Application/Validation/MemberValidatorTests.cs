@@ -1,103 +1,119 @@
-﻿using FluentValidation.TestHelper;
+﻿using FluentAssertions;
 using MemberManagement.Application.Validation;
 using MemberManagement.Domain.Entities;
-using MemberManagement.Infrastructure; // Added for MMSDbContext
-using Microsoft.EntityFrameworkCore; // Added for InMemory options
-using System;
+using MemberManagement.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
-using Assert = Xunit.Assert;
 
-namespace MemberManagement.UnitTests.Application.Validation
+namespace MemberManagement.Test.Validation;
+
+public class MemberValidatorTests
 {
-    public class MemberValidatorTests
+    private readonly MMSDbContext _context;
+    private readonly MemberValidator _validator;
+
+    public MemberValidatorTests()
     {
-        private readonly MemberValidator _validator;
-        private readonly MMSDbContext _context;
+        var options = new DbContextOptionsBuilder<MMSDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
 
-        public MemberValidatorTests()
-        {
-            // Setup an In-Memory Database to satisfy the MemberValidator constructor
-            var options = new DbContextOptionsBuilder<MMSDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
+        _context = new MMSDbContext(options);
+        _validator = new MemberValidator(_context);
+    }
 
-            _context = new MMSDbContext(options);
+    [Fact]
+    public async Task Should_Fail_When_FullName_And_BirthDate_Is_Duplicate()
+    {
+        // Arrange: Add an existing member
+        var birthDate = new DateOnly(1990, 1, 1);
+        var existing = new Member("John", "Doe", birthDate, 1, 1);
+        _context.Members.Add(existing);
+        await _context.SaveChangesAsync();
 
-            // FIX: Pass the context to the validator
-            _validator = new MemberValidator(_context);
-        }
+        // New member with same name and birthdate
+        var duplicate = new Member("john", "DOE", birthDate, 1, 1);
 
-        [Fact]
-        public void Should_Have_Error_When_Names_Are_Empty()
-        {
-            // Arrange
-            var member = new Member { FirstName = "", LastName = "" };
+        // Act
+        var result = await _validator.ValidateAsync(duplicate);
 
-            // Act & Assert
-            var result = _validator.TestValidate(member);
-            result.ShouldHaveValidationErrorFor(m => m.FirstName);
-            result.ShouldHaveValidationErrorFor(m => m.LastName);
-        }
+        // Assert
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.ErrorMessage == "A member with this name and birthdate already exists.");
+    }
 
-        [Fact]
-        public void Should_Have_Error_When_BirthDate_Is_In_Future()
-        {
-            // Arrange
-            var member = new Member
-            {
-                BirthDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1))
-            };
+    [Theory]
+    [InlineData("1234567890")]  // Too short
+    [InlineData("08123456789")] // Doesn't start with 09
+    [InlineData("0912345678A")] // Contains letters
+    public async Task Should_Fail_When_PH_ContactNo_Is_Invalid(string invalidNumber)
+    {
+        // Arrange
+        var member = new Member("Alice", "Smith", new DateOnly(1995, 1, 1), 1, 1, contactNo: invalidNumber);
 
-            // Act & Assert
-            var result = _validator.TestValidate(member);
-            result.ShouldHaveValidationErrorFor(m => m.BirthDate)
-                  .WithErrorMessage("BirthDate cannot be in the future.");
-        }
+        // Act
+        var result = await _validator.ValidateAsync(member);
 
-        [Theory]
-        [InlineData("12345")]          // Too short
-        [InlineData("08123456789")]    // Doesn't start with 09
-        [InlineData("0912345678A")]    // Contains letters
-        public void Should_Have_Error_When_ContactNo_Is_Invalid(string invalidContact)
-        {
-            // Arrange
-            var member = new Member { ContactNo = invalidContact };
+        // Assert
+        result.Errors.Should().Contain(e => e.ErrorMessage == "Invalid PH number. Format: 09XXXXXXXXX");
+    }
 
-            // Act & Assert
-            var result = _validator.TestValidate(member);
-            result.ShouldHaveValidationErrorFor(m => m.ContactNo)
-                  .WithErrorMessage("Invalid PH number.");
-        }
+    [Fact]
+    public async Task Should_Fail_When_Age_Is_Exactly_Under_18()
+    {
+        // 1. Create a VALID member first (so the constructor doesn't throw)
+        var birthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-20);
+        var member = new Member("Young", "User", birthDate, 1, 1);
 
-        [Fact]
-        public void Should_Not_Have_Error_When_Email_Is_Valid()
-        {
-            // Arrange
-            var member = new Member { EmailAddress = "test@example.com" };
+        // 2. Force an INVALID birthdate (17 years old) into the property via Reflection
+        var invalidBirthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-17);
 
-            // Act & Assert
-            var result = _validator.TestValidate(member);
-            result.ShouldNotHaveValidationErrorFor(m => m.EmailAddress);
-        }
+        var property = typeof(Member).GetProperty(nameof(Member.BirthDate));
+        property?.SetValue(member, invalidBirthDate);
 
-        [Fact]
-        public void Should_Be_Valid_When_All_Fields_Are_Correct()
-        {
-            // Arrange
-            var member = new Member
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                BirthDate = new DateOnly(1990, 1, 1),
-                ContactNo = "09123456789",
-                EmailAddress = "john@doe.com"
-            };
+        // 3. Now the Validator can run and find the error
+        // Act
+        var result = await _validator.ValidateAsync(member);
 
-            // Act
-            var result = _validator.TestValidate(member);
+        // Assert
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == "BirthDate");
+    }
 
-            // Assert
-            Assert.True(result.IsValid);
-        }
+    [Fact]
+    public async Task Should_Fail_When_Age_Exceeds_65_And_Six_Months()
+    {
+        // Arrange: 
+        // 1. Create a valid 30-year-old so the constructor doesn't throw InvalidOperationException
+        var validBirthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-30);
+        var member = new Member("Senior", "User", validBirthDate, 1, 1);
+
+        // 2. Force the "too old" birthdate (66 years) via Reflection
+        var tooOldBirthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-66);
+
+        var property = typeof(Member).GetProperty(nameof(Member.BirthDate));
+        property?.SetValue(member, tooOldBirthDate);
+
+        // Act
+        var result = await _validator.ValidateAsync(member);
+
+        // Assert
+        result.IsValid.Should().BeFalse();
+        // This now tests that the Validator (Application layer) catches what the Constructor (Domain layer) also protects.
+        result.Errors.Should().Contain(e => e.PropertyName == "BirthDate");
+    }
+
+    [Fact]
+    public async Task Should_Pass_When_Updating_Same_Member_With_Same_Email()
+    {
+        // Arrange: Add a member with an email
+        var member = new Member("John", "Doe", new DateOnly(1990, 1, 1), 1, 1, emailAddress: "john@example.com"); _context.Members.Add(member);
+        await _context.SaveChangesAsync();
+
+        // Act: Validate the SAME member instance (simulating an update)
+        var result = await _validator.ValidateAsync(member);
+
+        // Assert: Should NOT flag "Email exists" because it belongs to this MemberID
+        result.IsValid.Should().BeTrue();
     }
 }

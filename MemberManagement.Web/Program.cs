@@ -29,6 +29,8 @@ namespace MemberManagement.Web
             builder.Services.AddScoped<IValidator<Member>, MemberValidator>();
             builder.Services.AddScoped<IValidator<MemberVM>, MemberVMValidator>();
             builder.Services.AddFluentValidationClientsideAdapters();
+            builder.Services.AddScoped<IValidator<Branch>, BranchValidator>();
+            builder.Services.AddScoped<IValidator<MembershipType>, MembershipTypeValidator>();
 
             // --- DATABASE ---
             builder.Services.AddDbContext<MMSDbContext>(options =>
