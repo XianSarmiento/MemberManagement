@@ -2,6 +2,7 @@
 using MemberManagement.Application.MembershipTypes;
 using MemberManagement.Domain.Interfaces;
 using MemberManagement.SharedKernel.Constant;
+using FluentValidation; // Required for catching ValidationException
 
 namespace MemberManagement.Web.Controllers;
 
@@ -26,18 +27,16 @@ public class MembershipTypesController(
     [HttpPost]
     public async Task<IActionResult> Create(string name, string membershipCode, decimal fee, string description)
     {
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(membershipCode) || fee < 0)
-        {
-            TempData["ErrorMessage"] = OperationMessage.Error.InvalidInput;
-            return RedirectToAction(nameof(Index));
-        }
-
         try
         {
             await _createHandler.Handle(name, membershipCode, fee, description);
             TempData["SuccessMessage"] = OperationMessage.Membership.Created;
         }
-        catch
+        catch (ValidationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? OperationMessage.Error.InvalidInput;
+        }
+        catch (Exception)
         {
             TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
         }
@@ -48,12 +47,6 @@ public class MembershipTypesController(
     [HttpPost]
     public async Task<IActionResult> Update(int id, string name, string membershipCode, decimal fee, string description)
     {
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(membershipCode) || fee < 0)
-        {
-            TempData["ErrorMessage"] = OperationMessage.Error.InvalidInput;
-            return RedirectToAction(nameof(Index));
-        }
-
         try
         {
             var existing = await _repository.GetByIdAsync(id);
@@ -75,11 +68,15 @@ public class MembershipTypesController(
             await _updateHandler.Handle(id, name, membershipCode, fee, description ?? string.Empty);
             TempData["SuccessMessage"] = OperationMessage.Membership.Updated;
         }
+        catch (ValidationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? OperationMessage.Error.InvalidInput;
+        }
         catch (KeyNotFoundException)
         {
             TempData["ErrorMessage"] = OperationMessage.Error.NotFound;
         }
-        catch
+        catch (Exception)
         {
             TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
         }

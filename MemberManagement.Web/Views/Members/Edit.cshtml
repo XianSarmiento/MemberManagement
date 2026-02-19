@@ -13,6 +13,8 @@
     <div class="member-form-card">
         <h2 class="card-header-name">Edit Member Profile</h2>
 
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size: 0.85rem;"></div>
+
         <form asp-action="Edit" method="post">
             <input type="hidden" asp-for="MemberID" />
 

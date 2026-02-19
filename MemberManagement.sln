@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemberManagement.Tests", "M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemberManagement.SharedKernel", "MemberManagement.SharedKernel\MemberManagement.SharedKernel.csproj", "{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemberManagement.IntegrationTests", "MemberManagement.IntegrationTests\MemberManagement.IntegrationTests.csproj", "{CADDE6F0-1773-4EF9-BF39-03C373F59D1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3CD1E8B-4ED4-4028-A4CE-F60A9C354488}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CADDE6F0-1773-4EF9-BF39-03C373F59D1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CADDE6F0-1773-4EF9-BF39-03C373F59D1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CADDE6F0-1773-4EF9-BF39-03C373F59D1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CADDE6F0-1773-4EF9-BF39-03C373F59D1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

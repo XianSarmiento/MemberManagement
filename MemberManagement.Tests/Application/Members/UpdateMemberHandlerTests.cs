@@ -1,89 +1,89 @@
-﻿using FluentValidation;
+﻿using FluentAssertions;
+using FluentValidation;
 using FluentValidation.Results;
-using MemberManagement.SharedKernel.Constant;
 using MemberManagement.Application.DTOs;
-using MemberManagement.Application.Interfaces;
 using MemberManagement.Application.Members;
+using MemberManagement.Application.Interfaces;
 using MemberManagement.Domain.Entities;
+using MemberManagement.SharedKernel.Constant;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
-using Assert = Xunit.Assert;
 
-namespace MemberManagement.UnitTests.Application.Members
+namespace MemberManagement.Test.Members
 {
     public class UpdateMemberHandlerTests
     {
-        private readonly Mock<IMemberService> _mockService;
-        private readonly Mock<IValidator<Member>> _mockValidator;
+        private readonly Mock<IMemberService> _memberServiceMock;
+        private readonly Mock<IValidator<Member>> _validatorMock;
         private readonly UpdateMemberHandler _handler;
 
         public UpdateMemberHandlerTests()
         {
-            _mockService = new Mock<IMemberService>();
-            _mockValidator = new Mock<IValidator<Member>>();
-            _handler = new UpdateMemberHandler(_mockService.Object, _mockValidator.Object);
+            _memberServiceMock = new Mock<IMemberService>();
+            _validatorMock = new Mock<IValidator<Member>>();
+            _handler = new UpdateMemberHandler(_memberServiceMock.Object, _validatorMock.Object);
         }
 
         [Fact]
-        public async Task HandleAsync_WhenMemberExistsAndValid_ShouldUpdateMember()
+        public async Task HandleAsync_WhenMemberExists_ShouldUpdateFieldsAndCallService()
         {
             // Arrange
+            // Create existing member (Year 1995 to pass age validation)
+            var existingMember = new Member("OldName", "OldLastName", new DateOnly(1995, 1, 1), 1, 1, "", "", "");
+
             var dto = new MemberDTO
             {
                 MemberID = 1,
-                FirstName = "UpdatedName",
-                LastName = "UpdatedLast"
+                FirstName = "NewName",
+                LastName = "NewLastName",
+                BirthDate = new DateTime(1995, 1, 1),
+                BranchId = 2,
+                Address = "New Address",
+                ContactNo = "123",
+                EmailAddress = "test@test.com"
             };
 
-            var existingMember = new Member { MemberID = 1, FirstName = "OldName", LastName = "OldLast" };
-
-            _mockService.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(existingMember);
-
-            _mockValidator.Setup(v => v.ValidateAsync(It.IsAny<Member>(), default))
-                          .ReturnsAsync(new ValidationResult());
+            _memberServiceMock.Setup(s => s.GetByIdAsync(dto.MemberID)).ReturnsAsync(existingMember);
+            _validatorMock.Setup(v => v.ValidateAsync(existingMember, default)).ReturnsAsync(new ValidationResult());
 
             // Act
             await _handler.HandleAsync(dto);
 
             // Assert
-            Assert.Equal("UpdatedName", existingMember.FirstName);
-            _mockService.Verify(s => s.UpdateAsync(It.IsAny<Member>()), Times.Once);
+            existingMember.FirstName.Should().Be("NewName");
+            existingMember.BranchId.Should().Be(2);
+            _memberServiceMock.Verify(s => s.UpdateAsync(existingMember), Times.Once);
         }
 
         [Fact]
         public async Task HandleAsync_WhenMemberNotFound_ShouldThrowKeyNotFoundException()
         {
             // Arrange
-            var dto = new MemberDTO { MemberID = 99 };
-            _mockService.Setup(s => s.GetByIdAsync(99)).ReturnsAsync((Member?)null);
+            var dto = new MemberDTO { MemberID = 99, FirstName = "", LastName = "" };
+            _memberServiceMock.Setup(s => s.GetByIdAsync(dto.MemberID)).ReturnsAsync((Member?)null);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _handler.HandleAsync(dto));
-            Assert.Equal(OperationMessage.Error.NotFound, exception.Message);
-
-            _mockService.Verify(s => s.UpdateAsync(It.IsAny<Member>()), Times.Never);
+            var act = () => _handler.HandleAsync(dto);
+            await act.Should().ThrowAsync<KeyNotFoundException>()
+                .WithMessage(OperationMessage.Error.NotFound);
         }
 
         [Fact]
         public async Task HandleAsync_WhenValidationFails_ShouldThrowValidationException()
         {
             // Arrange
-            var dto = new MemberDTO { MemberID = 1, FirstName = "" };
-            var existingMember = new Member { MemberID = 1 };
+            var existingMember = new Member("John", "Doe", new DateOnly(1995, 1, 1), 1, 1, "", "", "");
+            var dto = new MemberDTO { MemberID = 1, FirstName = "John", LastName = "Doe" };
 
-            _mockService.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(existingMember);
+            var failures = new List<ValidationFailure> { new("FirstName", "Invalid") };
 
-            var failures = new List<ValidationFailure> { new("FirstName", "Required") };
-            _mockValidator.Setup(v => v.ValidateAsync(It.IsAny<Member>(), default))
-                          .ReturnsAsync(new ValidationResult(failures));
+            _memberServiceMock.Setup(s => s.GetByIdAsync(dto.MemberID)).ReturnsAsync(existingMember);
+            _validatorMock.Setup(v => v.ValidateAsync(existingMember, default))
+                .ReturnsAsync(new ValidationResult(failures));
 
             // Act & Assert
-            await Assert.ThrowsAsync<ValidationException>(() => _handler.HandleAsync(dto));
-            _mockService.Verify(s => s.UpdateAsync(It.IsAny<Member>()), Times.Never);
+            await Xunit.Assert.ThrowsAsync<ValidationException>(() => _handler.HandleAsync(dto));
+            _memberServiceMock.Verify(s => s.UpdateAsync(It.IsAny<Member>()), Times.Never);
         }
     }
 }

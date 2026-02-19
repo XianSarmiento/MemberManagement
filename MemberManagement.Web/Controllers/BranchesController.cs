@@ -2,6 +2,7 @@
 using MemberManagement.Application.Branches;
 using MemberManagement.Domain.Interfaces;
 using MemberManagement.SharedKernel.Constant;
+using FluentValidation;
 
 namespace MemberManagement.Web.Controllers;
 
@@ -26,12 +27,6 @@ public class BranchesController(
     [HttpPost]
     public async Task<IActionResult> Create(string name, string branchCode, string? address)
     {
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(branchCode))
-        {
-            TempData["ErrorMessage"] = OperationMessage.Error.InvalidInput;
-            return RedirectToAction(nameof(Index));
-        }
-
         address ??= string.Empty;
 
         try
@@ -39,7 +34,11 @@ public class BranchesController(
             await _createHandler.Handle(name, address, branchCode);
             TempData["SuccessMessage"] = OperationMessage.Branch.Created;
         }
-        catch
+        catch (ValidationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? OperationMessage.Error.InvalidInput;
+        }
+        catch (Exception)
         {
             TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
         }
@@ -50,12 +49,6 @@ public class BranchesController(
     [HttpPost]
     public async Task<IActionResult> Update(int id, string name, string branchCode, string? address)
     {
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(branchCode))
-        {
-            TempData["ErrorMessage"] = OperationMessage.Error.InvalidInput;
-            return RedirectToAction(nameof(Index));
-        }
-
         address ??= string.Empty;
 
         try
@@ -64,10 +57,7 @@ public class BranchesController(
             if (existing != null)
             {
                 string currentAddress = existing.Address ?? string.Empty;
-
-                if (existing.Name == name &&
-                    existing.BranchCode == branchCode &&
-                    currentAddress == address)
+                if (existing.Name == name && existing.BranchCode == branchCode && currentAddress == address)
                 {
                     TempData["SuccessMessage"] = OperationMessage.Branch.NoChanges;
                     return RedirectToAction(nameof(Index));
@@ -77,11 +67,15 @@ public class BranchesController(
             await _updateHandler.Handle(id, name, address, branchCode);
             TempData["SuccessMessage"] = OperationMessage.Branch.Updated;
         }
+        catch (ValidationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Errors.FirstOrDefault()?.ErrorMessage ?? OperationMessage.Error.InvalidInput;
+        }
         catch (KeyNotFoundException)
         {
             TempData["ErrorMessage"] = OperationMessage.Error.NotFound;
         }
-        catch
+        catch (Exception)
         {
             TempData["ErrorMessage"] = OperationMessage.Error.SaveFailed;
         }

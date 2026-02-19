@@ -31,6 +31,12 @@
             if (this.value) {
                 this.value = this.value.trim();
                 this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+
+                // ADD THIS: Trigger validation so the "Name is required" 
+                // error disappears immediately after formatting
+                if (typeof $(this).valid === "function") {
+                    $(this).valid();
+                }
             }
         });
     });

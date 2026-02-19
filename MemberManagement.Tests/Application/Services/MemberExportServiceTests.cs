@@ -1,11 +1,11 @@
-﻿using MemberManagement.Application.DTOs;
+﻿using FluentAssertions;
+using MemberManagement.Application.DTOs;
 using MemberManagement.Application.Services;
 using System;
 using System.Collections.Generic;
 using Xunit;
-using Assert = Xunit.Assert;
 
-namespace MemberManagement.UnitTests.Application.Services
+namespace MemberManagement.Test.Services
 {
     public class MemberExportServiceTests
     {
@@ -27,13 +27,24 @@ namespace MemberManagement.UnitTests.Application.Services
                     LastName = "Doe",
                     Branch = "Main",
                     BirthDate = new DateTime(1990, 1, 1),
-                    EmailAddress = "john@example.com"
+                    EmailAddress = "john@example.com",
+                    MembershipType = "Regular"
+                },
+                new MemberDTO
+                {
+                    MemberID = 2,
+                    FirstName = "Jane",
+                    LastName = "Smith",
+                    Branch = "West",
+                    BirthDate = new DateTime(1985, 5, 20),
+                    EmailAddress = "jane@example.com",
+                    MembershipType = "Premium"
                 }
             };
         }
 
         [Fact]
-        public void GenerateExcel_ShouldReturnValidByteArray()
+        public void GenerateExcel_ShouldReturnByteArray()
         {
             // Arrange
             var members = GetSampleMembers();
@@ -42,17 +53,15 @@ namespace MemberManagement.UnitTests.Application.Services
             var result = _service.GenerateExcel(members);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.True(result.Length > 0, "Excel file should not be empty.");
-
-            // Optional: Check for Excel magic number (PK..) 
-            // Most modern Excel files (xlsx) start with 'P' and 'K' (ZIP format)
-            Assert.Equal('P', (char)result[0]);
-            Assert.Equal('K', (char)result[1]);
+            result.Should().NotBeNull();
+            result.Length.Should().BeGreaterThan(0);
+            // Optional: Check for Excel magic number (first few bytes)
+            result[0].Should().Be(0x50); // 'P' (from PK zip header used by .xlsx)
+            result[1].Should().Be(0x4B); // 'K'
         }
 
         [Fact]
-        public void GeneratePdf_ShouldReturnValidByteArray()
+        public void GeneratePdf_ShouldReturnByteArray()
         {
             // Arrange
             var members = GetSampleMembers();
@@ -61,25 +70,21 @@ namespace MemberManagement.UnitTests.Application.Services
             var result = _service.GeneratePdf(members);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.True(result.Length > 0, "PDF file should not be empty.");
-
+            result.Should().NotBeNull();
+            result.Length.Should().BeGreaterThan(0);
             // Check for PDF magic number (%PDF-)
-            Assert.Equal('%', (char)result[0]);
-            Assert.Equal('P', (char)result[1]);
-            Assert.Equal('D', (char)result[2]);
-            Assert.Equal('F', (char)result[3]);
+            System.Text.Encoding.ASCII.GetString(result, 0, 4).Should().Be("%PDF");
         }
 
         [Fact]
-        public void GenerateExcel_WithEmptyList_ShouldNotThrow()
+        public void GenerateExcel_WithEmptyList_ShouldStillGenerateFile()
         {
-            // Arrange
-            var members = new List<MemberDTO>();
+            // Act
+            var result = _service.GenerateExcel(new List<MemberDTO>());
 
-            // Act & Assert
-            var result = Record.Exception(() => _service.GenerateExcel(members));
-            Assert.Null(result);
+            // Assert
+            result.Should().NotBeNull();
+            result.Length.Should().BeGreaterThan(0);
         }
     }
 }
