@@ -1,0 +1,114 @@
+/* =========================================
+   DASHBOARD STYLES
+   Member Management System
+========================================= */
+
+.dashboard-container {
+    padding: 40px 15px;
+    background-color: #f8fafc;
+    min-height: 85vh;
+}
+
+/* ===============================
+   STAT CARDS
+================================= */
+.stat-card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.2s ease-in-out;
+    background: #ffffff;
+}
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+/* ===============================
+   ICON WRAPPER
+================================= */
+.icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Soft Background Colors */
+.bg-soft-primary {
+    background: rgba(67, 97, 238, 0.1);
+    color: #4361ee;
+}
+
+.bg-soft-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.bg-soft-info {
+    background: rgba(6, 182, 212, 0.1);
+    color: #06b6d4;
+}
+
+.bg-soft-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+/* ===============================
+   HEADER
+================================= */
+.welcome-header {
+    color: #1e293b;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+}
+
+/* ===============================
+   BUTTONS
+================================= */
+.btn-action {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+}
+
+/* =========================================
+   DASHBOARD FOOTER
+========================================= */
+
+.dashboard-footer {
+    background-color: #f1f5f9;
+    border-top: 1px solid #e2e8f0;
+}
+
+.footer-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1e293b;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .footer-links li {
+        margin-bottom: 0.5rem;
+    }
+
+    .footer-links a {
+        text-decoration: none;
+        font-size: 0.9rem;
+        color: #475569;
+        transition: color 0.2s ease-in-out;
+    }
+
+        .footer-links a:hover {
+            color: #2563eb;
+        }

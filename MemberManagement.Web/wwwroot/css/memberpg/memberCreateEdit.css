@@ -130,7 +130,6 @@
         text-transform: uppercase;
     }
 
-/* Cloud Validation Tooltip */
 .floating-error {
     position: absolute;
     top: -14px;
@@ -145,8 +144,9 @@
     display: none;
     box-shadow: 0 4px 6px rgba(0,0,0,0.15);
     pointer-events: none;
-    white-space: normal;
-    max-width: 200px;
+    white-space: nowrap;
+    width: max-content;
+    max-width: 250px;
     line-height: 1.2;
     text-align: center;
 }
@@ -244,4 +244,17 @@
 .validation-summary-errors ul {
     margin-bottom: 0;
     padding-left: 20px;
+}
+
+/* Force validation error visibility for empty fields */
+.input-wrapper .field-validation-error.floating-error {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 100;
+}
+
+/* Ensure the wrapper doesn't clip the error bubble */
+.input-wrapper {
+    overflow: visible !important;
 }

@@ -8,6 +8,7 @@ using MemberManagement.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList.Extensions;
 using MemberManagement.SharedKernel.Constant;
@@ -128,7 +129,7 @@ namespace MemberManagement.Web.Controllers
             var dto = MemberEntityMapper.ToDto(member);
             var memberVM = dto.ToViewModel();
 
-            await PopulateSelectionLists();
+            await PopulateSelectionLists(memberVM.BranchId, memberVM.MembershipTypeId);
             return View(memberVM);
         }
 
@@ -143,7 +144,7 @@ namespace MemberManagement.Web.Controllers
                 foreach (var error in validationResult.Errors)
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
 
-                await PopulateSelectionLists();
+                await PopulateSelectionLists(memberVM.BranchId, memberVM.MembershipTypeId);
                 return View(memberVM);
             }
 
@@ -160,19 +161,19 @@ namespace MemberManagement.Web.Controllers
                     var key = string.IsNullOrEmpty(error.PropertyName) ? string.Empty : error.PropertyName;
                     ModelState.AddModelError(key, error.ErrorMessage);
                 }
-                await PopulateSelectionLists();
+                await PopulateSelectionLists(memberVM.BranchId, memberVM.MembershipTypeId);
                 return View(memberVM);
             }
             catch (InvalidOperationException ex)
             {
                 ModelState.AddModelError("BirthDate", ex.Message);
-                await PopulateSelectionLists();
+                await PopulateSelectionLists(memberVM.BranchId, memberVM.MembershipTypeId);
                 return View(memberVM);
             }
             catch (Exception)
             {
                 ModelState.AddModelError(string.Empty, OperationMessage.Error.SaveFailed);
-                await PopulateSelectionLists();
+                await PopulateSelectionLists(memberVM.BranchId, memberVM.MembershipTypeId);
                 return View(memberVM);
             }
         }
@@ -262,10 +263,18 @@ namespace MemberManagement.Web.Controllers
             return RedirectToAction(nameof(Inactive));
         }
 
-        private async Task PopulateSelectionLists()
+        private async Task PopulateSelectionLists(int? selectedBranchId = null, int? selectedTypeId = null)
         {
-            ViewBag.Branches = await _branchService.GetAllAsync();
-            ViewBag.MembershipTypes = await _typeService.GetAllAsync();
+            var allBranches = await _branchService.GetAllAsync();
+            var allTypes = await _typeService.GetAllAsync();
+
+            ViewBag.Branches = allBranches
+                .Where(b => b.IsActive || b.Id == selectedBranchId)
+                .ToList();
+
+            ViewBag.MembershipTypes = allTypes
+                .Where(t => t.IsActive || t.Id == selectedTypeId)
+                .ToList();
         }
     }
 }

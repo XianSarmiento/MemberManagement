@@ -16,14 +16,26 @@ namespace MemberManagement.Application.Validation
 
             RuleFor(m => m.FirstName)
                 .NotEmpty().WithMessage("First Name is required.")
-                .MaximumLength(50);
+                .MaximumLength(50).WithMessage("First Name is too long.")
+                .Matches(@"^[a-zA-Z\s]*$").WithMessage("First Name should only contain letters.");
 
+            // 1. Basic Validation (Always runs)
+            RuleFor(m => m.LastName)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty().WithMessage("Last Name is required.")
+                .MaximumLength(50).WithMessage("Last Name is too long.")
+                .Matches(@"^[a-zA-Z\s]*$").WithMessage("Last Name should only contain letters.");
+
+            // 2. Database Duplicate Check (Only runs when fields are filled)
             RuleFor(m => m.LastName)
                 .MustAsync(async (member, lastName, cancellation) =>
                 {
+                    if (string.IsNullOrEmpty(member.FirstName) || string.IsNullOrEmpty(lastName) || member.BirthDate == default)
+                        return true;
+
                     return !await _context.Members.AnyAsync(m =>
                         m.FirstName.ToLower() == member.FirstName.ToLower() &&
-                        m.LastName.ToLower() == member.LastName.ToLower() &&
+                        m.LastName.ToLower() == lastName.ToLower() &&
                         m.BirthDate == member.BirthDate &&
                         m.MemberID != member.MemberID, cancellation);
                 })
@@ -54,7 +66,7 @@ namespace MemberManagement.Application.Validation
                     .When(m => !string.IsNullOrEmpty(m.ContactNo))
                 .MustAsync(async (member, contact, cancellation) =>
                 {
-                    if (string.IsNullOrEmpty(contact)) return true; // Allow null/empty
+                    if (string.IsNullOrEmpty(contact)) return true;
                     return !await _context.Members.AnyAsync(m => m.ContactNo == contact && m.MemberID != member.MemberID, cancellation);
                 })
                 .WithMessage("Contact number already exists.")
@@ -66,7 +78,7 @@ namespace MemberManagement.Application.Validation
                     .When(m => !string.IsNullOrEmpty(m.EmailAddress))
                 .MustAsync(async (member, email, cancellation) =>
                 {
-                    if (string.IsNullOrEmpty(email)) return true; // Allow null/empty
+                    if (string.IsNullOrEmpty(email)) return true;
                     return !await _context.Members.AnyAsync(m => m.EmailAddress == email && m.MemberID != member.MemberID, cancellation);
                 })
                 .WithMessage("Email address already exists.")

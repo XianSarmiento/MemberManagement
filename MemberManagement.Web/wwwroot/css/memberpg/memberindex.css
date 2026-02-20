@@ -1,5 +1,4 @@
-﻿
-/* 1. LAYOUT & CONTAINERS */
+﻿/* 1. LAYOUT & CONTAINERS */
 .card.shadow-lg {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
@@ -11,12 +10,6 @@
     margin-bottom: 1rem;
     border-radius: 8px;
     background-color: #fff;
-}
-
-.search-input-container,
-.branch-filter-container {
-    width: 150px !important;
-    max-width: 150px;
 }
 
 .search-input-container,
@@ -46,33 +39,26 @@
         transform: scale(1.1);
     }
 
-.btn-delete-hover {
-    transition: all 0.2s ease-in-out;
-}
-
-    .btn-delete-hover:hover {
-        color: #fff !important;
-        background-color: #dc3545 !important;
-        border-color: #dc3545 !important;
-    }
-
-/* 3. TABLE STYLING */
+/* 3. TABLE STYLING - ALL WHITE ROWS */
 .member-table {
     width: 100%;
     font-size: 13px;
     border-collapse: separate;
     border-spacing: 0;
+    background-color: #ffffff !important; /* Force overall table white */
 }
 
     .member-table th,
     .member-table td {
         vertical-align: middle;
         padding: 0.6rem;
+        background-color: #ffffff !important; /* Force every cell white */
     }
 
     .member-table th {
         font-weight: 600;
         white-space: nowrap;
+        background-color: #cfe2ff !important; /* Keep the header color */
     }
 
         .member-table th a {
@@ -108,18 +94,87 @@
         font-size: 0.85rem;
     }
 
-    /* 4. MANAGE COLUMN - BORDERLESS ICONS (MATCHING INACTIVE UI) */
-    .member-table .btn {
-        border: none !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        padding: 0.25rem;
-        font-size: 1.1rem;
-        transition: all 0.2s ease-in-out;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+/* 4. STATUS COLUMN - WHITE PILL WITH DOT */
+
+/* ACTIVE STYLE (Green Dot) */
+.btn-status-active {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 50px !important;
+    padding: 2px 14px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 110px;
+    height: 26px;
+    text-transform: uppercase;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+    .btn-status-active::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background-color: #5ad012;
+        border-radius: 50%;
+        display: inline-block;
     }
+
+    .btn-status-active:hover {
+        background-color: #dc3545 !important;
+        color: #ffffff !important;
+        border-color: #dc3545 !important;
+    }
+
+        .btn-status-active:hover::before {
+            display: none;
+        }
+
+/* DEACTIVATE/INACTIVE STYLE (Red Dot) */
+.btn-status-deactivate {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 50px !important;
+    padding: 2px 14px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 110px;
+    height: 26px;
+    text-transform: uppercase;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+    /* The Red Dot for Inactive State */
+    .btn-status-deactivate::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background-color: #dc3545; /* Red Dot */
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Hover State: Turn Blue (signifying activation) */
+    .btn-status-deactivate:hover {
+        background-color: #0d6efd !important; /* Blue hover */
+        color: #ffffff !important;
+        border-color: #0d6efd !important;
+    }
+
+        .btn-status-deactivate:hover::before {
+            display: none;
+        }
 
 .btn-detail-hover {
     color: #6c757d !important;
@@ -141,16 +196,13 @@
 
 .btn-delete-hover {
     color: #6c757d !important;
+    transition: all 0.2s ease-in-out;
 }
 
     .btn-delete-hover:hover {
         color: #dc3545 !important;
         transform: scale(1.2);
     }
-
-.member-table .btn i {
-    font-size: 1.1rem;
-}
 
 .btn-restore-hover {
     color: #6c757d !important;
@@ -172,13 +224,15 @@
 }
 
 /* 6. MODALS */
-#deleteModal .modal-content {
+#deleteModal .modal-content,
+#restoreModal .modal-content {
     border-radius: 12px;
     border: none;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-#deleteModal .modal-header {
+#deleteModal .modal-header,
+#restoreModal .modal-header {
     background-color: #f8f9fa;
     border-bottom: 1px solid #eee;
 }
@@ -206,16 +260,6 @@
     to {
         top: 20px;
         opacity: 1;
-    }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
     }
 }
 
@@ -276,8 +320,7 @@
         font-size: 0.85rem;
     }
 
-/* 11. Copy Contact and Email*/
-/* Container cell styling */
+/* 11. Copy Contact and Email & ROW HOVER */
 .copy-cell {
     cursor: pointer;
     transition: background-color 0.2s;
@@ -287,14 +330,48 @@
         background-color: rgba(13, 110, 253, 0.05) !important;
     }
 
-/* Icon styling - hidden by default */
 .copy-icon {
     font-size: 0.85rem;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 }
 
-/* Show icon when the cell is hovered */
 .copy-cell:hover .copy-icon {
     opacity: 1;
+}
+
+/* Make the whole row feel interactive and manage hover color */
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+    /* Target the td specifically to override the white background on hover */
+    .clickable-row:hover td {
+        background-color: #f8f9fa !important;
+    }
+
+/* Specific styling for the ID link */
+.edit-trigger-cell:hover {
+    color: #0a58ca !important;
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+/* 12. UPDATED MODAL BRANDING (Matching Branch Management) */
+#deleteModal .modal-header,
+#restoreModal .modal-header {
+    background-color: #0d6efd !important; /* Professional Blue Header */
+    color: white !important;
+    border-bottom: none;
+}
+
+#deleteModal .btn-close,
+#restoreModal .btn-close {
+    filter: brightness(0) invert(1); /* Makes close button white */
+}
+
+#deleteModal .modal-footer,
+#restoreModal .modal-footer {
+    border-top: none;
+    padding-bottom: 1.5rem;
 }

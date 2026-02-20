@@ -1,40 +1,140 @@
 ﻿@{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center">Member Management System</h2>
-    <p class="lead text-center">Record and maintain basic membership information.</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+}
 
-    <br />
 
-    <div class="row justify-content-center mt-4">
-        @*  Add Member Card *@
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-person-plus-fill" style="font-size: 2.5rem;"></i>
-                    <h5 class="card-title mt-2">Add Member</h5>
-                    <p class="card-text small">Click here to add a new member to the system.</p>
-                    <a asp-controller="Members" asp-action="Create" class="btn btn-outline-primary">
-                        Add Member
-                    </a>
-                </div>
+<div class="dashboard-container">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h1 class="welcome-header display-5">MEMBER MANAGEMENT SYSTEM</h1>
+                <p class="text-muted">Manage your members, locations, and membership plans in one place.</p>
             </div>
         </div>
 
-        @* View Members Card *@
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-people-fill" style="font-size: 2.5rem;"></i>
-                    <h5 class="card-title mt-2">View Members</h5>
-                    <p class="card-text small">See all existing members in the system.</p>
-                    <a asp-controller="Members" asp-action="Index" class="btn btn-outline-success">
-                        View Members
-                    </a>
+        <div class="row g-4 justify-content-center">
+
+            @* Members Section *@
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column align-items-center">
+                        <div class="icon-wrapper bg-soft-primary">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <h5 class="fw-bold">Members</h5>
+                        <p class="text-muted small text-center">Total member database and registration.</p>
+                        <div class="mt-auto d-flex gap-2 w-100">
+                            <a asp-controller="Members" asp-action="Index" class="btn btn-outline-primary btn-action w-100">View</a>
+                            <a asp-controller="Members" asp-action="Create" class="btn btn-primary btn-action w-100"><i class="bi bi-plus"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            @* Branches Section *@
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column align-items-center">
+                        <div class="icon-wrapper bg-soft-info">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <h5 class="fw-bold">Branches</h5>
+                        <p class="text-muted small text-center">Manage physical branch locations.</p>
+                        <div class="mt-auto w-100">
+                            <a asp-controller="Branches" asp-action="Index" class="btn btn-outline-info btn-action w-100">Manage Branches</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Membership Types Section *@
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column align-items-center">
+                        <div class="icon-wrapper bg-soft-warning">
+                            <i class="bi bi-card-checklist"></i>
+                        </div>
+                        <h5 class="fw-bold">Membership</h5>
+                        <p class="text-muted small text-center">Configure membership classifications</p>
+                        <div class="mt-auto w-100">
+                            <a asp-controller="MembershipTypes" asp-action="Index" class="btn btn-outline-warning btn-action w-100">Manage Plans</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* System Reports *@
+            <div class="col-md-6 col-lg-3">
+                <div class="card stat-card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column align-items-center">
+                        <div class="icon-wrapper bg-soft-success">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h5 class="fw-bold">Reports</h5>
+                        <p class="text-muted small text-center">Analytics and member demographics.</p>
+                        <div class="mt-auto w-100">
+                            <button class="btn btn-outline-success btn-action w-100" disabled>Coming Soon</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-5 text-center">
+            <span class="badge rounded-pill bg-light text-dark p-2 px-3 border">
+                <i class="bi bi-shield-check text-success me-1"></i> MMS by JCMS
+            </span>
         </div>
     </div>
 </div>
+
+<footer class="dashboard-footer mt-5">
+    <div class="container py-5">
+        <div class="row">
+
+            <div class="col-md-4 mb-4">
+                <h6 class="footer-title">Member Management System</h6>
+                <p class="text-muted small">
+                    Centralized system for managing members, branches, and
+                    membership classifications efficiently and securely.
+                </p>
+                <p class="text-muted small mb-0">
+                    © 2026 ARDCI MMS. All rights reserved.
+                </p>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <h6 class="footer-title">Modules</h6>
+                <ul class="footer-links">
+                    <li><a asp-controller="Members" asp-action="Index">Members</a></li>
+                    <li><a asp-controller="Branches" asp-action="Index">Branches</a></li>
+                    <li><a asp-controller="MembershipTypes" asp-action="Index">Membership Types</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <h6 class="footer-title">System</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Reports</a></li>
+                    <li><a href="#">User Management</a></li>
+                    <li><a href="#">Audit Logs</a></li>
+                </ul>
+            </div>
+
+            <div class="col-md-2 mb-4">
+                <h6 class="footer-title">Support</h6>
+                <ul class="footer-links">
+                    <li><a href="#">Contact Admin</a></li>
+                    <li><a href="#">System Guide</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</footer>
+
