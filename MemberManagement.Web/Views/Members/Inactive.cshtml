@@ -21,11 +21,10 @@
     <script src="~/js/memberpg/memberindex.js"></script>
 }
 
-
 <div class="card shadow-lg">
     <div class="card-body">
 
-        @* TOP BAR *@
+        @* MEMBERS LIST | SEARCH BAR | FILTER | REFRESH *@
         <div class="member-top-bar mb-3">
             <div class="d-flex justify-content-between align-items-center">
 
@@ -39,7 +38,6 @@
                 <form asp-action="Inactive" method="get" class="d-flex align-items-center gap-3">
                     <input type="hidden" name="pageSize" value="@Model.PageSize" />
                     
-                    @* Search *@
                     <div class="d-flex align-items-center gap-1">
                         <div class="search-input-container">
                             <input type="text" name="searchLastName" id="searchLastName" class="form-control form-control-sm" placeholder="Search by Last Name" value="@Model.SearchLastName" />
@@ -49,7 +47,6 @@
                         </button>
                     </div>
 
-                    @* Filter *@
                     <div class="d-flex align-items-center gap-1">
                         <div style="width:180px;">
                             <select name="branch" id="branchFilter" class="form-select form-select-sm">
@@ -72,9 +69,9 @@
             </div>
         </div>
 
-        @* TABLE *@
+        @* MEMBERS TABLE *@
         <div class="table-responsive scrollable-table">
-            <table class="table table-bordered table-striped member-table">
+            <table class="table table-bordered member-table">
                 <thead class="table-primary">
                     <tr>
                         <th>
@@ -106,7 +103,7 @@
                         <th>Birth Date</th>
                         <th>Contact No</th>
                         <th>Email Address</th>
-                        <th class="text-center">Manage</th>
+                        <th class="text-center">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -121,40 +118,38 @@
                     }
                     @foreach (var m in Model.Members)
                     {
-                        <tr>
-                            <td>@m.MemberID</td>
+                        <tr class="clickable-row" data-details-url="@Url.Action("Detail", new { id = m.MemberID })">
+                            <td class="edit-trigger-cell text-primary fw-bold" 
+                                onclick="window.location.href='@Url.Action("Detail", new { id = m.MemberID })'"
+                                style="cursor:pointer; text-decoration: underline;">
+                                @m.MemberID
+                            </td>
                             <td>@m.FirstName</td>
                             <td>@m.LastName</td>
                             <td>@m.Branch</td>
                             <td>@m.MembershipType</td>
                             <td>@m.Address</td>
                             <td>@(m.BirthDate.HasValue ? m.BirthDate.Value.ToString("yyyy-MM-dd") : "")</td>
-                            <td class="copy-cell" onclick="copyToClipboard('@m.ContactNo', this)" title="Click to copy">
+                            <td class="copy-cell" onclick="copyToClipboard('@m.ContactNo', this); event.stopPropagation();" title="Click to copy">
                                 <div class="d-flex align-items-center">
                                     <span class="me-auto">@m.ContactNo</span>
                                     <i class="bi bi-copy text-primary ms-2 copy-icon"></i>
                                 </div>
                             </td>
-                            <td class="copy-cell" onclick="copyToClipboard('@m.EmailAddress', this)" title="Click to copy">
+                            <td class="copy-cell" onclick="copyToClipboard('@m.EmailAddress', this); event.stopPropagation();" title="Click to copy">
                                 <div class="d-flex align-items-center">
                                     <span class="me-auto text-truncate" style="max-width: 140px;">@m.EmailAddress</span>
                                     <i class="bi bi-copy text-primary ms-2 copy-icon"></i>
                                 </div>
                             </td>
                             <td class="text-center">
-                                <div class="btn-group gap-1">
-                                    <a asp-action="Detail" asp-route-id="@m.MemberID" 
-                                       class="btn btn-sm btn-detail-hover" title="View Details">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </a>
-
-                                    <button type="button" class="btn btn-sm btn-restore-hover" 
-                                            data-bs-toggle="modal" data-bs-target="#restoreModal"
-                                            data-id="@m.MemberID" data-name="@($"{m.FirstName} {m.LastName}")"
-                                            title="Restore Member">
-                                        <i class="bi bi-person-check-fill"></i>
-                                    </button>
-                                </div>
+                                <button type="button" class="btn-status-deactivate" 
+                                        onclick="event.stopPropagation();"
+                                        data-bs-toggle="modal" data-bs-target="#restoreModal"
+                                        data-id="@m.MemberID" data-name="@($"{m.FirstName} {m.LastName}")"
+                                        title="Click to Activate">
+                                    INACTIVE
+                                </button>
                             </td>
                         </tr>
                     }
@@ -162,7 +157,7 @@
             </table>
         </div>
 
-        @* PAGINATION & EXPORT *@
+        @* PAGINATION SECTION *@
         <div class="d-flex justify-content-between align-items-center mt-2">
             <div class="d-flex align-items-center gap-2 mt-3">
                 <form method="get" class="d-flex align-items-center gap-2">
@@ -170,6 +165,7 @@
                         <option value="10" selected="@(Model.PageSize == 10)">10 rows</option>
                         <option value="20" selected="@(Model.PageSize == 20)">20 rows</option>
                         <option value="50" selected="@(Model.PageSize == 50)">50 rows</option>
+                        <option value="-1" selected="@(Model.PageSize == -1)">All rows</option>
                     </select>
                     <input type="hidden" name="searchLastName" value="@Model.SearchLastName" />
                     <input type="hidden" name="branch" value="@Model.SelectedBranch" />
@@ -182,7 +178,8 @@
 
             <div class="text-center flex-grow-1 member-pagination-info">
                 Total Inactive: <strong>@Model.Members.TotalItemCount</strong> | 
-                Page: <strong>@Model.Members.PageNumber</strong> of <strong>@Model.Members.PageCount</strong>
+                Page: <strong>@Model.Members.PageNumber</strong> of <strong>@Model.Members.PageCount</strong> |
+                Showing <strong>@Model.Members.Count</strong> items
             </div>
 
             <div class="mt-3">
@@ -195,7 +192,8 @@
                     DisplayLinkToFirstPage = PagedListDisplayMode.Never,
                     DisplayLinkToLastPage = PagedListDisplayMode.Never,
                     DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
-                    DisplayLinkToNextPage = PagedListDisplayMode.Always
+                    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                    DisplayEllipsesWhenNotShowingAllPageNumbers = true
                 })
             </div>
         </div>
@@ -203,25 +201,37 @@
         @* RESTORE MODAL *@
         <div class="modal fade" id="restoreModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
+                <div class="modal-content border-0 shadow">
                     <form asp-action="Restore" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" id="restoreMemberId" />
-                        <div class="modal-header">
-                            <h5 class="modal-title">Restore Member</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                        @* Primary Blue Header to match Branch Restore/Edit style *@
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title fs-6">
+                                <i class="bi bi-arrow-counterclockwise me-2"></i>Restore Member
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="modal-body">
-                            Are you sure you want to reactivate <strong id="restoreMemberName"></strong>? 
+
+                        <div class="modal-body p-4 text-center">
+                            <p class="mb-0">
+                                Are you sure you want to reactivate <strong id="restoreMemberName"></strong>?
+                                <br /><span class="text-muted small">This will return the member to the active list.</span>
+                            </p>
                         </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Continue</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                        <div class="modal-footer border-top-0 px-4 pb-4 d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                                <i class="bi bi-x-lg"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-outline-primary px-4">
+                                <i class="bi bi-check-lg"></i> Yes, Restore
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-
     </div>
 </div>

@@ -19,18 +19,29 @@ namespace MemberManagement.Web.ValidationsVM
                 .MaximumLength(50).WithMessage("First Name is too long.")
                 .Matches(@"^[a-zA-Z\s]*$").WithMessage("First Name should only contain letters.");
 
+            // 1. Basic Validation for Last Name (Always active)
+            RuleFor(x => x.LastName)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty().WithMessage("Last Name is required.")
+                .MaximumLength(50).WithMessage("Last Name is too long.")
+                .Matches(@"^[a-zA-Z\s]*$").WithMessage("Last Name should only contain letters.");
+
+            // 2. Separate Duplicate Check for Last Name (Conditional)
             RuleFor(x => x.LastName)
                 .MustAsync(async (memberVM, lastName, cancellation) =>
                 {
+                    if (string.IsNullOrEmpty(memberVM.FirstName) || string.IsNullOrEmpty(lastName) || !memberVM.BirthDate.HasValue)
+                        return true;
+
                     var exists = await _context.Members.AnyAsync(m =>
                         m.FirstName.ToLower() == memberVM.FirstName.ToLower() &&
-                        m.LastName.ToLower() == memberVM.LastName.ToLower() &&
+                        m.LastName.ToLower() == lastName.ToLower() &&
                         m.BirthDate == DateOnly.FromDateTime(memberVM.BirthDate.Value) &&
                         m.MemberID != memberVM.MemberID, cancellation);
                     return !exists;
                 })
                 .WithMessage("A member with this name and birthdate already exists.")
-                .When(x => !string.IsNullOrEmpty(x.FirstName) && !string.IsNullOrEmpty(x.LastName) && x.BirthDate.HasValue);
+                .When(x => !string.IsNullOrEmpty(x.LastName));
 
             RuleFor(x => x.BirthDate)
                 .NotEmpty().WithMessage(OperationMessage.Error.BirthDateRequired)

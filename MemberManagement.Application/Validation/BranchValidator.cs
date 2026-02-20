@@ -19,11 +19,19 @@ namespace MemberManagement.Application.Validation
 
             RuleFor(x => x.BranchCode)
                 .NotEmpty().WithMessage("Branch Code is required.")
-                .MustAsync(async (branch, code, cancellation) =>
+                .MaximumLength(20);
+
+            RuleFor(x => x)
+                .MustAsync(async (branch, cancellation) =>
                 {
                     return !await _context.Branches.AnyAsync(b =>
-                        b.BranchCode == code && b.Id != branch.Id, cancellation);
-                }).WithMessage("Branch code already exists.");
+                        b.Name == branch.Name &&
+                        b.Address == branch.Address &&
+                        b.BranchCode == branch.BranchCode &&
+                        b.Id != branch.Id,
+                        cancellation);
+                })
+                .WithMessage("Branch already exists with the same name, address, and code.");
         }
     }
 }

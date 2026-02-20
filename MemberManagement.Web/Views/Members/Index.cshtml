@@ -21,7 +21,6 @@
     <script src="~/js/memberpg/memberindex.js"></script>
 }
 
-
 <div class="card shadow-lg">
     <div class="card-body">
 
@@ -66,7 +65,7 @@
                     </div>
 
                     <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary" title="Reset filters">
-                       <i class="bi bi-arrow-clockwise"></i>
+                        <i class="bi bi-arrow-clockwise"></i>
                     </a>
                 </form>
             </div>
@@ -74,7 +73,7 @@
 
         @* MEMBERS TABLE *@
         <div class="table-responsive scrollable-table">
-            <table class="table table-bordered table-striped member-table">
+            <table class="table table-bordered member-table">
                 <thead class="table-primary">
                     <tr>
                         <th>
@@ -106,14 +105,14 @@
                         <th>Birth Date</th>
                         <th>Contact No</th>
                         <th>Email Address</th>
-                        <th>Manage</th>
+                        <th class="text-center">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (!Model.Members.Any())
                     {
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-5">
+                            <td colspan="10" class="text-center text-muted py-5">
                                 <i class="bi bi-emoji-frown d-block mb-2" style="font-size: 2rem;"></i>
                                 @Model.NoResultsMessage
                             </td>
@@ -121,46 +120,39 @@
                     }
                     @foreach (var m in Model.Members)
                     {
-                        <tr>
-                            <td>@m.MemberID</td>
+                        <tr class="clickable-row" data-details-url="@Url.Action("Detail", new { id = m.MemberID })">
+                            <td class="edit-trigger-cell text-primary fw-bold"
+                                data-edit-url="@Url.Action("Edit", new { id = m.MemberID })"
+                                title="Click to Edit Member"
+                                style="cursor:pointer; text-decoration: underline;">
+                                @m.MemberID
+                            </td>
                             <td>@m.FirstName</td>
                             <td>@m.LastName</td>
                             <td>@m.Branch</td>
                             <td>@m.MembershipType</td>
                             <td>@m.Address</td>
-                            <td>@(m.BirthDate.HasValue ? m.BirthDate.Value.ToString("yyyy-MM-dd") : "")</td>
-                            <td class="copy-cell" onclick="copyToClipboard('@m.ContactNo', this)" title="Click to copy">
+                            <td>@(m.BirthDate.HasValue? m.BirthDate.Value.ToString("yyyy-MM-dd") : "")</td>
+                            <td class="copy-cell" onclick="copyToClipboard('@m.ContactNo', this); event.stopPropagation();" title="Click to copy">
                                 <div class="d-flex align-items-center">
                                     <span class="me-auto">@m.ContactNo</span>
                                     <i class="bi bi-copy text-primary ms-2 copy-icon"></i>
                                 </div>
                             </td>
-                            <td class="copy-cell" onclick="copyToClipboard('@m.EmailAddress', this)" title="Click to copy">
+                            <td class="copy-cell" onclick="copyToClipboard('@m.EmailAddress', this); event.stopPropagation();" title="Click to copy">
                                 <div class="d-flex align-items-center">
                                     <span class="me-auto text-truncate" style="max-width: 140px;">@m.EmailAddress</span>
                                     <i class="bi bi-copy text-primary ms-2 copy-icon"></i>
                                 </div>
                             </td>
                             <td class="text-center">
-                                <div class="btn-group gap-1">
-                                    <a asp-action="Edit" asp-route-id="@m.MemberID"
-                                       class="btn btn-sm btn-edit-hover" title="Edit Member">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
-
-                                    <a asp-action="Detail" asp-route-id="@m.MemberID"
-                                       class="btn btn-sm btn-detail-hover" title="Member Details">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </a>
-
-                                    <button type="button" class="btn btn-sm btn-delete-hover"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                            data-id="@m.MemberID" data-name="@($"{m.FirstName} {m.LastName}")"
-                                            data-url="@Url.Action("Delete", "Members")"
-                                            title="Deactivate Member">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </button>
-                                </div>
+                                <button type="button" class="btn btn-status-active"
+                                        onclick="event.stopPropagation();"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                        data-id="@m.MemberID" data-name="@($"{m.FirstName} {m.LastName}")"
+                                        title="Click to Deactivate">
+                                    ACTIVE
+                                </button>
                             </td>
                         </tr>
                     }
@@ -168,11 +160,10 @@
             </table>
         </div>
 
-        @* PAGINATION & PAGE SIZE *@
+        @* PAGINATION | PAGE SIZE | EXPORT *@
         <div class="d-flex justify-content-between align-items-center mt-2">
 
             <div class="d-flex align-items-center gap-2 mt-3">
-                @* Page Size Selector *@
                 <form method="get" class="d-flex align-items-center gap-2">
                     <select name="pageSize" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
                         <option value="10" selected="@(Model.PageSize == 10)">10 rows</option>
@@ -184,9 +175,8 @@
                     <input type="hidden" name="branch" value="@Model.SelectedBranch" />
                 </form>
 
-                @* Export Buttons *@
                 <span class="text-muted mx-2">|</span>
-                <a asp-action="ExportToExcel" asp-route-searchLastName="@Model.SearchLastName" asp-route-branch="@Model.SelectedBranch" class="btn btn-outline-success btn-sm btn-pg-size icon-btn"  title="Export to Excel"> <i class="bi bi-file-earmark-excel"></i> </a>
+                <a asp-action="ExportToExcel" asp-route-searchLastName="@Model.SearchLastName" asp-route-branch="@Model.SelectedBranch" class="btn btn-outline-success btn-sm btn-pg-size icon-btn" title="Export to Excel"> <i class="bi bi-file-earmark-excel"></i> </a>
                 <a asp-action="ExportToPdf" asp-route-searchLastName="@Model.SearchLastName" asp-route-branch="@Model.SelectedBranch" class="btn btn-outline-danger btn-sm btn-pg-size icon-btn" title="Export to PDF"> <i class="bi bi-file-earmark-pdf"></i> </a>
                 <span class="text-muted mx-2">|</span>
                 <a asp-action="Inactive" class="btn btn-outline-secondary btn-sm" title="View Inactive List"> <i class="bi bi-person-x"></i> </a>
@@ -201,45 +191,56 @@
 
             <div>
                 @Html.PagedListPager(
-                    Model.Members,
-                    page => Url.Action("Index", new { page, searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize }),
-                    new PagedListRenderOptions
-                    {
-                        LiElementClasses = new[] { "page-item" },
-                        PageClasses = new[] { "page-link" },
-                        UlElementClasses = new[] { "pagination pagination-sm mb-0" },
-                        MaximumPageNumbersToDisplay = 3,
-                        DisplayLinkToFirstPage = PagedListDisplayMode.Never,
-                        DisplayLinkToLastPage = PagedListDisplayMode.Never,
-                        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
-                        DisplayLinkToNextPage = PagedListDisplayMode.Always,
-                        DisplayEllipsesWhenNotShowingAllPageNumbers = true
-                    })
+                Model.Members,
+                                page => Url.Action("Index", new { page, searchLastName = Model.SearchLastName, branch = Model.SelectedBranch, pageSize = Model.PageSize }),
+                                new PagedListRenderOptions
+                                {
+                                    LiElementClasses = new[] { "page-item" },
+                                    PageClasses = new[] { "page-link" },
+                                    UlElementClasses = new[] { "pagination pagination-sm mb-0" },
+                                    MaximumPageNumbersToDisplay = 3,
+                                    DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+                                    DisplayLinkToLastPage = PagedListDisplayMode.Never,
+                                    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                                    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                                    DisplayEllipsesWhenNotShowingAllPageNumbers = true
+                                })
             </div>
         </div>
 
-        @* DELETE MODAL *@
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        @* DEACTIVATE MODAL *@
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form id="deleteForm" method="post">
+                <div class="modal-content border-0 shadow">
+                    <form id="deleteForm" method="post" asp-action="Deactivate">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" id="deleteMemberId" />
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deleteModalLabel">Deactivate Member</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title fs-6" id="deleteModalLabel">
+                                <i class="bi bi-exclamation-circle me-2"></i>Deactivate Member
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="modal-body">
-                            <strong id="memberName"></strong> will be marked as inactive. Continue?
+
+                        <div class="modal-body p-4 text-center">
+                            <p class="mb-0">
+                                <strong id="memberName"></strong> will be marked as inactive. <br />
+                                <span class="text-muted small">Continue with this action?</span>
+                            </p>
                         </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-danger">Yes</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                        <div class="modal-footer border-top-0 px-4 pb-4 d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                                <i class="bi bi-x-lg"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-outline-danger px-4">
+                                <i class="bi bi-check-lg"></i> Yes, Proceed
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
