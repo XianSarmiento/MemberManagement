@@ -31,26 +31,28 @@ namespace MemberManagement.Test.MembershipTypes
             _handler = new UpdateMembershipTypeHandler(_repoMock.Object, _validatorMock.Object);
         }
 
-        [Fact]
-        public async Task Handle_WhenEntityExists_ShouldUpdateAndSave()
+        [Theory]
+        [InlineData("Regular Member", "R01", 50, "Member from Catanduanes, Albay, Sorsogon, Camarines Sur")]
+        [InlineData("Associate Member", "A01", 50, "Member from Pio Duran, Polangui, Labay, Pili, Calabanga, Ragay, Caramoan, Sipocot")]
+        [InlineData("Balik-Sagip Member", "B01", 100, "Special membership for returning members")]
+        [InlineData("Extension Member", "E01", 200, "Extended membership plan")]
+        public async Task Handle_ShouldUpdateAndSaveMembershipType(string name, string code, decimal fee, string desc)
         {
             // Arrange
-            var existingType = new MembershipType("Old Name", "OLD01", 100m, "Old Desc");
+            var existingType = new MembershipType("Old Name", "OLD01", 10m, "Old Desc");
             int targetId = 1;
 
             _repoMock.Setup(r => r.GetByIdAsync(targetId)).ReturnsAsync(existingType);
 
-            string newName = "New Name";
-            string newCode = "NEW01";
-            decimal newFee = 200m;
-            string newDesc = "New Desc";
-
             // Act
-            await _handler.Handle(targetId, newName, newCode, newFee, newDesc);
+            await _handler.Handle(targetId, name, code, fee, desc);
 
             // Assert
-            existingType.Name.Should().Be(newName);
-            existingType.MembershipFee.Should().Be(newFee);
+            existingType.Name.Should().Be(name);
+            existingType.MembershipCode.Should().Be(code);
+            existingType.MembershipFee.Should().Be(fee);
+            existingType.Description.Should().Be(desc);
+
             _repoMock.Verify(r => r.UpdateAsync(existingType), Times.Once);
         }
 

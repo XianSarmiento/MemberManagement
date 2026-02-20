@@ -22,12 +22,13 @@ namespace MemberManagement.Test.MembershipTypes
         [Fact]
         public async Task Handle_ShouldMapEntitiesToDtosCorrectly()
         {
-            // Arrange
-            // Using the public gatekeeper constructor from your entity
+            // Arrange: Using your real membership types
             var mockEntities = new List<MembershipType>
             {
-                new MembershipType("Student", "STU01", 500m, "Student Discount Tier"),
-                new MembershipType("Regular", "REG01", 1000m, "Standard Membership")
+                new MembershipType("Regular Member", "R01", 50m, "Member from Catanduanes, Albay, Sorsogon, Camarines Sur"),
+                new MembershipType("Associate Member", "A01", 50m, "Member from Pio Duran, Polangui, Labay, Pili, Calabanga, Ragay, Caramoan, Sipocot"),
+                new MembershipType("Balik-Sagip Member", "B01", 100m, "Special membership for returning members"),
+                new MembershipType("Extension Member", "E01", 200m, "Extended membership plan")
             };
 
             _repoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(mockEntities);
@@ -37,13 +38,14 @@ namespace MemberManagement.Test.MembershipTypes
 
             // Assert
             var resultList = result.ToList();
-            resultList.Should().HaveCount(2);
+            resultList.Should().HaveCount(4);
 
-            // Check specific mapping values
-            resultList.Should().ContainSingle(d => d.MembershipCode == "STU01" && d.Name == "Student");
-            resultList.Should().ContainSingle(d => d.MembershipCode == "REG01" && d.MembershipFee == 1000m);
+            resultList.Should().ContainSingle(d => d.MembershipCode == "R01" && d.Name == "Regular Member");
+            resultList.Should().ContainSingle(d => d.MembershipCode == "A01" && d.Name == "Associate Member");
+            resultList.Should().ContainSingle(d => d.MembershipCode == "B01" && d.Name == "Balik-Sagip Member");
+            resultList.Should().ContainSingle(d => d.MembershipCode == "E01" && d.Name == "Extension Member");
 
-            // Verify all items are active (since constructor sets IsActive = true)
+            // Verify all items are active
             resultList.Should().AllSatisfy(d => d.IsActive.Should().BeTrue());
 
             _repoMock.Verify(r => r.GetAllAsync(), Times.Once);

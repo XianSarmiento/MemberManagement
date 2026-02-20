@@ -28,19 +28,27 @@ namespace MemberManagement.Test.Members
         public async Task HandleAsync_WhenMemberExists_ShouldUpdateFieldsAndCallService()
         {
             // Arrange
-            // Create existing member (Year 1995 to pass age validation)
-            var existingMember = new Member("OldName", "OldLastName", new DateOnly(1995, 1, 1), 1, 1, "", "", "");
+            var existingMember = new Member(
+                "John Christian",
+                "Sarmiento",
+                new DateOnly(1997, 8, 7),
+                1,
+                1,
+                "",
+                "",
+                ""
+            );
 
             var dto = new MemberDTO
             {
                 MemberID = 1,
-                FirstName = "NewName",
-                LastName = "NewLastName",
-                BirthDate = new DateTime(1995, 1, 1),
+                FirstName = "John Christian",
+                LastName = "Sarmiento",
+                BirthDate = new DateTime(1997, 8, 7),
                 BranchId = 2,
-                Address = "New Address",
-                ContactNo = "123",
-                EmailAddress = "test@test.com"
+                Address = "Naga City",
+                ContactNo = "09123456789",
+                EmailAddress = "john.sarmiento@email.com"
             };
 
             _memberServiceMock.Setup(s => s.GetByIdAsync(dto.MemberID)).ReturnsAsync(existingMember);
@@ -50,7 +58,8 @@ namespace MemberManagement.Test.Members
             await _handler.HandleAsync(dto);
 
             // Assert
-            existingMember.FirstName.Should().Be("NewName");
+            existingMember.FirstName.Should().Be("John Christian");
+            existingMember.LastName.Should().Be("Sarmiento");
             existingMember.BranchId.Should().Be(2);
             _memberServiceMock.Verify(s => s.UpdateAsync(existingMember), Times.Once);
         }
@@ -72,8 +81,18 @@ namespace MemberManagement.Test.Members
         public async Task HandleAsync_WhenValidationFails_ShouldThrowValidationException()
         {
             // Arrange
-            var existingMember = new Member("John", "Doe", new DateOnly(1995, 1, 1), 1, 1, "", "", "");
-            var dto = new MemberDTO { MemberID = 1, FirstName = "John", LastName = "Doe" };
+            var existingMember = new Member(
+                "John Christian",
+                "Sarmiento",
+                new DateOnly(1997, 8, 7),
+                1,
+                1,
+                "",
+                "",
+                ""
+            );
+
+            var dto = new MemberDTO { MemberID = 1, FirstName = "John Christian", LastName = "Sarmiento" };
 
             var failures = new List<ValidationFailure> { new("FirstName", "Invalid") };
 

@@ -20,13 +20,10 @@ namespace MemberManagement.Test.MembershipTypes
             _repoMock = new Mock<IMembershipTypeRepository>();
             _validatorMock = new Mock<IValidator<MembershipType>>();
 
-            // FIX: This setup covers ALL overloads of ValidateAsync
-            // including if your handler uses a ValidationContext internally.
             _validatorMock
                 .Setup(v => v.ValidateAsync(It.IsAny<IValidationContext>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            // Keeping this one as well just in case
             _validatorMock
                 .Setup(v => v.ValidateAsync(It.IsAny<MembershipType>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
@@ -35,18 +32,72 @@ namespace MemberManagement.Test.MembershipTypes
         }
 
         [Fact]
-        public async Task Handle_ShouldCreateEntityAndCallRepository()
+        public async Task Handle_ShouldCreateRegularMember()
         {
-            // Arrange
-            string name = "Gold";
-            string code = "G01";
-            decimal fee = 1500.00m;
-            string desc = "Premium tier";
+            string name = "Regular Member";
+            string code = "R01";
+            decimal fee = 50m;
+            string desc = "Member from Catanduanes, Albay, Sorsogon, Camarines Sur";
 
-            // Act
             var resultId = await _handler.Handle(name, code, fee, desc);
 
-            // Assert
+            _repoMock.Verify(r => r.AddAsync(It.Is<MembershipType>(m =>
+                m.Name == name &&
+                m.MembershipCode == code &&
+                m.MembershipFee == fee &&
+                m.Description == desc &&
+                m.IsActive == true
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_ShouldCreateAssociateMember()
+        {
+            string name = "Associate Member";
+            string code = "A01";
+            decimal fee = 50m;
+            string desc = "Member from Pio Duran, Polangui, Labay, Pili, Calabanga, Ragay, Caramoan, Sipocot";
+
+            var resultId = await _handler.Handle(name, code, fee, desc);
+
+            _repoMock.Verify(r => r.AddAsync(It.Is<MembershipType>(m =>
+                m.Name == name &&
+                m.MembershipCode == code &&
+                m.MembershipFee == fee &&
+                m.Description == desc &&
+                m.IsActive == true
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_ShouldCreateBalikSagipMember()
+        {
+            string name = "Balik-Sagip Member";
+            string code = "B01";
+            decimal fee = 100m;
+            string desc = "Special membership for returning members";
+
+            var resultId = await _handler.Handle(name, code, fee, desc);
+
+            _repoMock.Verify(r => r.AddAsync(It.Is<MembershipType>(m =>
+                m.Name == name &&
+                m.MembershipCode == code &&
+                m.MembershipFee == fee &&
+                m.Description == desc &&
+                m.IsActive == true
+            )), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_ShouldCreateExtensionMember()
+        {
+            string name = "Extension Member";
+            string code = "E01";
+            decimal fee = 200m;
+            string desc = "Extended membership plan";
+
+            var resultId = await _handler.Handle(name, code, fee, desc);
+
             _repoMock.Verify(r => r.AddAsync(It.Is<MembershipType>(m =>
                 m.Name == name &&
                 m.MembershipCode == code &&
@@ -59,10 +110,8 @@ namespace MemberManagement.Test.MembershipTypes
         [Fact]
         public async Task Handle_ShouldReturnIdFromCreatedEntity()
         {
-            // Act
-            var result = await _handler.Handle("Silver", "S01", 500m, "Basic");
+            var result = await _handler.Handle("Sample Member", "S01", 500m, "Basic");
 
-            // Assert
             result.Should().Be(0);
         }
     }
