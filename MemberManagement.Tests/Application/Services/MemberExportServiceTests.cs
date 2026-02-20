@@ -23,22 +23,42 @@ namespace MemberManagement.Test.Services
                 new MemberDTO
                 {
                     MemberID = 1,
-                    FirstName = "John",
-                    LastName = "Doe",
-                    Branch = "Main",
-                    BirthDate = new DateTime(1990, 1, 1),
-                    EmailAddress = "john@example.com",
+                    FirstName = "John Christian",
+                    LastName = "Sarmiento",
+                    Branch = "Catanduanes Branch",
+                    BirthDate = new DateTime(1997, 8, 7),
+                    EmailAddress = "john.sarmiento@example.com",
                     MembershipType = "Regular"
                 },
                 new MemberDTO
                 {
                     MemberID = 2,
-                    FirstName = "Jane",
-                    LastName = "Smith",
-                    Branch = "West",
-                    BirthDate = new DateTime(1985, 5, 20),
-                    EmailAddress = "jane@example.com",
-                    MembershipType = "Premium"
+                    FirstName = "Maria",
+                    LastName = "Dela Cruz",
+                    Branch = "Albay Branch",
+                    BirthDate = new DateTime(1995, 4, 12),
+                    EmailAddress = "maria.delacruz@example.com",
+                    MembershipType = "Associate"
+                },
+                new MemberDTO
+                {
+                    MemberID = 3,
+                    FirstName = "Jose",
+                    LastName = "Ramos",
+                    Branch = "Sorsogon Branch",
+                    BirthDate = new DateTime(1990, 9, 23),
+                    EmailAddress = "jose.ramos@example.com",
+                    MembershipType = "Balik-Sagip"
+                },
+                new MemberDTO
+                {
+                    MemberID = 4,
+                    FirstName = "Ana",
+                    LastName = "Lopez",
+                    Branch = "Camarines Sur Branch",
+                    BirthDate = new DateTime(1998, 2, 5),
+                    EmailAddress = "ana.lopez@example.com",
+                    MembershipType = "Extension"
                 }
             };
         }

@@ -29,9 +29,9 @@ namespace MemberManagement.Test.Members
             // Arrange
             var dto = new MemberDTO
             {
-                FirstName = "John",
-                LastName = "Doe",
-                BirthDate = new DateTime(1995, 1, 1),
+                FirstName = "John Christian",
+                LastName = "Sarmiento",
+                BirthDate = new DateTime(1997, 8, 7),
                 BranchId = 1,
                 MembershipTypeId = 1
             };
@@ -44,7 +44,6 @@ namespace MemberManagement.Test.Members
             await _handler.HandleAsync(dto);
 
             // Assert
-            // Verify that the service's CreateAsync was called exactly once
             _memberServiceMock.Verify(s => s.CreateAsync(It.IsAny<Member>()), Times.Once);
         }
 
@@ -55,8 +54,8 @@ namespace MemberManagement.Test.Members
             var dto = new MemberDTO
             {
                 FirstName = "", // This makes it "Invalid" for the Validator
-                LastName = "Doe",
-                BirthDate = new DateTime(1995, 1, 1), // This satisfies the Constructor Gatekeeper
+                LastName = "Sarmiento",
+                BirthDate = new DateTime(1997, 8, 7), // This satisfies the Constructor Gatekeeper
                 BranchId = 1,
                 MembershipTypeId = 1
             };
@@ -67,7 +66,6 @@ namespace MemberManagement.Test.Members
                 .ReturnsAsync(new ValidationResult(failures));
 
             // Act & Assert
-            // Now it will reach the handler's ValidateAsync call and throw the expected exception
             await Xunit.Assert.ThrowsAsync<ValidationException>(() => _handler.HandleAsync(dto));
 
             // Verify the service was NEVER called because validation failed

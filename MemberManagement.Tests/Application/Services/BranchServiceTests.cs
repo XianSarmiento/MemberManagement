@@ -23,12 +23,13 @@ namespace MemberManagement.Test.Services
             // Arrange
             var context = GetDbContext();
 
-            // Fix: Use the constructor defined in your Branch entity
-            // signature: Branch(string name, string address, string branchCode)
+            // Use your own branches
             var branches = new List<Branch>
             {
-                new Branch("Main Branch", "123 Main St", "BR001"),
-                new Branch("West Coast", "456 West Ave", "BR002")
+                new Branch("Catanduanes Branch", "123 Catanduanes St", "R01"),
+                new Branch("Albay Branch", "456 Albay Ave", "A01"),
+                new Branch("Sorsogon Branch", "789 Sorsogon Blvd", "B01"),
+                new Branch("Camarines Sur Branch", "321 Camarines St", "E01")
             };
 
             context.Branches.AddRange(branches);
@@ -41,9 +42,11 @@ namespace MemberManagement.Test.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.Should().HaveCount(2);
-            result.Should().Contain(b => b.Name == "Main Branch" && b.BranchCode == "BR001");
-            result.Should().Contain(b => b.Name == "West Coast" && b.BranchCode == "BR002");
+            result.Should().HaveCount(4);
+            result.Should().Contain(b => b.Name == "Catanduanes Branch" && b.BranchCode == "R01");
+            result.Should().Contain(b => b.Name == "Albay Branch" && b.BranchCode == "A01");
+            result.Should().Contain(b => b.Name == "Sorsogon Branch" && b.BranchCode == "B01");
+            result.Should().Contain(b => b.Name == "Camarines Sur Branch" && b.BranchCode == "E01");
         }
 
         [Fact]

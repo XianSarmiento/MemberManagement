@@ -1,7 +1,7 @@
-﻿using MemberManagement.Domain.Entities; // FIX 1: Add this
+﻿using MemberManagement.Domain.Entities;
 using FluentAssertions;
 using Xunit;
-using System; // Required for Action
+using System;
 
 namespace MemberManagement.UnitTests.Domain.Entities
 {
@@ -19,11 +19,9 @@ namespace MemberManagement.UnitTests.Domain.Entities
         [Theory]
         [InlineData("", "CODE")]
         [InlineData("Name", "")]
-        [InlineData(null, "CODE")] // This triggers the warning
-        // FIX 2: Change 'string' to 'string?' to allow null inputs in the test
+        [InlineData(null, "CODE")]
         public void Constructor_InvalidData_ShouldThrowArgumentException(string? name, string? code)
         {
-            // Use '!' to tell the compiler "I know I'm passing null/empty, that's the point"
             Action act = () => new Branch(name!, "Address", code!);
             act.Should().Throw<ArgumentException>();
         }

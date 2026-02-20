@@ -11,7 +11,7 @@ public class BranchDtoTests
     public void BranchDto_ShouldFailValidation_WhenRequiredFieldsAreMissing()
     {
         // Arrange
-        var dto = new BranchDto { Name = null! }; // Intentionally missing name
+        var dto = new BranchDto { Name = null! };
         var context = new ValidationContext(dto);
         var results = new List<ValidationResult>();
 

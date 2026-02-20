@@ -20,12 +20,11 @@ namespace MemberManagement.Test.Members
 
         private List<Member> GetSampleMembers()
         {
-            // Fix: We provide values for the optional parameters (address, contact, email) 
-            // to ensure the properties aren't uninitialized/null.
+            // Updated to use your real information
             return new List<Member>
             {
-                new Member("Alice", "Zubiri", new DateOnly(1995, 1, 1), 1, 1, "", "", "") { MemberID = 10 },
-                new Member("Charlie", "Brown", new DateOnly(1995, 1, 1), 1, 1, "", "", "") { MemberID = 20 },
+                new Member("John Christian", "Sarmiento", new DateOnly(1997, 8, 7), 1, 1, "Naga City", "09123456789", "john.sarmiento@email.com") { MemberID = 10 },
+                new Member("Alice", "Zubiri", new DateOnly(1995, 1, 1), 1, 1, "", "", "") { MemberID = 20 },
                 new Member("Bob", "Adams", new DateOnly(1995, 1, 1), 2, 1, "", "", "") { MemberID = 5 }
             };
         }
@@ -33,45 +32,36 @@ namespace MemberManagement.Test.Members
         [Fact]
         public async Task HandleAsync_ShouldFilterByLastName()
         {
-            // Arrange
             var members = GetSampleMembers();
             _memberServiceMock.Setup(s => s.GetActiveMembersAsync()).ReturnsAsync(members);
 
-            // Act: Search for "Brown" - Passing "" instead of null for required string params
-            var result = await _handler.HandleAsync("Brown", "", "LastName", "asc");
+            var result = await _handler.HandleAsync("Sarmiento", "", "LastName", "asc");
 
-            // Assert
             result.Members.Should().HaveCount(1);
-            result.Members.First().LastName.Should().Be("Brown");
+            result.Members.First().LastName.Should().Be("Sarmiento");
         }
 
         [Fact]
         public async Task HandleAsync_ShouldSortByFirstName_Descending()
         {
-            // Arrange
             var members = GetSampleMembers();
             _memberServiceMock.Setup(s => s.GetActiveMembersAsync()).ReturnsAsync(members);
 
-            // Act: Using empty strings instead of null literals
             var result = await _handler.HandleAsync("", "", "FirstName", "desc");
 
-            // Assert
             result.Members.Should().HaveCount(3);
-            result.Members.First().FirstName.Should().Be("Charlie");
+            result.Members.First().FirstName.Should().Be("John Christian");
             result.Members.Last().FirstName.Should().Be("Alice");
         }
 
         [Fact]
         public async Task HandleAsync_ShouldReturnUniqueSortedBranches()
         {
-            // Arrange
             var members = GetSampleMembers();
             _memberServiceMock.Setup(s => s.GetActiveMembersAsync()).ReturnsAsync(members);
 
-            // Act
             var result = await _handler.HandleAsync("", "", "MemberID", "asc");
 
-            // Assert
             result.Branches.Should().NotBeNull();
             result.Branches.Should().BeInAscendingOrder();
         }
@@ -79,14 +69,11 @@ namespace MemberManagement.Test.Members
         [Fact]
         public async Task HandleAsync_WhenSwitchingToInactive_ShouldCallGetInactiveMembers()
         {
-            // Arrange
             _memberServiceMock.Setup(s => s.GetInactiveMembersAsync())
                 .ReturnsAsync(new List<Member>());
 
-            // Act
             await _handler.HandleAsync("", "", "MemberID", "asc", false);
 
-            // Assert
             _memberServiceMock.Verify(s => s.GetInactiveMembersAsync(), Times.Once);
         }
     }

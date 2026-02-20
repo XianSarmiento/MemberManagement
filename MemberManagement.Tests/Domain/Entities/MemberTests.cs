@@ -2,36 +2,58 @@
 using MemberManagement.SharedKernel.Constant;
 using FluentAssertions;
 using Xunit;
-using System; // FIX: Added for Action delegate
+using System;
 
 namespace MemberManagement.UnitTests.Domain.Entities
 {
     public class MemberTests
     {
+        private readonly DateOnly validBirthDate = new DateOnly(1997, 8, 7);
+
+        [Fact]
+        public void Constructor_Should_Set_Branch_And_MembershipType()
+        {
+            var member = new Member("John Christian", "Sarmiento", validBirthDate, 10, 20);
+
+            member.BranchId.Should().Be(10);
+            member.MembershipTypeId.Should().Be(20);
+        }
+
+        [Fact]
+        public void ChangeBranch_Should_Update_BranchId()
+        {
+            var member = new Member("John Christian", "Sarmiento", validBirthDate, 1, 1);
+
+            member.ChangeBranch(5);
+
+            member.BranchId.Should().Be(5);
+        }
+
         [Fact]
         public void Constructor_WithValidData_ShouldInitializeCorrectly()
         {
-            // Arrange
-            var birthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-25);
+            var member = new Member(
+                "John Christian",
+                "Sarmiento",
+                validBirthDate,
+                1,
+                1,
+                "Manila",
+                "09123456789",
+                "john.sarmiento@test.com"
+            );
 
-            // Act
-            var member = new Member("John", "Doe", birthDate, 1, 1, "Manila", "09123456789", "john@test.com");
-
-            // Assert
-            member.FirstName.Should().Be("John");
+            member.FirstName.Should().Be("John Christian");
+            member.LastName.Should().Be("Sarmiento");
             member.IsActive.Should().BeTrue();
-            // BeCloseTo is great for handling the slight delay in execution time
             member.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
         }
 
         [Fact]
         public void Constructor_WhenBirthDateNull_ShouldThrowException()
         {
-            // Act
-            // Use the ! (null-forgiving operator) to tell the compiler you are intentionally passing null
-            Action act = () => new Member("John", "Doe", null!, 1, 1);
+            Action act = () => new Member("John Christian", "Sarmiento", null!, 1, 1);
 
-            // Assert
             act.Should().Throw<InvalidOperationException>()
                .WithMessage(OperationMessage.Error.BirthDateRequired);
         }
@@ -41,13 +63,10 @@ namespace MemberManagement.UnitTests.Domain.Entities
         [InlineData(-5)]
         public void Constructor_WhenUnderage_ShouldThrowException(int yearsToAdd)
         {
-            // Arrange
             var birthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(yearsToAdd);
 
-            // Act
-            Action act = () => new Member("John", "Doe", birthDate, 1, 1);
+            Action act = () => new Member("John Christian", "Sarmiento", birthDate, 1, 1);
 
-            // Assert
             act.Should().Throw<InvalidOperationException>()
                .WithMessage(OperationMessage.Error.Underage);
         }
@@ -55,32 +74,44 @@ namespace MemberManagement.UnitTests.Domain.Entities
         [Fact]
         public void Constructor_WhenExceedsAgeLimit_ShouldThrowException()
         {
-            // Arrange: 70 years ago
             var birthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-70);
 
-            // Act
-            Action act = () => new Member("Old", "User", birthDate, 1, 1);
+            Action act = () => new Member("John Christian", "Sarmiento", birthDate, 1, 1);
 
-            // Assert
             act.Should().Throw<InvalidOperationException>()
                .WithMessage(OperationMessage.Error.ExceedsAgeLimit);
         }
 
         [Fact]
+        public void Constructor_WhenExactly18YearsOld_ShouldSucceed()
+        {
+            var birthDate = DateOnly.FromDateTime(DateTime.Today).AddYears(-18);
+
+            var member = new Member("John Christian", "Sarmiento", birthDate, 1, 1);
+
+            member.Should().NotBeNull();
+        }
+
+        [Fact]
         public void Initialize_ShouldResetState()
         {
-            // Arrange 
-            // If IsActive has a public setter, this works. 
-            // If it's private, you must use the parameterless constructor 
-            // and trust the default state or use Reflection.
             var member = new Member();
 
-            // Act
             member.Initialize();
 
-            // Assert
             member.IsActive.Should().BeTrue();
             member.DateCreated.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        }
+
+        [Fact]
+        public void Constructor_Should_Preserve_All_Provided_Data()
+        {
+            var member = new Member("John Christian", "Sarmiento", validBirthDate, 3, 7);
+
+            member.FirstName.Should().Be("John Christian");
+            member.LastName.Should().Be("Sarmiento");
+            member.BranchId.Should().Be(3);
+            member.MembershipTypeId.Should().Be(7);
         }
     }
 }

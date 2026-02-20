@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using FluentValidation;
-using FluentValidation.Results; // 1. Necessary for ValidationResult
+using FluentValidation.Results; 
 using MemberManagement.Application.Branches;
 using MemberManagement.Domain.Entities;
 using MemberManagement.Domain.Interfaces;
@@ -20,7 +20,6 @@ public class UpdateBranchHandlerTests
         _repositoryMock = new Mock<IBranchRepository>();
         _validatorMock = new Mock<IValidator<Branch>>();
 
-        // 2. Setup the validator to return a "Success" result (empty errors)
         _validatorMock
             .Setup(v => v.ValidateAsync(It.IsAny<Branch>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
